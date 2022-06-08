@@ -57,7 +57,6 @@ std::ostream& operator<<(std::ostream& os, const State& state)
 
 FSM::FSM():
     mStates{},
-    mCurrentState{nullptr},
     mStartState{nullptr}
 {
     std::cout << "hello from HSM!" << std::endl;
@@ -69,9 +68,8 @@ State& FSM::addState(bool isStart, bool isFinal )
 
     if(isStart)
     {
-        assert(mStartState == nullptr);
+        assert(mStartState == nullptr); //TODO: exception instead?
         mStartState = &mStates.back();
-        mCurrentState = &mStates.back();
         
     }
 
@@ -84,28 +82,20 @@ State& FSM::startState()
     return *mStartState;
 }
 
-State& FSM::currentState()
-{
-    assert(mCurrentState != nullptr);
-    return *mCurrentState;
-}
-
 bool FSM::run(std::string string)
 {
-    State* nextState;
+    State* next;
+    State* current;
 
-    mCurrentState = mStartState;
-    
-    assert(mCurrentState == mStartState);
+    assert(mStartState != nullptr); //TODO: exception instead?
 
+    current = mStartState;
     for(char& c : string) 
     {
-        std::cout << c << std::endl;
-        nextState = mCurrentState->run(c);
-    
-        if(nextState!=nullptr)
+        next = current->run(c);
+        if(next!=nullptr)
         {
-            mCurrentState = nextState;
+            current = next;
         }
         else
         {
@@ -113,7 +103,7 @@ bool FSM::run(std::string string)
         }
     }
 
-    if (mCurrentState->isFinal())
+    if (current->isFinal())
     {
         return true;
     }
@@ -126,15 +116,16 @@ bool FSM::run(std::string string)
 
 State* State::run(char c)
 {
-    std::cout << "@@@@@" << std::endl;
-    std::cout << mTransitions.size() << std::endl;
     for (auto transition : mTransitions)
     {
-        std::cout << "----" << std::endl;
-        //if(c == transition.input())
-        //{
-        //    return &transition.targetState();
-        //}
+        if(c == transition.input())
+        {
+            State* next = &transition.targetState();
+            std::cout << "State" << this->mId << " -> " 
+                      << "State" << next->mId << " due to "
+                      << "<" << c << ">" << std::endl;
+            return next;
+        }
     }
 
     return nullptr;

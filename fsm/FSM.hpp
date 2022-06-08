@@ -45,10 +45,10 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const State& state);
 
-    int mId;
+    
 private:
     std::vector<Transition> mTransitions; //maybe switch to map?
-
+    int mId;
     bool mIsFinal;
     static int count;
 };
@@ -65,13 +65,10 @@ public:
 
     State& startState(); //maybe remove? only testing
 
-    State& currentState(); //maybe remove? only testing
-
     bool run(std::string string);
 
 private:
     std::list<State> mStates;
-    State* mCurrentState;
     State* mStartState;
 
 
