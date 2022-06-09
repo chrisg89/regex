@@ -3,6 +3,8 @@
 #include "FSM.hpp"
 
 
+//TODO backup on github
+
 SCENARIO( "Empty", "[empty]" ) 
 {
 
@@ -24,7 +26,7 @@ SCENARIO( "Empty", "[empty]" )
                 "(a)(b)*c|d*"
             );
 
-            WHEN( "given a the valid regex: " << goodRegex ) 
+            WHEN( "given the valid regex: " << goodRegex ) 
             {
                 THEN( "the validator passes" ) 
                 {
@@ -51,7 +53,7 @@ SCENARIO( "Empty", "[empty]" )
                 "ab||a"    // || is invalid
             );
 
-            WHEN( "given a the valid regex: " << badRegex ) 
+            WHEN( "given the invalid regex: " << badRegex ) 
             {
                 THEN( "the validator fails" ) 
                 {
