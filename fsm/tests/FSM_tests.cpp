@@ -3,6 +3,176 @@
 #include "FSM.hpp"
 
 
+SCENARIO( "Empty", "[empty]" ) 
+{
+
+
+    SECTION("TODO preprocess")
+    {
+        //TODO unit test this
+        std::cout << PreprocessRegex("abc*a|b") << std::endl;
+    }
+
+    SECTION("Validate Regex")
+    {
+
+        SECTION("Valid (Good) Regex")
+        {
+            auto goodRegex = GENERATE(
+                //TODO add more here. look at matrix!
+                "abc*a|b",
+                "(a)(b)*c|d*"
+            );
+
+            WHEN( "given a the valid regex: " << goodRegex ) 
+            {
+                THEN( "the validator passes" ) 
+                {
+                    REQUIRE(isValidRegex(goodRegex));
+                }
+            }
+        }
+
+        SECTION("Invalid (Bad) Regex")
+        {
+            auto badRegex = GENERATE(
+
+                "abc|",   // cant end in |
+                "abc(",   // cant end in (
+                "abc(a",  // only one left bracket
+                "abc)a",  // only one right bracket
+                "a)b(",   // right bracket before left bracket
+                "a(b(c)", // mismatching number of brackets
+                "a()c",    // () is invalid
+                "ab(*c)",  // (* is invalid
+                "ab(|c)",  // (| is invalid
+                "ab(a|)c", // |) is invalid
+                "ab|*c",   // |* is invalid
+                "ab||a"    // || is invalid
+            );
+
+            WHEN( "given a the valid regex: " << badRegex ) 
+            {
+                THEN( "the validator fails" ) 
+                {
+                    REQUIRE(!isValidRegex(badRegex));
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+
+    SECTION("TODO")
+    {
+        std::string infix1;
+        std::string postfix1;
+        std::string infix2;
+        std::string postfix2;
+
+        infix1 = "a&b&c*&a|b";
+        std::cout << "infix1: " << infix1 << std::endl;
+
+        postfix1 = RegexInfixToPostfix(infix1);
+        std::cout << "postfix1: " <<postfix1 << std::endl;
+
+        infix2 = RegexPostfixToInfix(postfix1);
+        std::cout << "infix2: " << infix2 << std::endl;
+
+        postfix2 = RegexInfixToPostfix(infix2);
+        std::cout << "postfix2: " <<postfix2 << std::endl;
+
+        // we cycle through infix/postfix twice because of parenthesis matching
+        REQUIRE((postfix1 == postfix2));
+    }
+
+
+    SECTION("TODO")
+    {
+        std::string infix1;
+        std::string postfix1;
+        std::string infix2;
+        std::string postfix2;
+
+        infix1 = "a&(a|b|c)*&a";
+        std::cout << "infix1: " << infix1 << std::endl;
+
+        postfix1 = RegexInfixToPostfix(infix1);
+        std::cout << "postfix1: " <<postfix1 << std::endl;
+
+        infix2 = RegexPostfixToInfix(postfix1);
+        std::cout << "infix2: " << infix2 << std::endl;
+
+        postfix2 = RegexInfixToPostfix(infix2);
+        std::cout << "postfix2: " <<postfix2 << std::endl;
+
+        // we cycle through infix/postfix twice because of parenthesis matching
+        REQUIRE((postfix1 == postfix2));
+    }
+
+    SECTION("TODO")
+    {
+        std::string infix1;
+        std::string postfix1;
+        std::string infix2;
+        std::string postfix2;
+
+        infix1 = "a&b&c|d&e|f|g|h&i";
+        std::cout << "infix1: " << infix1 << std::endl;
+
+        postfix1 = RegexInfixToPostfix(infix1);
+        std::cout << "postfix1: " <<postfix1 << std::endl;
+
+        infix2 = RegexPostfixToInfix(postfix1);
+        std::cout << "infix2: " << infix2 << std::endl;
+
+        postfix2 = RegexInfixToPostfix(infix2);
+        std::cout << "postfix2: " <<postfix2 << std::endl;
+
+        // we cycle through infix/postfix twice because of parenthesis matching
+        REQUIRE((postfix1 == postfix2));
+    }
+
+    SECTION("TODO")
+    {
+        std::string infix1;
+        std::string postfix1;
+        std::string infix2;
+        std::string postfix2;
+
+        infix1 = "a**";
+        std::cout << "infix1: " << infix1 << std::endl;
+
+        postfix1 = RegexInfixToPostfix(infix1);
+        std::cout << "postfix1: " <<postfix1 << std::endl;
+
+        infix2 = RegexPostfixToInfix(postfix1);
+        std::cout << "infix2: " << infix2 << std::endl;
+
+        postfix2 = RegexInfixToPostfix(infix2);
+        std::cout << "postfix2: " <<postfix2 << std::endl;
+
+        // we cycle through infix/postfix twice because of parenthesis matching
+        REQUIRE((postfix1 == postfix2));
+    }
+}
+
 SCENARIO( "API", "[api]" ) 
 {
 

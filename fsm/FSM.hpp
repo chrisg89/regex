@@ -73,3 +73,9 @@ private:
 
 
 };
+
+bool isValidRegex(std::string regex);
+std::string PreprocessRegex(std::string regex);
+std::string RegexInfixToPostfix(std::string regex);
+std::string RegexPostfixToInfix(std::string postfix);
+void parseRegex(std::string regex);
