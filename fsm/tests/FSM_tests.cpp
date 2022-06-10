@@ -7,6 +7,12 @@
 
 SCENARIO( "Empty", "[empty]" ) 
 {
+    FSM fsm;
+    regexToNFA(fsm, "abc");
+}
+
+SCENARIO( "Regex", "[regex]" ) 
+{
     SECTION("Validate Regex")
     {
         SECTION("Valid (Good) Regex")
@@ -163,8 +169,6 @@ SCENARIO( "Empty", "[empty]" )
             }
         }
     }
-
-
 }
 
 SCENARIO( "API", "[api]" ) 

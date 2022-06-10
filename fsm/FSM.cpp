@@ -13,7 +13,7 @@ State::State(bool isFinal):
     mId{++count},
     mIsFinal{isFinal}
 {
-    std::cout << "hello from state (id=" << mId << ")" << std::endl;
+    //std::cout << "hello from state (id=" << mId << ")" << std::endl;
 }
 
 int State::count=0;
@@ -200,39 +200,6 @@ BlackBox buildKleeneStar(FSM& fsm, BlackBox& BB)
     BB.exit.addTransitionTo(BB.entry, epsilon);
     BB.exit.addTransitionTo(exit, epsilon);
     return BlackBox(entry, exit);
-}
-
-void parseRegex(std::string regex)
-{
-    
-
-    for(char& c : regex) 
-    {
-
-    }
-
-    FSM fsm;
-
-    //a(a|b|c)*a
-    auto n1  = buildSymbol(fsm, 'a');
-    auto n2  = buildSymbol(fsm, 'b');
-    auto n3  = buildUnion(fsm, n1, n2);
-    auto n4  = buildSymbol(fsm, 'c');
-    auto n5  = buildUnion(fsm, n3, n4);
-    auto n6  = buildKleeneStar(fsm, n5);
-    auto n7  = buildSymbol(fsm, 'a');
-    auto n8  = buildConcatenation(fsm, n7, n6);
-    auto n9  = buildSymbol(fsm, 'a');
-    auto n10 = buildConcatenation(fsm, n8, n9);
-    
-    auto& start = fsm.addState(true, false);
-    auto& final = fsm.addState(false, true);
-
-    start.addTransitionTo(n10.entry, epsilon);
-    n10.exit.addTransitionTo(final, epsilon);
-
-    std::cout << n8.exit << std::endl;
-
 }
 
 #include <stack> 
@@ -597,3 +564,95 @@ bool isValidRegex(std::string regex)
 
     return valid;
 }
+
+
+
+// maybe change to return FSM by value? Would this break the 
+// internal references? I think it would be a move...
+void regexToNFA(FSM& fsm, std::string regex)
+{
+    if (!isValidRegex(regex))
+        assert(false);
+    
+    regex = PreprocessRegex(regex);
+    regex = RegexInfixToPostfix(regex);
+
+    std::stack<BlackBox> stack;
+
+    for(char& c : regex) 
+    {
+        switch (c)  
+        {
+            case '|':
+            {
+                auto op1 = stack.top();
+                stack.pop();
+                auto op2 = stack.top();
+                stack.pop();
+                stack.push(buildUnion(fsm, op1, op2));
+                break;
+            }
+            case '&':
+            {   
+                auto op1 = stack.top();
+                stack.pop();
+                auto op2 = stack.top();
+                stack.pop();
+                stack.push(buildConcatenation(fsm, op1, op2));
+                break;
+            }
+            case '*':
+            {
+                auto op1 = stack.top();
+                stack.pop();
+                stack.push(buildKleeneStar(fsm, op1));
+                break;
+            }
+
+            default:
+            {
+                stack.push(buildSymbol(fsm, c));
+            }
+        }
+    }
+    assert(stack.size()==1);
+
+    // stack now contains the black box containing within it
+    // the FSA equivalent of the regex. Only need to connect
+    // the entry and exit states of the black box to the start
+    // and end states.
+    auto bb = stack.top();
+    auto& start = fsm.addState(true, false);
+    auto& end = fsm.addState(false, true);
+    start.addTransitionTo(bb.entry, epsilon);
+    bb.exit.addTransitionTo(end, epsilon);
+}
+
+
+
+
+
+/*
+    //a(a|b|c)*a
+    auto n1  = buildSymbol(fsm, 'a');
+    auto n2  = buildSymbol(fsm, 'b');
+    auto n3  = buildUnion(fsm, n1, n2);
+    auto n4  = buildSymbol(fsm, 'c');
+    auto n5  = buildUnion(fsm, n3, n4);
+    auto n6  = buildKleeneStar(fsm, n5);
+    auto n7  = buildSymbol(fsm, 'a');
+    auto n8  = buildConcatenation(fsm, n7, n6);
+    auto n9  = buildSymbol(fsm, 'a');
+    auto n10 = buildConcatenation(fsm, n8, n9);
+    
+    auto& start = fsm.addState(true, false);
+    auto& final = fsm.addState(false, true);
+
+    start.addTransitionTo(n10.entry, epsilon);
+    n10.exit.addTransitionTo(final, epsilon);
+
+    std::cout << n8.exit << std::endl;
+
+    return fsm;
+
+*/
