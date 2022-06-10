@@ -76,6 +76,40 @@ State& FSM::addState(bool isStart, bool isFinal )
     return mStates.back();
 }
 
+
+std::string FSM::toPlantUML()
+{
+    std::string plantUML = "";
+    plantUML += "@startuml\n";
+    plantUML += "hide empty description\n";
+
+    plantUML += " [*] --> ";
+    plantUML += std::to_string(mStartState->mId);
+    plantUML += "\n";
+    
+    for (auto state = mStates.begin(); state != mStates.end(); ++state)
+    {
+        if(state->isFinal())
+        {
+            plantUML += std::to_string(state->mId);
+            plantUML += " : Final\n";
+        }
+
+        for (auto transition = state->mTransitions.begin(); transition != state->mTransitions.end(); ++transition)
+        {
+            plantUML += std::to_string(state->mId);
+            plantUML += " -> ";
+            plantUML += std::to_string(transition->targetState().mId);
+            plantUML += " : ";
+            plantUML += (transition->input() == epsilon ? std::string("null") : std::string(1, transition->input())); //todo clean up
+            plantUML += "\n";
+        }
+    }
+    plantUML += "@enduml\n";
+
+    return plantUML;
+}
+
 State& FSM::startState()
 {
     assert(mStartState != nullptr);
@@ -151,7 +185,7 @@ char Transition::input()
 
 
 
-#define epsilon char(0)
+
 
 struct BlackBox
 {
@@ -178,8 +212,8 @@ BlackBox buildUnion(FSM& fsm, BlackBox& BB1, BlackBox& BB2)
     auto& exit = fsm.addState(false, false);
     entry.addTransitionTo(BB1.entry, epsilon);
     entry.addTransitionTo(BB2.entry, epsilon);
-    exit.addTransitionTo(BB1.exit, epsilon);
-    exit.addTransitionTo(BB2.exit, epsilon);
+    BB1.exit.addTransitionTo(exit, epsilon);
+    BB2.exit.addTransitionTo(exit, epsilon);
     return BlackBox(entry, exit);
 }
 
@@ -212,7 +246,11 @@ int priority(char c)
     {
         prio=3;
     }
-    else if (c == '&' || c == '|')
+    else if (c == '&' )
+    {
+        prio=2;
+    }
+    else if (c == '|')
     {
         prio=1;
     }
@@ -589,7 +627,7 @@ void regexToNFA(FSM& fsm, std::string regex)
                 stack.pop();
                 auto op2 = stack.top();
                 stack.pop();
-                stack.push(buildUnion(fsm, op1, op2));
+                stack.push(buildUnion(fsm, op2, op1));
                 break;
             }
             case '&':
@@ -598,7 +636,7 @@ void regexToNFA(FSM& fsm, std::string regex)
                 stack.pop();
                 auto op2 = stack.top();
                 stack.pop();
-                stack.push(buildConcatenation(fsm, op1, op2));
+                stack.push(buildConcatenation(fsm, op2, op1));
                 break;
             }
             case '*':

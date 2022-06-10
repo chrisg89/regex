@@ -8,7 +8,15 @@
 SCENARIO( "Empty", "[empty]" ) 
 {
     FSM fsm;
-    regexToNFA(fsm, "abc");
+    std::string regex("(a|bd)");
+    regexToNFA(fsm, regex);
+
+    
+    regex = PreprocessRegex(regex);
+    regex = RegexInfixToPostfix(regex);
+
+
+    std::cout << fsm.toPlantUML() << std::endl << regex << std::endl;
 }
 
 SCENARIO( "Regex", "[regex]" ) 
@@ -120,6 +128,9 @@ SCENARIO( "Regex", "[regex]" )
         // to postfix, we can compare the first
         // and second postfix expressions for equality. 
         // Such a test should provide good coverage.
+
+        //TODO this testing was not super useful and a bug slipped through
+        // regarding operator prio. Need to test differently
 
         std::string infix1;
         std::string postfix1;

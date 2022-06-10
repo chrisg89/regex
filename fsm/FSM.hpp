@@ -5,6 +5,8 @@
 #include "string"
 #include "list"
 
+#define epsilon char(0)
+
 //forward declarations
 class State;
 class Transition;
@@ -45,10 +47,11 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const State& state);
 
-    
+    int mId; // maybe create accessor? useful for plantUml
+    std::vector<Transition> mTransitions; //maybe switch to map? // maybe make protected? useful for plantUML
 private:
-    std::vector<Transition> mTransitions; //maybe switch to map?
-    int mId;
+    
+    
     bool mIsFinal;
     static int count;
 };
@@ -66,6 +69,8 @@ public:
     State& startState(); //maybe remove? only testing
 
     bool run(std::string string);
+
+    std::string toPlantUML();
 
 private:
     std::list<State> mStates;
