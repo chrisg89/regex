@@ -7,172 +7,164 @@
 
 SCENARIO( "Empty", "[empty]" ) 
 {
-
-
-    SECTION("TODO preprocess")
-    {
-        //TODO unit test this
-        std::cout << PreprocessRegex("abc*a|b") << std::endl;
-    }
-
     SECTION("Validate Regex")
     {
-
         SECTION("Valid (Good) Regex")
         {
-            auto goodRegex = GENERATE(
-                //TODO add more here. look at matrix!
-                "abc*a|b",
-                "(a)(b)*c|d*"
+            auto goodRegex = GENERATE
+            (
+                "(a)",
+                "((a))",
+                "(a)(b)",
+                "(a)*",
+                "(a)|(b)",
+                "(a)b",
+                "(a*)",
+                "a**",
+                "a|b",
+                "ab"
             );
 
-            WHEN( "given the valid regex: " << goodRegex ) 
+            GIVEN( "a valid regex: " << goodRegex ) 
             {
-                THEN( "the validator passes" ) 
+                WHEN( "the regex is validated")
                 {
-                    REQUIRE(isValidRegex(goodRegex));
+                    THEN( "the validator exits with success" ) 
+                    {
+                        REQUIRE(isValidRegex(goodRegex));
+                    }
                 }
             }
         }
 
         SECTION("Invalid (Bad) Regex")
         {
-            auto badRegex = GENERATE(
-
-                "abc|",   // cant end in |
-                "abc(",   // cant end in (
-                "abc(a",  // only one left bracket
-                "abc)a",  // only one right bracket
+            auto badRegex = GENERATE
+            (
+                "ab|",    // cant end in |
+                "ab(",    // cant end in (
+                "a(b",    // only one left bracket
+                "a)b",    // only one right bracket
                 "a)b(",   // right bracket before left bracket
-                "a(b(c)", // mismatching number of brackets
-                "a()c",    // () is invalid
-                "ab(*c)",  // (* is invalid
-                "ab(|c)",  // (| is invalid
-                "ab(a|)c", // |) is invalid
-                "ab|*c",   // |* is invalid
-                "ab||a"    // || is invalid
+                "(a(b)",  // mismatching number of brackets
+                "a()b",   // () is invalid
+                "a(*b)",  // (* is invalid
+                "a(|b)",  // (| is invalid
+                "a(b|)",  // |) is invalid
+                "a|*b",   // |* is invalid
+                "a||b"    // || is invalid
             );
 
-            WHEN( "given the invalid regex: " << badRegex ) 
+            GIVEN( "an invalid regex: " << badRegex ) 
             {
-                THEN( "the validator fails" ) 
+                WHEN( "the regex is validated")
                 {
-                    REQUIRE(!isValidRegex(badRegex));
+                    THEN( "the validator exits with error" ) 
+                    {
+                        REQUIRE(!isValidRegex(badRegex));
+                    }
                 }
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
-
-    SECTION("TODO")
+    SECTION("Pre-processing inserts concatenation operator ")
     {
+        const auto [ input, output ] = GENERATE(table<std::string, std::string>
+        ({
+            { "ab", "a&b"},
+            { "a*", "a*"},
+            { "a|b", "a|b"},
+            { "a(b)", "a&(b)"},
+            { "(a)", "(a)"},
+            { "a*b", "a*&b"},
+            { "a**", "a**"},
+            { "a*|b", "a*|b"},
+            { "a*(b)", "a*&(b)"},
+            { "(a*)", "(a*)"},
+            { "a|(b)", "a|(b)"},
+            { "((a))", "((a))"},
+            { "(a)b", "(a)&b"},
+            { "(a)*", "(a)*"},
+            { "(a)|b", "(a)|b"},
+            { "(a)(b)", "(a)&(b)"}
+        }));
+
+        GIVEN( "the regex: " << input ) 
+        {
+            WHEN( "the regex is pre-processed")
+            {
+                THEN( "the concatenation operator is inserted correctly" ) 
+                {
+                    REQUIRE(PreprocessRegex(input) == output);
+                }
+            }
+        }
+    }
+
+    SECTION("Converting regex to postfix notation")
+    {
+        // In this test, we want to verify that a
+        // round trip from infix->postfix->infix
+        // does not alter the original expression.
+        // Unfortunatly, the conversion from 
+        // postfix -> infix generates brackets
+        // that make the comparision difficult.
+        // But, with one additional conversion back
+        // to postfix, we can compare the first
+        // and second postfix expressions for equality. 
+        // Such a test should provide good coverage.
+
         std::string infix1;
         std::string postfix1;
         std::string infix2;
         std::string postfix2;
+        std::string preprocessed;
 
-        infix1 = "a&b&c*&a|b";
-        std::cout << "infix1: " << infix1 << std::endl;
+        auto regex = GENERATE
+        (
+            "abc*a|b",
+            "((a))*|b",
+            "(ab)(a|b)*(a|b)|a",
+            "(ab*)a**|b",
+            "(ab)|a",
+            "a(a|b)a*aa"
+        );
 
-        postfix1 = RegexInfixToPostfix(infix1);
-        std::cout << "postfix1: " <<postfix1 << std::endl;
+        REQUIRE(isValidRegex(regex));
 
-        infix2 = RegexPostfixToInfix(postfix1);
-        std::cout << "infix2: " << infix2 << std::endl;
+        infix1 = PreprocessRegex(regex);
+        //std::cout << "infix1: " << infix1 << std::endl;
 
-        postfix2 = RegexInfixToPostfix(infix2);
-        std::cout << "postfix2: " <<postfix2 << std::endl;
+        GIVEN( "the regex: " << infix1 ) 
+        {
+            WHEN("the infix expression is converted to postfix ")
+            {
+                postfix1 = RegexInfixToPostfix(infix1);
+                //std::cout << "postfix1: " <<postfix1 << std::endl;
 
-        // we cycle through infix/postfix twice because of parenthesis matching
-        REQUIRE((postfix1 == postfix2));
+                AND_THEN("the postfix expression is converted to infix ")
+                {
+                    infix2 = RegexPostfixToInfix(postfix1);
+                    //std::cout << "infix2: " << infix2 << std::endl;
+
+                    AND_THEN("the infix expression is converted to postfix ")
+                    {
+
+                        postfix2 = RegexInfixToPostfix(infix2);
+                        //std::cout << "postfix2: " <<postfix2 << std::endl;
+
+                        THEN( "the first and second postfix expression are identical" ) 
+                        {
+                            REQUIRE((postfix1 == postfix2));
+                        }
+                    }
+                }
+            }
+        }
     }
 
 
-    SECTION("TODO")
-    {
-        std::string infix1;
-        std::string postfix1;
-        std::string infix2;
-        std::string postfix2;
-
-        infix1 = "a&(a|b|c)*&a";
-        std::cout << "infix1: " << infix1 << std::endl;
-
-        postfix1 = RegexInfixToPostfix(infix1);
-        std::cout << "postfix1: " <<postfix1 << std::endl;
-
-        infix2 = RegexPostfixToInfix(postfix1);
-        std::cout << "infix2: " << infix2 << std::endl;
-
-        postfix2 = RegexInfixToPostfix(infix2);
-        std::cout << "postfix2: " <<postfix2 << std::endl;
-
-        // we cycle through infix/postfix twice because of parenthesis matching
-        REQUIRE((postfix1 == postfix2));
-    }
-
-    SECTION("TODO")
-    {
-        std::string infix1;
-        std::string postfix1;
-        std::string infix2;
-        std::string postfix2;
-
-        infix1 = "a&b&c|d&e|f|g|h&i";
-        std::cout << "infix1: " << infix1 << std::endl;
-
-        postfix1 = RegexInfixToPostfix(infix1);
-        std::cout << "postfix1: " <<postfix1 << std::endl;
-
-        infix2 = RegexPostfixToInfix(postfix1);
-        std::cout << "infix2: " << infix2 << std::endl;
-
-        postfix2 = RegexInfixToPostfix(infix2);
-        std::cout << "postfix2: " <<postfix2 << std::endl;
-
-        // we cycle through infix/postfix twice because of parenthesis matching
-        REQUIRE((postfix1 == postfix2));
-    }
-
-    SECTION("TODO")
-    {
-        std::string infix1;
-        std::string postfix1;
-        std::string infix2;
-        std::string postfix2;
-
-        infix1 = "a**";
-        std::cout << "infix1: " << infix1 << std::endl;
-
-        postfix1 = RegexInfixToPostfix(infix1);
-        std::cout << "postfix1: " <<postfix1 << std::endl;
-
-        infix2 = RegexPostfixToInfix(postfix1);
-        std::cout << "infix2: " << infix2 << std::endl;
-
-        postfix2 = RegexInfixToPostfix(infix2);
-        std::cout << "postfix2: " <<postfix2 << std::endl;
-
-        // we cycle through infix/postfix twice because of parenthesis matching
-        REQUIRE((postfix1 == postfix2));
-    }
 }
 
 SCENARIO( "API", "[api]" ) 
@@ -233,7 +225,8 @@ SCENARIO( "FSM used in Deterministic Finite Automata", "[DFA]" )
 
             SECTION("Valid input (conforming to the language)")
             {
-                auto string = GENERATE(
+                auto string = GENERATE
+                (
                     "0",     //0
                     "11",    //3
                     "110",   //6
@@ -245,9 +238,9 @@ SCENARIO( "FSM used in Deterministic Finite Automata", "[DFA]" )
                     "11000", //24
                     "11011", //27
                     "11110"  //30
-                    );
+                );
 
-                WHEN( "given valid input of: " << string ) 
+                WHEN( "the DFA is given input: " << string ) 
                 {
                     THEN( "the input is accepted by the DFA" ) 
                     {
@@ -258,7 +251,8 @@ SCENARIO( "FSM used in Deterministic Finite Automata", "[DFA]" )
 
             SECTION("Invalid input (non-conforming to the language)")
             {
-                auto string = GENERATE(
+                auto string = GENERATE
+                (
                     "1",     //1
                     "10",    //2
                     "100",   //4
@@ -279,9 +273,9 @@ SCENARIO( "FSM used in Deterministic Finite Automata", "[DFA]" )
                     "11010", //26
                     "11100", //28
                     "11101"  //29
-                    );
+                );
 
-                WHEN( "given invalid input of: " << string ) 
+                WHEN( "the DFA is given input: " << string ) 
                 {
                     THEN( "the input is accepted by the DFA" ) 
                     {
