@@ -1,9 +1,11 @@
 
 #include "Regex.hpp"  //include before algo causes errors with #define epsilon char(0) maybe collision?
 
-#include <stack> 
+#include <stack>
+#include <map> 
 #include <sstream>
 #include <cassert> //todo try to replace with excpetion everywhere
+#include <algorithm>
 
 namespace regex
 {
@@ -280,7 +282,6 @@ std::string RegexPostfixToInfix(std::string postfix)
     return infix;
 }
 
-
 bool isValidRegex(std::string regex)
 {
     std::stringstream ss(regex);
@@ -424,7 +425,8 @@ bool isValidRegex(std::string regex)
 
 
 
-    // maybe change to return FSM by value? Would this break the 
+
+// maybe change to return FSM by value? Would this break the 
 // internal references? I think it would be a move...
 void regexToNFA(FSM& fsm, std::string regex)
 {
@@ -488,8 +490,6 @@ void regexToNFA(FSM& fsm, std::string regex)
     // or can be assumed inplicitly to optimize?
 
 }
-    
-
 
 // todo: add this to unit test?
 /*
@@ -516,6 +516,156 @@ void regexToNFA(FSM& fsm, std::string regex)
     return fsm;
 
 */
+
+
+/*
+regex.compile()
+{
+    //validate
+    //proprocess
+    //toPostfix
+    //createEpsilonNFA
+    //createNFA
+    //createDFA
+    //minimizeDFA
+};
+*/
+
+using Alphabet = std::vector<char>;
+using EpsilonClusureMap = std::map<int,std::vector<State*>>;
+
+class EpsilonNFA : public FSM
+{
+    using parent = FSM;
+
+public:
+    EpsilonNFA(Alphabet alphabet);
+    FSM toNFA();
+
+private:
+
+    std::vector<char> mAlphabet;
+
+    void step1(FSM& nfa);
+    void step2(FSM& nfa);
+    bool isReachableByEpsilonClosure(State& start, State& end);
+    EpsilonClusureMap CreateEpsilonClosureMap();
+
+};
+
+EpsilonNFA::EpsilonNFA(Alphabet alphabet)
+    :parent()
+    ,mAlphabet{alphabet}
+{}
+
+
+FSM EpsilonNFA::toNFA()
+{
+    FSM nfa;
+
+    step1(nfa);
+    step2(nfa);
+
+    return nfa;
+}
+
+void EpsilonNFA::step1(FSM& nfa)
+{
+
+}
+
+void EpsilonNFA::step2(FSM& nfa)
+{
+    State* final;
+
+    // the constructed epsilon NFA should
+    // only have one final state
+    for (auto state : mStates)
+    {
+        if (state.isFinal())
+        {
+            final = &state;
+            break;
+        }
+    }
+
+    auto map = CreateEpsilonClosureMap();
+
+    for(auto character : mAlphabet)
+    {
+        for (auto state : mStates)
+        {
+            for (auto reachableByEpsilonClosure1 : map[state.mId])
+            {
+                auto target = reachableByEpsilonClosure1->run(character);
+
+                if(target != nullptr)
+                {
+                    for (auto reachableByEpsilonClosure2 : map[target->mId])
+                    {
+                        // add transition to nfa
+                    }
+                }
+            }
+        }
+    }
+}
+
+EpsilonClusureMap EpsilonNFA::CreateEpsilonClosureMap()
+{
+    EpsilonClusureMap map;
+
+    for (auto state : mStates)
+    {
+        std::vector<State*> statesByEpsilonClosure;
+
+        for (auto peer : mStates)
+        {
+            if(isReachableByEpsilonClosure(state, peer))
+            {
+                map[state.mId].push_back(&state);
+            }
+        }
+    }
+
+    return map;
+}
+
+bool EpsilonNFA::isReachableByEpsilonClosure(State& start, State& end)
+{
+    std::stack<State*> stack;
+    std::vector<State*> visited;
+
+    stack.push(&start);
+    visited.push_back(&start);
+
+    while(!stack.empty())
+    {
+        auto state = stack.top();
+        stack.pop();
+
+        for (auto transition : state->mTransitions)
+        {
+            if(transition.input() == epsilon)
+            {
+                auto adjacent = transition.targetState();
+
+                if(adjacent == end)
+                {
+                    return true;
+                }
+
+                if (std::find(visited.begin(), visited.end(), &adjacent) == visited.end())
+                {
+                    stack.push(&adjacent);
+                    visited.push_back(&adjacent);
+                }
+            }
+        }
+    }
+
+    return false;
+}
 
 
 } //namespace regex

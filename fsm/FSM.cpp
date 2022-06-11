@@ -161,6 +161,7 @@ bool FSM::isReachableIf(State& start, State& end, std::function<bool(char)> pred
 
 State& FSM::startState()
 {
+    // todo: change implementation to search for start state
     assert(mStartState != nullptr);
     return *mStartState;
 }

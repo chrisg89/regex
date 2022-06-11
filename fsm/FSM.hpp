@@ -70,7 +70,7 @@ public:
 
     State& startState(); //maybe remove? only testing
 
-    bool run(std::string string);
+    bool run(std::string string); //TODO this must be moved to DFA. NFA is not runnable
 
     std::string toPlantUML();
 
@@ -78,12 +78,12 @@ public:
     // todo: change to use a predicate?
     bool isReachableIf(State& start, State& end, std::function<bool(char)>);
 
-private:
+protected:
 
     
 
     std::list<State> mStates;
-    State* mStartState;
+    State* mStartState; //should remove. calc start state in getter
 
 
 };
