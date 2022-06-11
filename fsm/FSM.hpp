@@ -1,12 +1,13 @@
 
 #pragma once 
 
-#include "vector"
-#include "string"
-#include "list"
-#include "functional"
+#include <vector>
+#include <string>
+#include <list>
+#include <functional>
 
-#define epsilon char(0)
+namespace fsm
+{
 
 //forward declarations
 class State;
@@ -87,8 +88,5 @@ private:
 
 };
 
-bool isValidRegex(std::string regex);
-std::string PreprocessRegex(std::string regex);
-std::string RegexInfixToPostfix(std::string regex);
-std::string RegexPostfixToInfix(std::string postfix);
-void regexToNFA(FSM& fsm, std::string regex);
+
+} //namespace fsm

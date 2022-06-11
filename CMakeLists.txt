@@ -18,5 +18,6 @@ TARGET_LINK_LIBRARIES( Lexer
     )
 
 add_subdirectory(fsm)
+add_subdirectory(regex)
 add_subdirectory(catch)
  
