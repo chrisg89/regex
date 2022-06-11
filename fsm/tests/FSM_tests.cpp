@@ -11,12 +11,11 @@ SCENARIO( "Empty", "[empty]" )
     std::string regex("(a|bd)");
     regexToNFA(fsm, regex);
 
+    //iteratre over all states and find all final states
+    // assert only one final state
+    //fsm.isReachable(star, ) // move to fsm unit test and create manual state machine
     
-    regex = PreprocessRegex(regex);
-    regex = RegexInfixToPostfix(regex);
-
-
-    std::cout << fsm.toPlantUML() << std::endl << regex << std::endl;
+    //std::cout << fsm.toPlantUML() << std::endl << regex << std::endl;
 }
 
 SCENARIO( "Regex", "[regex]" ) 
@@ -219,6 +218,89 @@ SCENARIO( "API", "[api]" )
 
     REQUIRE( fsm.run("ab") );
 
+    SECTION("Check if a node is reachable from another on any input")
+    {
+        FSM fsm;
+        auto& stateA = fsm.addState(true, false);
+        auto& stateB = fsm.addState(false, false);
+        auto& stateC = fsm.addState(false, false); 
+        auto& stateD = fsm.addState(false, false);  
+
+        stateA.addTransitionTo(stateB, 'a');
+        stateA.addTransitionTo(stateC, 'b');
+        stateC.addTransitionTo(stateB, 'c');
+        stateC.addTransitionTo(stateD, 'd');
+        stateD.addTransitionTo(stateC, 'e');
+
+        std::function<bool(char)> any = 
+        [](char c)
+        {
+            return true;
+        };
+
+        // State A -> others
+        REQUIRE(fsm.isReachableIf(stateA, stateB, any));
+        REQUIRE(fsm.isReachableIf(stateA, stateC, any));
+        REQUIRE(fsm.isReachableIf(stateA, stateD, any));
+
+        // State B -> others
+        REQUIRE(!fsm.isReachableIf(stateB, stateA, any));
+        REQUIRE(!fsm.isReachableIf(stateB, stateC, any));
+        REQUIRE(!fsm.isReachableIf(stateB, stateD, any));
+
+        // State C -> others
+        REQUIRE(!fsm.isReachableIf(stateC, stateA, any));
+        REQUIRE(fsm.isReachableIf(stateC, stateB, any));
+        REQUIRE(fsm.isReachableIf(stateC, stateD, any));
+
+        // State D -> others
+        REQUIRE(!fsm.isReachableIf(stateD, stateA, any));
+        REQUIRE(fsm.isReachableIf(stateD, stateB, any));
+        REQUIRE(fsm.isReachableIf(stateD, stateC, any));
+
+    }
+
+
+    SECTION("Check if a node is reachable from another on a* (a-closure) ")
+    {
+        FSM fsm;
+        auto& stateA = fsm.addState(true, false);
+        auto& stateB = fsm.addState(false, false);
+        auto& stateC = fsm.addState(false, false); 
+        auto& stateD = fsm.addState(false, false);  
+
+        stateA.addTransitionTo(stateB, 'a');
+        stateB.addTransitionTo(stateC, 'a');
+        stateB.addTransitionTo(stateD, 'b');
+        stateC.addTransitionTo(stateD, 'a');
+
+        std::function<bool(char)> aClosure = 
+        [](char c)
+        {
+            return (c == 'a');
+        };
+
+        // State A -> others
+        REQUIRE(fsm.isReachableIf(stateA, stateB, aClosure));
+        REQUIRE(fsm.isReachableIf(stateA, stateC, aClosure));
+        REQUIRE(fsm.isReachableIf(stateA, stateD, aClosure));
+
+        // State B -> others
+        REQUIRE(!fsm.isReachableIf(stateB, stateA, aClosure));
+        REQUIRE(fsm.isReachableIf(stateB, stateC, aClosure));
+        REQUIRE(fsm.isReachableIf(stateB, stateD, aClosure));
+
+        // State C -> others
+        REQUIRE(!fsm.isReachableIf(stateC, stateA, aClosure));
+        REQUIRE(!fsm.isReachableIf(stateC, stateB, aClosure));
+        REQUIRE(fsm.isReachableIf(stateC, stateD, aClosure));
+
+        // State D -> others
+        REQUIRE(!fsm.isReachableIf(stateD, stateA, aClosure));
+        REQUIRE(!fsm.isReachableIf(stateD, stateB, aClosure));
+        REQUIRE(!fsm.isReachableIf(stateD, stateC, aClosure));
+
+    }
 }
 
 SCENARIO( "FSM used in Deterministic Finite Automata", "[DFA]" ) 

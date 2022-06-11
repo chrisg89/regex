@@ -1,7 +1,8 @@
-#include "FSM.hpp"
+
 #include "iostream"
 #include <cassert>
-
+#include <algorithm>
+#include "FSM.hpp"  //include before algo causes errors with #define epsilon char(0) maybe collision?
 
 Transition::Transition(State& target, char input):
     mTarget{target},
@@ -108,6 +109,48 @@ std::string FSM::toPlantUML()
     plantUML += "@enduml\n";
 
     return plantUML;
+}
+
+#include "stack"
+
+
+bool FSM::isReachableIf(State& start, State& end, std::function<bool(char)> predicate)
+{
+    //DFS approach //TODO check performance against BFS later?
+
+    std::stack<State*> stack;
+    std::vector<int> visited;
+
+    stack.push(&start);
+    visited.push_back(start.mId);
+
+    while(!stack.empty())
+    {
+        auto state = stack.top();
+        stack.pop();
+
+        for (auto t : state->mTransitions)
+        {
+            //todo put targte state into local to clean this up
+            if(t.targetState() == end)
+            {
+                return true;
+            }
+
+            if(!predicate(t.input()))
+            {
+                continue;
+            }
+
+            if (std::find(visited.begin(), visited.end(), t.targetState().mId) == visited.end())
+            {
+                stack.push(&(t.targetState()));
+                visited.push_back(t.targetState().mId);
+            }
+        }
+    }
+
+    return false;
 }
 
 State& FSM::startState()
@@ -664,6 +707,10 @@ void regexToNFA(FSM& fsm, std::string regex)
     auto& end = fsm.addState(false, true);
     start.addTransitionTo(bb.entry, epsilon);
     bb.exit.addTransitionTo(end, epsilon);
+
+    // TODO: need to add epsilon self-transition for each node?
+    // or can be assumed inplicitly to optimize?
+
 }
 
 

@@ -4,6 +4,7 @@
 #include "vector"
 #include "string"
 #include "list"
+#include "functional"
 
 #define epsilon char(0)
 
@@ -72,7 +73,14 @@ public:
 
     std::string toPlantUML();
 
+    // todo: make private
+    // todo: change to use a predicate?
+    bool isReachableIf(State& start, State& end, std::function<bool(char)>);
+
 private:
+
+    
+
     std::list<State> mStates;
     State* mStartState;
 
