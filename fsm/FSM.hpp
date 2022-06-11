@@ -74,10 +74,6 @@ public:
 
     std::string toPlantUML();
 
-    // todo: make private
-    // todo: change to use a predicate?
-    bool isReachableIf(State& start, State& end, std::function<bool(char)>);
-
 protected:
 
     

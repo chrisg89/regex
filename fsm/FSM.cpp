@@ -118,47 +118,6 @@ std::string FSM::toPlantUML()
 }
 
 
-
-
-bool FSM::isReachableIf(State& start, State& end, std::function<bool(char)> predicate)
-{
-    //DFS approach //TODO check performance against BFS later?
-
-    std::stack<State*> stack;
-    std::vector<int> visited;
-
-    stack.push(&start);
-    visited.push_back(start.mId);
-
-    while(!stack.empty())
-    {
-        auto state = stack.top();
-        stack.pop();
-
-        for (auto t : state->mTransitions)
-        {
-            //todo put targte state into local to clean this up
-            if(t.targetState() == end)
-            {
-                return true;
-            }
-
-            if(!predicate(t.input()))
-            {
-                continue;
-            }
-
-            if (std::find(visited.begin(), visited.end(), t.targetState().mId) == visited.end())
-            {
-                stack.push(&(t.targetState()));
-                visited.push_back(t.targetState().mId);
-            }
-        }
-    }
-
-    return false;
-}
-
 State& FSM::startState()
 {
     // todo: change implementation to search for start state
