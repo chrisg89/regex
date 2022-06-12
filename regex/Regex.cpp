@@ -578,6 +578,8 @@ void EpsilonNFA::step2(FSM& nfa)
 {
     State* final;
 
+    std::map<int,State*> stateMapping;
+
     // the constructed epsilon NFA should
     // only have one final state
     for (auto state : mStates)
@@ -587,6 +589,9 @@ void EpsilonNFA::step2(FSM& nfa)
             final = &state;
             break;
         }
+        // todo: add start and stop
+        stateMapping[state.mId] = &nfa.addState(false, false);
+
     }
 
     auto map = CreateEpsilonClosureMap();
@@ -603,7 +608,11 @@ void EpsilonNFA::step2(FSM& nfa)
                 {
                     for (auto reachableByEpsilonClosure2 : map[target->mId])
                     {
-                        // add transition to nfa
+                        //todo: remove insertaion of duplicates.
+                        auto mappedStartState = stateMapping[state.mId];
+                        auto mappedTargetState = stateMapping[target->mId];
+                        mappedStartState->addTransitionTo(*mappedTargetState, character);
+
                     }
                 }
             }
