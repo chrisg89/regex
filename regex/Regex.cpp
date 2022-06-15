@@ -12,50 +12,50 @@ namespace regex
 
 struct BlackBox
 {
-    BlackBox(State& entry, State& exit)
+    BlackBox(StateId entry, StateId exit)
     : entry {entry}
     , exit {exit}
     {}
 
-    State& entry;
-    State& exit;
+    StateId entry;
+    StateId exit;
 };
 
-BlackBox buildSymbol(FSM& fsm, char c)
+BlackBox buildSymbol(NFA& nfa, char c)
 {
-    auto& entry = fsm.addState(false, false);
-    auto& exit = fsm.addState(false, false);
-    entry.addTransitionTo(exit, c);
+    auto entry = nfa.addState(false, false);
+    auto exit = nfa.addState(false, false);
+    nfa.addTransition(c, entry, exit);
     return BlackBox(entry, exit);
 }
 
-BlackBox buildUnion(FSM& fsm, BlackBox& BB1, BlackBox& BB2)
+BlackBox buildUnion(NFA& nfa, BlackBox& BB1, BlackBox& BB2)
 {
-    auto& entry = fsm.addState(false, false);
-    auto& exit = fsm.addState(false, false);
-    entry.addTransitionTo(BB1.entry, epsilon);
-    entry.addTransitionTo(BB2.entry, epsilon);
-    BB1.exit.addTransitionTo(exit, epsilon);
-    BB2.exit.addTransitionTo(exit, epsilon);
+    auto entry = nfa.addState(false, false);
+    auto exit = nfa.addState(false, false);
+    nfa.addTransition(epsilon, entry, BB1.entry);
+    nfa.addTransition(epsilon, entry, BB2.entry);
+    nfa.addTransition(epsilon, BB1.exit, exit);
+    nfa.addTransition(epsilon, BB2.exit, exit);
     return BlackBox(entry, exit);
 }
 
-BlackBox buildConcatenation(FSM& fsm, BlackBox& BB1, BlackBox& BB2)
+BlackBox buildConcatenation(NFA& nfa, BlackBox& BB1, BlackBox& BB2)
 {
-    auto& entry = BB1.entry;
-    auto& exit = BB2.exit;
-    BB1.exit.addTransitionTo(BB2.entry, epsilon);
+    auto entry = BB1.entry;
+    auto exit = BB2.exit;
+    nfa.addTransition(epsilon, BB1.exit, BB2.entry);
     return BlackBox(entry, exit);
 }
 
-BlackBox buildKleeneStar(FSM& fsm, BlackBox& BB)
+BlackBox buildKleeneStar(NFA& nfa, BlackBox& BB)
 {
-    auto& entry = fsm.addState(false, false);
-    auto& exit = fsm.addState(false, false);
-    entry.addTransitionTo(BB.entry, epsilon);
-    entry.addTransitionTo(exit, epsilon);
-    BB.exit.addTransitionTo(BB.entry, epsilon);
-    BB.exit.addTransitionTo(exit, epsilon);
+    auto entry = nfa.addState(false, false);
+    auto exit = nfa.addState(false, false);
+    nfa.addTransition(epsilon, entry, BB.entry);
+    nfa.addTransition(epsilon, entry, exit);
+    nfa.addTransition(epsilon, BB.exit, BB.entry);
+    nfa.addTransition(epsilon, BB.exit, exit);
     return BlackBox(entry, exit);
 }
 
@@ -428,7 +428,7 @@ bool isValidRegex(std::string regex)
 
 // maybe change to return FSM by value? Would this break the 
 // internal references? I think it would be a move...
-void regexToNFA(FSM& fsm, std::string regex)
+void regexToNFA(NFA& nfa, std::string regex)
 {
     if (!isValidRegex(regex))
         assert(false);
@@ -448,7 +448,7 @@ void regexToNFA(FSM& fsm, std::string regex)
                 stack.pop();
                 auto op2 = stack.top();
                 stack.pop();
-                stack.push(buildUnion(fsm, op2, op1));
+                stack.push(buildUnion(nfa, op2, op1));
                 break;
             }
             case '&':
@@ -457,20 +457,20 @@ void regexToNFA(FSM& fsm, std::string regex)
                 stack.pop();
                 auto op2 = stack.top();
                 stack.pop();
-                stack.push(buildConcatenation(fsm, op2, op1));
+                stack.push(buildConcatenation(nfa, op2, op1));
                 break;
             }
             case '*':
             {
                 auto op1 = stack.top();
                 stack.pop();
-                stack.push(buildKleeneStar(fsm, op1));
+                stack.push(buildKleeneStar(nfa, op1));
                 break;
             }
 
             default:
             {
-                stack.push(buildSymbol(fsm, c));
+                stack.push(buildSymbol(nfa, c));
             }
         }
     }
@@ -481,10 +481,10 @@ void regexToNFA(FSM& fsm, std::string regex)
     // the entry and exit states of the black box to the start
     // and end states.
     auto bb = stack.top();
-    auto& start = fsm.addState(true, false);
-    auto& end = fsm.addState(false, true);
-    start.addTransitionTo(bb.entry, epsilon);
-    bb.exit.addTransitionTo(end, epsilon);
+    auto start = nfa.addState(true, false);
+    auto end = nfa.addState(false, true);
+    nfa.addTransition(start, bb.entry, epsilon);
+    nfa.addTransition(bb.exit, end, epsilon);
 
     // TODO: need to add epsilon self-transition for each node?
     // or can be assumed inplicitly to optimize?
@@ -530,151 +530,6 @@ regex.compile()
     //minimizeDFA
 };
 */
-
-using Alphabet = std::vector<char>;
-using EpsilonClusureMap = std::map<int,std::vector<State*>>;
-
-class EpsilonNFA : public FSM
-{
-    using parent = FSM;
-
-public:
-    EpsilonNFA(Alphabet alphabet);
-    FSM toNFA();
-
-private:
-
-    std::vector<char> mAlphabet;
-
-    void step1(FSM& nfa);
-    void step2(FSM& nfa);
-    bool isReachableByEpsilonClosure(State& start, State& end);
-    EpsilonClusureMap CreateEpsilonClosureMap();
-
-};
-
-EpsilonNFA::EpsilonNFA(Alphabet alphabet)
-    :parent()
-    ,mAlphabet{alphabet}
-{}
-
-
-FSM EpsilonNFA::toNFA()
-{
-    FSM nfa;
-
-    step1(nfa);
-    step2(nfa);
-
-    return nfa;
-}
-
-void EpsilonNFA::step1(FSM& nfa)
-{
-
-}
-
-void EpsilonNFA::step2(FSM& nfa)
-{
-    State* final;
-
-    std::map<int,State*> stateMapping;
-
-    // the constructed epsilon NFA should
-    // only have one final state
-    for (auto state : mStates)
-    {
-        if (state.isFinal())
-        {
-            final = &state;
-            break;
-        }
-        // todo: add start and stop
-        stateMapping[state.mId] = &nfa.addState(false, false);
-
-    }
-
-    auto map = CreateEpsilonClosureMap();
-
-    for(auto character : mAlphabet)
-    {
-        for (auto state : mStates)
-        {
-            for (auto reachableByEpsilonClosure1 : map[state.mId])
-            {
-                auto target = reachableByEpsilonClosure1->run(character);
-
-                if(target != nullptr)
-                {
-                    for (auto reachableByEpsilonClosure2 : map[target->mId])
-                    {
-                        //todo: remove insertaion of duplicates.
-                        auto mappedStartState = stateMapping[state.mId];
-                        auto mappedTargetState = stateMapping[target->mId];
-                        mappedStartState->addTransitionTo(*mappedTargetState, character);
-
-                    }
-                }
-            }
-        }
-    }
-}
-
-EpsilonClusureMap EpsilonNFA::CreateEpsilonClosureMap()
-{
-    EpsilonClusureMap map;
-
-    for (auto state : mStates)
-    {
-        std::vector<State*> statesByEpsilonClosure;
-
-        for (auto peer : mStates)
-        {
-            if(isReachableByEpsilonClosure(state, peer))
-            {
-                map[state.mId].push_back(&state);
-            }
-        }
-    }
-
-    return map;
-}
-
-bool EpsilonNFA::isReachableByEpsilonClosure(State& start, State& end)
-{
-    std::stack<State*> stack;
-    std::vector<State*> visited;
-
-    stack.push(&start);
-    visited.push_back(&start);
-
-    while(!stack.empty())
-    {
-        auto state = stack.top();
-        stack.pop();
-
-        for (auto transition : state->mTransitions)
-        {
-            if(transition.input() == epsilon)
-            {
-                auto adjacent = transition.targetState();
-
-                if(adjacent == end)
-                {
-                    return true;
-                }
-
-                if (std::find(visited.begin(), visited.end(), &adjacent) == visited.end())
-                {
-                    stack.push(&adjacent);
-                    visited.push_back(&adjacent);
-                }
-            }
-        }
-    }
-
-    return false;
-}
 
 
 } //namespace regex

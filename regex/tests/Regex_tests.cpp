@@ -8,13 +8,12 @@ namespace {
 
 SCENARIO( "Empty", "[empty]" ) 
 {
-       //FSM fsm;
-    //std::string regex("(a|bd)");
-    //regexToNFA(fsm, regex);
+    nfa::NFA nfa{nfa::Alphabet{}};
 
-    //iteratre over all states and find all final states
-    // assert only one final state
-    //fsm.isReachable(star, ) // move to fsm unit test and create manual state machine
+    std::string regex("(a|bd)");
+    regex::regexToNFA(nfa, regex);
+
+    auto dfa = nfa.toDFA();
     
 }
 

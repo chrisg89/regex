@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "FSM.hpp"
+#include "NFA.hpp"
 
 #include <string>
 
@@ -9,14 +9,14 @@
 
 namespace regex
 {
-    using FSM = fsm::FSM;
-    using State = fsm::State;
+    using NFA = nfa::NFA;
+    using StateId = nfa::StateId;
 
-    constexpr char epsilon = 0;
+    constexpr char epsilon = 0; //TODO: map to definition in NFA
 
     bool isValidRegex(std::string regex);
     std::string PreprocessRegex(std::string regex);
     std::string RegexInfixToPostfix(std::string regex);
     std::string RegexPostfixToInfix(std::string postfix);
-    void regexToNFA(FSM& fsm, std::string regex);
+    void regexToNFA(NFA& nfa, std::string regex);
 }

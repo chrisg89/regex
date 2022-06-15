@@ -1,17 +1,17 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include "FSM.hpp"
+#include "NFA.hpp"
 
 namespace fsm{
 namespace{
 
 //TODO backup on github
 
+
 SCENARIO( "Empty", "[empty]" ) 
 {
-    //FSM fsm;
-    //std::string regex("(a|bd)");
-    //regexToNFA(fsm, regex);
+
 
     //iteratre over all states and find all final states
     // assert only one final state
@@ -23,39 +23,15 @@ SCENARIO( "Empty", "[empty]" )
 SCENARIO( "API", "[api]" ) 
 {
 
-    FSM fsm;
+    nfa::NFA nfa{nfa::Alphabet{}};
 
-    auto& state1 = fsm.addState(true, false);
-    auto& state2 = fsm.addState(false, false);
-    auto& state3 = fsm.addState(false, true);
+    auto state1 = nfa.addState(true, false);
+    auto state2 = nfa.addState(false, false);
+    auto state3 = nfa.addState(false, true);
 
-    REQUIRE((state1 == fsm.startState())); //TODO sm.startState() error if no start state specified
-    REQUIRE((state2 != fsm.startState()));
-    REQUIRE((state3 != fsm.startState()));
+    nfa.addTransition('a', state1, state2);
+    nfa.addTransition('b', state2, state3);
 
-    REQUIRE((state1 == state1));
-    REQUIRE((state1 != state2));
-    REQUIRE((state1 != state3));
-
-    REQUIRE( state1.numTransitions() == 0 );
-    REQUIRE( state2.numTransitions() == 0 );
-    REQUIRE( state3.numTransitions() == 0 );
-
-    state1.addTransitionTo(state2, 'a');
-    REQUIRE( state1.numTransitions() == 1 );
-    REQUIRE( state2.numTransitions() == 0 );
-    REQUIRE( state3.numTransitions() == 0 );
-
-    state3.addTransitionFrom(state2, 'b');
-    REQUIRE( state1.numTransitions() == 1 );
-    REQUIRE( state2.numTransitions() == 1 );
-    REQUIRE( state3.numTransitions() == 0 );
-
-    std::cout << state1 << std::endl;
-    std::cout << state2 << std::endl;
-    std::cout << state3 << std::endl;
-
-    REQUIRE( fsm.run("ab") );
 }
 
 SCENARIO( "FSM used in Deterministic Finite Automata", "[DFA]" ) 
