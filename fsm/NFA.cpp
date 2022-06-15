@@ -69,6 +69,43 @@ void NFA::addTransition(char input, StateId source, StateId destination)
     mStates[source].addTransition(input, destination);
 }
 
+std::string NFA::toPlantUML()
+{
+    //TODO: plantuml does an awful job of positioning the
+    // states and its really hard to see useful details.
+    // maybe remove this?
+    std::string plantUML = "";
+
+    plantUML += "@startuml\n";
+    plantUML += "hide empty description\n";
+
+    plantUML += "[*] --> ";
+    plantUML += std::to_string(mStartState);
+    plantUML += "\n";
+    
+    for (auto state : mStates)
+    {
+        if(state.mIsFinal)
+        {
+            plantUML += std::to_string(state.mId);
+            plantUML += " : Final\n";
+        }
+
+        for (auto transition : state.mTransitions)
+        {
+            plantUML += std::to_string(state.mId);
+            plantUML += " -> ";
+            plantUML += std::to_string(transition.destination);
+            plantUML += " : ";
+            plantUML += (transition.input == kEpsilon ? std::string("null") : std::string(1, transition.input)); //todo clean up
+            plantUML += "\n";
+        }
+    }
+    plantUML += "@enduml\n";
+
+    return plantUML;
+}
+
 
 DFA NFA::toDFA()
 {
@@ -120,6 +157,7 @@ void NFA::EpsilonNFAToNFAConversion()
             {
                 newNFA.addTransition(character, state.mId, reachableByEpsilon);
             }
+            reachableByEpsilonClosureSet.clear();
         }
     }
 

@@ -8,12 +8,107 @@ namespace {
 
 SCENARIO( "Empty", "[empty]" ) 
 {
-    nfa::NFA nfa{nfa::Alphabet{}};
+    nfa::NFA nfa{nfa::Alphabet{'a','b'}};
 
-    std::string regex("(a|bd)");
+    std::string regex("a|b");
     regex::regexToNFA(nfa, regex);
 
+    std::cout << nfa.toPlantUML();
+
     auto dfa = nfa.toDFA();
+
+    std::cout << nfa.toPlantUML();
+
+
+//TODO: unit test this stuff below.!
+
+    //ab (correct)
+    /*
+    @startuml
+hide empty description
+[*] --> 4
+0 -> 2 : a
+0 -> 1 : a
+1 -> 5 : b
+1 -> 3 : b
+2 -> 5 : b
+2 -> 3 : b
+3 : Final
+4 -> 2 : a
+4 -> 1 : a
+5 : Final
+@enduml
+*/
+
+
+
+
+    // a*b (correct)
+    /*
+    @startuml
+hide empty description
+[*] --> 6
+0 -> 4 : a
+0 -> 3 : a
+0 -> 1 : a
+0 -> 0 : a
+1 -> 4 : a
+1 -> 3 : a
+1 -> 1 : a
+1 -> 0 : a
+1 -> 7 : b
+1 -> 5 : b
+2 -> 4 : a
+2 -> 3 : a
+2 -> 1 : a
+2 -> 0 : a
+2 -> 7 : b
+2 -> 5 : b
+3 -> 7 : b
+3 -> 5 : b
+4 -> 7 : b
+4 -> 5 : b
+5 : Final
+6 -> 4 : a
+6 -> 3 : a
+6 -> 1 : a
+6 -> 0 : a
+6 -> 7 : b
+6 -> 5 : b
+7 : Final
+@enduml
+*/
+
+// a|b
+/*
+@startuml
+hide empty description
+[*] --> 6
+0 -> 7 : a
+0 -> 5 : a
+0 -> 1 : a
+1 : Final
+2 -> 7 : b
+2 -> 5 : b
+2 -> 3 : b
+3 : Final
+4 -> 7 : a
+4 -> 5 : a
+4 -> 1 : a
+4 -> 7 : b
+4 -> 5 : b
+4 -> 3 : b
+5 : Final
+6 -> 7 : a
+6 -> 5 : a
+6 -> 1 : a
+6 -> 7 : b
+6 -> 5 : b
+6 -> 3 : b
+7 : Final
+@enduml
+
+*/
     
 }
 

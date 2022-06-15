@@ -59,6 +59,8 @@ public:
 
     DFA toDFA();
 
+    std::string toPlantUML();
+
 private:
 
     void EpsilonNFAToNFAConversion();

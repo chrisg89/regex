@@ -483,8 +483,8 @@ void regexToNFA(NFA& nfa, std::string regex)
     auto bb = stack.top();
     auto start = nfa.addState(true, false);
     auto end = nfa.addState(false, true);
-    nfa.addTransition(start, bb.entry, epsilon);
-    nfa.addTransition(bb.exit, end, epsilon);
+    nfa.addTransition(epsilon, start, bb.entry);
+    nfa.addTransition(epsilon, bb.exit, end);
 
     // TODO: need to add epsilon self-transition for each node?
     // or can be assumed inplicitly to optimize?
