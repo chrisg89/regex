@@ -141,6 +141,8 @@ void NFA::EpsilonNFAToNFAConversion()
         {
             for (auto reachableByEpsilonClosure1 : map[state.mId])
             {
+                // TODO: Is there a bug here? a state can go to multiple next state,
+                // not just one...
                 auto target = mStates[reachableByEpsilonClosure1].next(character);
 
                 if(target != kNullState)
