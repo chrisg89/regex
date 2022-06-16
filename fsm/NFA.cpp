@@ -125,15 +125,21 @@ void NFA::EpsilonNFAToNFAConversion()
 {
     NFA newNFA(mAlphabet);
 
+    // This algorithm assumes only one final state
+    assert(mFinalStates.size() == 1);
+
+    // STEP1: Calculate the new states and insert
+    // them into the new NFA
     for (auto state : mStates)
     {
-        newNFA.addState(state.mIsStart, state.mIsFinal);
+        //TODO: can optimize this further?
+        newNFA.addState(state.mIsStart, isReachableByEpsilonClosure(state.mId, mFinalStates[0]));
     }
 
     auto map = CreateEpsilonClosureMap();
 
-    // STEP1: Calculate the new state transitions replacing 
-    // epsilon transitions and insert them into the new NFA
+    // STEP2: Calculate the new transitions and insert
+    // them into the new NFA
     std::unordered_set<StateId> reachableByEpsilonClosureSet;
     for(auto character : mAlphabet)
     {
@@ -160,17 +166,6 @@ void NFA::EpsilonNFAToNFAConversion()
                 newNFA.addTransition(character, state.mId, reachableByEpsilon);
             }
             reachableByEpsilonClosureSet.clear();
-        }
-    }
-
-    // STEP2: Calculate new final states after removal of epsilon  
-    // transitions and update states in the new NFA
-    for (auto state : mStates)
-    {
-        if (isReachableByEpsilonClosure(state.mId, mFinalStates[0])) // TODO: optimize this... its very wasteful to recalc 
-        {
-            newNFA.mStates[state.mId].mIsFinal = true;
-            newNFA.mFinalStates.push_back(state.mId);
         }
     }
 
