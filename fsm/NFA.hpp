@@ -39,13 +39,12 @@ public:
     State(StateId id, bool isStart, bool isFinal);
 
     void addTransition(char input, StateId destination);
-    StateId next(char input);
 
 //private:
     StateId mId;
     bool mIsStart;
     bool mIsFinal;
-    std::vector<Transition> mTransitions;
+    std::map<char, std::vector<Transition>> mTransitions;
 };
 
 class NFA

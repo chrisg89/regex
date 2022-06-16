@@ -22,20 +22,7 @@ State::State(StateId id, bool isStart, bool isFinal)
 
 void State::addTransition(char input, StateId destination)
 {
-    mTransitions.emplace_back(input, destination);
-}
-
-StateId State::next(char input)
-{
-    for (auto transition : mTransitions)
-    {
-        if(transition.input == input)
-        {
-            return transition.destination;
-        }
-    }
-
-    return kNullState;
+    mTransitions[input].emplace_back(input, destination);
 }
 
 NFA::NFA(Alphabet alphabet)
@@ -71,6 +58,7 @@ void NFA::addTransition(char input, StateId source, StateId destination)
 
 std::string NFA::toPlantUML()
 {
+
     //TODO: plantuml does an awful job of positioning the
     // states and its really hard to see useful details.
     // maybe remove this?
@@ -91,17 +79,21 @@ std::string NFA::toPlantUML()
             plantUML += " : Final\n";
         }
 
-        for (auto transition : state.mTransitions)
+        for (auto const& [input, transitions] : state.mTransitions)
         {
-            plantUML += std::to_string(state.mId);
-            plantUML += " -> ";
-            plantUML += std::to_string(transition.destination);
-            plantUML += " : ";
-            plantUML += (transition.input == kEpsilon ? std::string("null") : std::string(1, transition.input)); //todo clean up
-            plantUML += "\n";
+            for (auto transition: transitions)
+            {
+                plantUML += std::to_string(state.mId);
+                plantUML += " -> ";
+                plantUML += std::to_string(transition.destination);
+                plantUML += " : ";
+                plantUML += (transition.input == kEpsilon ? std::string("null") : std::string(1, transition.input)); //todo clean up
+                plantUML += "\n";
+            }
         }
     }
     plantUML += "@enduml\n";
+
 
     return plantUML;
 }
@@ -147,13 +139,9 @@ void NFA::EpsilonNFAToNFAConversion()
         {
             for (auto reachableByEpsilonClosure1 : map[state.mId])
             {
-                // TODO: Is there a bug here? a state can go to multiple next state,
-                // not just one...
-                auto target = mStates[reachableByEpsilonClosure1].next(character);
-
-                if(target != kNullState)
+                for(auto transition : mStates[reachableByEpsilonClosure1].mTransitions[character])
                 {
-                    for (auto reachableByEpsilonClosure2 : map[target])
+                    for (auto reachableByEpsilonClosure2 : map[transition.destination])
                     {
                         reachableByEpsilonClosureSet.insert(reachableByEpsilonClosure2);
                     }
@@ -210,22 +198,19 @@ bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination)
         auto state = stack.top();
         stack.pop();
 
-        for (auto transition : mStates[state].mTransitions)
+        for (auto transition : mStates[state].mTransitions[kEpsilon])
         {
-            if(transition.input == kEpsilon)
+            auto adjacent = transition.destination;
+
+            if(adjacent == destination)
             {
-                auto adjacent = transition.destination;
+                return true;
+            }
 
-                if(adjacent == destination)
-                {
-                    return true;
-                }
-
-                if (std::find(visited.begin(), visited.end(), adjacent) == visited.end())
-                {
-                    stack.push(adjacent);
-                    visited.push_back(adjacent);
-                }
+            if (std::find(visited.begin(), visited.end(), adjacent) == visited.end())
+            {
+                stack.push(adjacent);
+                visited.push_back(adjacent);
             }
         }
     }
