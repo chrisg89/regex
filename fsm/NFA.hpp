@@ -29,7 +29,7 @@ struct Transition
 {
     Transition(char input, StateId destination);
 
-    char input;
+    char input; //TODO: not used;
     StateId destination;
 };
 
