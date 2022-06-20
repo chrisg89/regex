@@ -68,6 +68,7 @@ private:
     
 };
 
+
 } //namespace nfa
 
 
