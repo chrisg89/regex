@@ -13,7 +13,6 @@ namespace nfa
 
 //forward declarations
 class State;
-class Transition;
 class NFA;
 
 using DFA = dfa::DFA;
@@ -24,14 +23,6 @@ using EpsilonClusureMap = std::map<StateId,std::vector<StateId>>;
 
 constexpr char kNullState = -1;
 constexpr char kEpsilon = 0;
-
-struct Transition
-{
-    Transition(char input, StateId destination);
-
-    char input; //TODO: not used;
-    StateId destination;
-};
 
 class State
 {
@@ -44,7 +35,7 @@ public:
     StateId mId;
     bool mIsStart;
     bool mIsFinal;
-    std::map<char, std::vector<Transition>> mTransitions;
+    std::map<char, std::vector<StateId>> mTransitions;
 };
 
 class NFA

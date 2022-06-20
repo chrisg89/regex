@@ -8,11 +8,6 @@
 namespace nfa
 {
 
-Transition::Transition(char input, StateId destination)
-    : input{input}
-    , destination{destination}
-{}
-
 State::State(StateId id, bool isStart, bool isFinal)
     : mId{id}
     , mIsStart{isStart}
@@ -22,7 +17,7 @@ State::State(StateId id, bool isStart, bool isFinal)
 
 void State::addTransition(char input, StateId destination)
 {
-    mTransitions[input].emplace_back(input, destination);
+    mTransitions[input].emplace_back(destination);
 }
 
 NFA::NFA(Alphabet alphabet)
@@ -79,15 +74,15 @@ std::string NFA::toPlantUML()
             plantUML += " : Final\n";
         }
 
-        for (auto const& [input, transitions] : state.mTransitions)
+        for (auto const& [input, destinations] : state.mTransitions)
         {
-            for (auto transition: transitions)
+            for (auto destination: destinations)
             {
                 plantUML += std::to_string(state.mId);
                 plantUML += " -> ";
-                plantUML += std::to_string(transition.destination);
+                plantUML += std::to_string(destination);
                 plantUML += " : ";
-                plantUML += (transition.input == kEpsilon ? std::string("null") : std::string(1, transition.input)); //todo clean up
+                plantUML += (input == kEpsilon ? std::string("null") : std::string(1, input)); //todo clean up
                 plantUML += "\n";
             }
         }
@@ -139,9 +134,9 @@ void NFA::EpsilonNFAToNFAConversion()
         {
             for (auto reachableByEpsilonClosure1 : map[state.mId])
             {
-                for(auto transition : mStates[reachableByEpsilonClosure1].mTransitions[character])
+                for(auto destination : mStates[reachableByEpsilonClosure1].mTransitions[character])
                 {
-                    for (auto reachableByEpsilonClosure2 : map[transition.destination])
+                    for (auto reachableByEpsilonClosure2 : map[destination])
                     {
                         reachableByEpsilonClosureSet.insert(reachableByEpsilonClosure2);
                     }
@@ -200,7 +195,7 @@ bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination)
 
         for (auto transition : mStates[state].mTransitions[kEpsilon])
         {
-            auto adjacent = transition.destination;
+            auto adjacent = destination;
 
             if(adjacent == destination)
             {
@@ -223,5 +218,10 @@ void NFA::NFAToDFAConversion()
 {
 
 }
+
+
+
+
+
 
 } //namespace nfa
