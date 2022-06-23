@@ -1,4 +1,5 @@
 #include "NFA.hpp"
+#include "Bimap.hpp"
 
 #include <cassert>
 #include <stack>
@@ -7,9 +8,6 @@
 
 namespace nfa
 {
-
-#include <unordered_map>
-using CompositeStateId = int;
 
 struct VectorHasher {
     int operator()(const std::vector<StateId> &V) const {
@@ -22,50 +20,11 @@ struct VectorHasher {
 };
 
 
-class CompositeStateDictionary
-{
-public:
-    CompositeStateDictionary();
-    CompositeStateId getComposite(std::vector<StateId> transitions);
-    std::vector<StateId> getConstituents(CompositeStateId id);
 
-private:
-    std::unordered_map<std::vector<StateId>, CompositeStateId, VectorHasher> mValueToId;
-    std::unordered_map<CompositeStateId, std::vector<StateId>> mIdToValue;
-    int numBuckets;
-};
 
-CompositeStateDictionary::CompositeStateDictionary()
-    : mValueToId{}
-    , mIdToValue{}
-    , numBuckets{0}
-    {}
+using StateMapper = Bimap<std::vector<StateId>, StateId, VectorHasher>;
 
-CompositeStateId CompositeStateDictionary::getComposite(std::vector<StateId> transitions)
-{
-    auto bucket = mValueToId.find(transitions);
 
-    if(bucket == mValueToId.end())
-    {
-        mValueToId[transitions] = numBuckets;
-        mIdToValue[numBuckets] = transitions;
-        return numBuckets++;
-    }
-
-    return bucket->second;
-}
-
-std::vector<StateId> CompositeStateDictionary::getConstituents(CompositeStateId id)
-{
-    auto bucket = mIdToValue.find(id);
-
-    if(bucket == mIdToValue.end())
-    {
-        assert(false);
-    }
-
-    return bucket->second;
-}
 
 
 
@@ -284,22 +243,17 @@ bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination)
 
 void NFA::NFAToDFAConversion()
 {
-    CompositeStateDictionary compositeStateDict;
-    std::vector<CompositeStateId> a1{};
-    std::vector<CompositeStateId> a2{1};
-    std::vector<CompositeStateId> a3{1,2};
-    std::vector<CompositeStateId> a4{1,2,3};
-    auto composite1 = compositeStateDict.getComposite(a1);
-    auto states1 = compositeStateDict.getConstituents(composite1);
+    //assert(false);
+    StateMapper stateMapper;
+    std::vector<StateId> a1{};
+    std::vector<StateId> a2{1};
+    std::vector<StateId> a3{1,2};
+    std::vector<StateId> a4{1,2,3};
 
-    auto composite2 = compositeStateDict.getComposite(a2);
-    auto states2 = compositeStateDict.getConstituents(composite2);
+    stateMapper.insert(a1, 2);
+    stateMapper.insert(3, a2);
 
-    auto composite3 = compositeStateDict.getComposite(a3);
-    auto states3 = compositeStateDict.getConstituents(composite3);
 
-    auto composite4 = compositeStateDict.getComposite(a4);
-    auto states4 = compositeStateDict.getConstituents(composite4);
 }
 
 

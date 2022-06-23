@@ -2,7 +2,8 @@
 add_library(fsm_lib
     FSM.cpp
     NFA.cpp
-    DFA.cpp)
+    DFA.cpp
+    Bimap.cpp)
 
 TARGET_LINK_LIBRARIES( fsm_lib
     )
