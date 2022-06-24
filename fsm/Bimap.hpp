@@ -14,6 +14,10 @@ public:
     Type2 get(Type1);
     Type1 get(Type2);
 
+    bool contains(Type1);
+    bool contains(Type2);
+
+
 private:
     std::unordered_map<Type1, Type2, Type1Hasher> unordered_map1;
     std::unordered_map<Type2, Type1, Type2Hasher> unordered_map2;

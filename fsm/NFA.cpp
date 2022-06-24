@@ -5,6 +5,7 @@
 #include <stack>
 #include <algorithm>
 #include <unordered_set>
+#include <set>
 
 namespace nfa
 {
@@ -121,13 +122,11 @@ std::string NFA::toPlantUML()
 
 DFA NFA::toDFA()
 {
-    DFA dfa;
-
     // TODO: explain
     EpsilonNFAToNFAConversion();
 
     // TODO: explain
-    NFAToDFAConversion();
+    auto dfa = NFAToDFAConversion();
 
     return dfa;
 
@@ -220,7 +219,7 @@ bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination)
 
         for (auto transition : mStates[state].mTransitions[kEpsilon])
         {
-            auto adjacent = destination;
+            auto adjacent = transition; //TODO rename transition to something better
 
             if(adjacent == destination)
             {
@@ -240,26 +239,57 @@ bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination)
 
 
 
-
-void NFA::NFAToDFAConversion()
+DFA NFA::NFAToDFAConversion()
 {
-    //assert(false);
-    StateMapper stateMapper;
-    std::vector<StateId> a1{};
-    std::vector<StateId> a2{1};
-    std::vector<StateId> a3{1,2};
-    std::vector<StateId> a4{1,2,3};
 
-    stateMapper.insert(a1, 2);
-    stateMapper.insert(3, a2);
+    DFA dfa(mAlphabet);
+    std::stack<StateId> stack;
+    StateMapper mapper;
+    std::set<StateId> set;
 
 
+    auto dfaState = dfa.addState(true, mStates[mStartState].mIsFinal);
+    mapper.insert(dfaState, {mStartState});
+    stack.push(dfaState);
+
+
+    while(!stack.empty())
+    {
+        dfaState = stack.top();
+        stack.pop();
+
+        auto nfaStates = mapper.get(dfaState);
+
+        for(auto character : mAlphabet)
+        {
+
+            set.clear();
+
+            for(auto nfaState : nfaStates)
+            {
+                auto destinations = mStates[nfaState].mTransitions[character];
+                std::copy(destinations.begin(), destinations.end(), std::inserter(set, set.end()));
+            }
+
+            std::vector<StateId> composite(set.begin(), set.end());
+            auto newDfaState = StateId{kNullState};
+            if(mapper.contains(composite))
+            {
+                newDfaState = mapper.get(composite);
+            }
+            else
+            {
+                auto newDfaState = dfa.addState(false, false);  //TODO calculate if final state
+                mapper.insert(newDfaState, composite);
+                stack.push(newDfaState);
+            }
+
+            dfa.addTransition(character, dfaState, newDfaState);
+        }
+    }
+
+    return dfa;
 }
-
-
-
-
-
 
 
 

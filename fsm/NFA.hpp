@@ -57,7 +57,7 @@ private:
     EpsilonClusureMap CreateEpsilonClosureMap();
     bool isReachableByEpsilonClosure(StateId source, StateId destination);
 
-    void NFAToDFAConversion();
+    DFA NFAToDFAConversion();
 
     std::vector<State> mStates;
     Alphabet mAlphabet;
