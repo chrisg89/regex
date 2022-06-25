@@ -430,6 +430,15 @@ fa::Alphabet getAlphabet(std::string regex)
 {
     fa::Alphabet alphabet;
 
+    for(char& c: regex)
+    {
+        if (c != '|' && c != '(' && c != ')' && c != '*' )
+        {
+            alphabet.insert(c);
+        }
+
+    }
+
     return alphabet;
 }
 
@@ -541,8 +550,10 @@ void Regex::compile(std::string regex)
     
     if (!isValidRegex(regex))
     assert(false);
+
+    auto alphabet = getAlphabet(regex);
     
-    NFA nfa{fa::Alphabet{'a','b'}}; //TODO
+    NFA nfa{alphabet};
 
 
 
