@@ -8,16 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
 
 # set the project name
-project(Lexer)
+project(Regex)
 
-# add the executable
-add_executable(Lexer 
-    main.cpp)
-
-TARGET_LINK_LIBRARIES( Lexer
-    )
-
-add_subdirectory(fsm)
-add_subdirectory(regex)
-add_subdirectory(catch)
+add_subdirectory(src/fa)
+add_subdirectory(src/regex)
+add_subdirectory(src/catch)
  
