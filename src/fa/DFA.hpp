@@ -41,7 +41,7 @@ public:
 
 private:
     std::vector<DFAState> mStates;
-    Alphabet mAlphabet;
+    Alphabet mAlphabet; // Todo reference?
 
     StateId mStateCount;
     StateId mStartState;

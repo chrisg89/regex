@@ -6,8 +6,6 @@
 
 #include <string>
 
-
-
 namespace regex
 {
 
@@ -30,10 +28,7 @@ private:
 
 };
 
-
-
-
-
+//TODO encapsulate this stuff
 bool isValidRegex(std::string regex);
 std::string PreprocessRegex(std::string regex);
 std::string RegexInfixToPostfix(std::string regex);

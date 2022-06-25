@@ -15,7 +15,7 @@ SCENARIO( "Empty", "[empty]" )
         std::string regex("a|b");
         regex::regexToNFA(nfa, regex);
 
-        std::cout << nfa.toPlantUML();
+        //std::cout << nfa.toPlantUML();
 
         auto dfa = nfa.toDFA();
 

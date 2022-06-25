@@ -1,11 +1,12 @@
-
-#include "Regex.hpp"  //include before algo causes errors with #define epsilon char(0) maybe collision?
+#include "Regex.hpp" 
 
 #include <stack>
 #include <map> 
 #include <sstream>
 #include <cassert> //todo try to replace with excpetion everywhere
 #include <algorithm>
+
+
 
 namespace regex
 {
@@ -541,7 +542,7 @@ void Regex::compile(std::string regex)
 
     mDFA = nfa.toDFA();
 
-    auto plantNFA = nfa.toPlantUML();
+    std::cout << nfa.toPlantUML();
 
 
 }
