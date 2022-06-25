@@ -13,7 +13,9 @@ SCENARIO( "Empty", "[empty]" )
     {
 
         std::string regex("a|b");
-        regex::regexToNFA(nfa, regex);
+        auto preprocessed = PreprocessRegex(regex);
+        auto postfix = RegexInfixToPostfix(preprocessed);
+        regex::regexToNFA(nfa, postfix);
 
         //std::cout << nfa.toPlantUML();
 

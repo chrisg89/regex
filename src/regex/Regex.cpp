@@ -83,6 +83,8 @@ int priority(char c)
     return prio;
 }
 
+
+
 std::string PreprocessRegex(std::string regex)
 {
     std::stringstream ss;
@@ -424,6 +426,13 @@ bool isValidRegex(std::string regex)
     return valid;
 }
 
+fa::Alphabet getAlphabet(std::string regex)
+{
+    fa::Alphabet alphabet;
+
+    return alphabet;
+}
+
 
 
 
@@ -431,11 +440,6 @@ bool isValidRegex(std::string regex)
 // internal references? I think it would be a move...
 void regexToNFA(NFA& nfa, std::string regex)
 {
-    if (!isValidRegex(regex))
-        assert(false);
-    
-    regex = PreprocessRegex(regex);
-    regex = RegexInfixToPostfix(regex);
 
     std::stack<BlackBox> stack;
 
@@ -534,9 +538,18 @@ Regex::Regex()
 
 void Regex::compile(std::string regex)
 {
+    
+    if (!isValidRegex(regex))
+    assert(false);
+    
     NFA nfa{fa::Alphabet{'a','b'}}; //TODO
 
-    regexToNFA(nfa, regex);
+
+
+    auto preprocessed = PreprocessRegex(regex);
+    auto postfix = RegexInfixToPostfix(preprocessed);
+
+    regexToNFA(nfa, postfix);
 
     std::cout << nfa.toPlantUML();
 
