@@ -20,6 +20,8 @@ SCENARIO( "Empty", "[empty]" )
 
     auto plantNFA = nfa.toPlantUML();
 
+    //std::cout << plantNFA << std::endl;
+
     //TODO need to implement checks for other known NFAs as well
     auto expected = std::string(
         "@startuml\n"

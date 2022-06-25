@@ -58,6 +58,7 @@ private:
     bool isReachableByEpsilonClosure(StateId source, StateId destination);
 
     DFA NFAToDFAConversion();
+    bool ContainsFinalState(const std::vector<StateId>& composite );
 
     std::vector<State> mStates;
     Alphabet mAlphabet;

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <unordered_set>
 #include <set>
+#include <deque>
 
 namespace nfa
 {
@@ -23,7 +24,7 @@ struct VectorHasher {
 
 
 
-using StateMapper = Bimap<std::vector<StateId>, StateId, VectorHasher>;
+using StateMapper = Bimap<std::vector<StateId>, StateId, VectorHasher>;  //TODO change to set<StateId>
 
 
 
@@ -237,26 +238,39 @@ bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination)
     return false;
 }
 
-
+bool NFA::ContainsFinalState(const std::vector<StateId>& composite )
+{
+    for(auto state1 : composite)
+    {
+        for(auto state2 : mFinalStates)
+        {
+            if (state1 == state2)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 DFA NFA::NFAToDFAConversion()
 {
 
     DFA dfa(mAlphabet);
-    std::stack<StateId> stack;
+    std::deque<StateId> queue;
     StateMapper mapper;
     std::set<StateId> set;
 
 
     auto dfaState = dfa.addState(true, mStates[mStartState].mIsFinal);
     mapper.insert(dfaState, {mStartState});
-    stack.push(dfaState);
+    queue.push_back(dfaState);
 
 
-    while(!stack.empty())
+    while(!queue.empty())
     {
-        dfaState = stack.top();
-        stack.pop();
+        dfaState = queue.front();
+        queue.pop_front();
 
         auto nfaStates = mapper.get(dfaState);
 
@@ -267,11 +281,12 @@ DFA NFA::NFAToDFAConversion()
 
             for(auto nfaState : nfaStates)
             {
+                // calc  union of all dest states
                 auto destinations = mStates[nfaState].mTransitions[character];
                 std::copy(destinations.begin(), destinations.end(), std::inserter(set, set.end()));
             }
 
-            std::vector<StateId> composite(set.begin(), set.end());
+            std::vector<StateId> composite(set.begin(), set.end());  // call this union?
             auto newDfaState = StateId{kNullState};
             if(mapper.contains(composite))
             {
@@ -279,9 +294,9 @@ DFA NFA::NFAToDFAConversion()
             }
             else
             {
-                auto newDfaState = dfa.addState(false, false);  //TODO calculate if final state
+                newDfaState = dfa.addState(false, ContainsFinalState(composite));  //TODO calculate if final state
                 mapper.insert(newDfaState, composite);
-                stack.push(newDfaState);
+                queue.push_back(newDfaState);
             }
 
             dfa.addTransition(character, dfaState, newDfaState);
