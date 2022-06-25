@@ -106,6 +106,43 @@ SCENARIO( "Empty", "[empty]" )
         REQUIRE(regex.match("aa"));
         REQUIRE(regex.match("aaa"));
     }
+
+    {
+        auto regex = Regex();
+        regex.compile("a*(b|c)");
+        REQUIRE(regex.match("b"));
+        REQUIRE(regex.match("ab"));
+        REQUIRE(regex.match("aab"));
+        REQUIRE(regex.match("aaab"));
+
+        REQUIRE(regex.match("c"));
+        REQUIRE(regex.match("ac"));
+        REQUIRE(regex.match("aac"));
+        REQUIRE(regex.match("aaac"));
+
+        REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match("a"));
+        REQUIRE(!regex.match("aa"));
+        REQUIRE(!regex.match("aaa"));
+
+        REQUIRE(!regex.match("aba"));
+        REQUIRE(!regex.match("abc"));
+        REQUIRE(!regex.match("aca"));
+        REQUIRE(!regex.match("acb"));
+    }
+
+    {
+        auto regex = Regex();
+        regex.compile("((ab)|(cd))*e");
+        REQUIRE(regex.match("e"));
+        REQUIRE(regex.match("abe"));
+        REQUIRE(regex.match("cde"));
+        REQUIRE(regex.match("ababe"));
+        REQUIRE(regex.match("cdcde"));
+        REQUIRE(regex.match("abcde"));
+        REQUIRE(regex.match("cdabe"));
+    }
+
     
     //TODO add more here
 
