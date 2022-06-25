@@ -1,6 +1,5 @@
 
 add_library(fsm_lib
-    FSM.cpp
     NFA.cpp
     DFA.cpp
     Bimap.cpp)

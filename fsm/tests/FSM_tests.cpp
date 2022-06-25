@@ -1,6 +1,5 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-#include "FSM.hpp"
 #include "NFA.hpp"
 
 namespace fsm{
@@ -40,6 +39,7 @@ SCENARIO( "FSM used in Deterministic Finite Automata", "[DFA]" )
     {
        GIVEN( "a DFA that accepts the language" ) 
        {
+            /*
             FSM fsm;
             auto& stateA = fsm.addState(true, true);
             auto& stateB = fsm.addState(false, false);
@@ -111,6 +111,8 @@ SCENARIO( "FSM used in Deterministic Finite Automata", "[DFA]" )
                     }
                 }
             }
+
+            */
         }
     }
 }
