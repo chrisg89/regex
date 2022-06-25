@@ -89,5 +89,21 @@ std::string DFA::toPlantUML()
     return plantUML;
 }
 
+bool DFA::run(std::string string)
+{
+
+    StateId current;
+
+    assert(mStartState != kNullState);
+
+    current = mStartState;
+
+    for(char& c : string)
+    {
+        current = mStates[current].mTransitions[c];
+    }
+
+    return mStates[current].mIsFinal;
+}
 
 } //namespace fa

@@ -531,5 +531,30 @@ regex.compile()
 };
 */
 
+Regex::Regex()
+: mDFA{{}} //TODO: create default constructor?
+{}
+
+void Regex::compile(std::string regex)
+{
+    NFA nfa{fa::Alphabet{'a','b'}}; //TODO
+
+    regexToNFA(nfa, regex);
+
+    std::cout << nfa.toPlantUML();
+
+    mDFA = nfa.toDFA();
+
+    auto plantNFA = nfa.toPlantUML();
+
+
+}
+
+bool Regex::match(std::string string)
+{
+    return mDFA.run(string);
+}
+
+
 
 } //namespace regex

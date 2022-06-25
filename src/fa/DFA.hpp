@@ -37,6 +37,8 @@ public:
 
     std::string toPlantUML();
 
+    bool run(std::string string);
+
 private:
     std::vector<DFAState> mStates;
     Alphabet mAlphabet;
