@@ -1,5 +1,6 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+#include "DFA.hpp"
 #include "NFA.hpp"
 
 namespace fa{
@@ -7,6 +8,7 @@ namespace{
 
 //TODO backup on github
 
+//TODO rename to PLantUml to serialize()
 
 SCENARIO( "Empty", "[empty]" ) 
 {
