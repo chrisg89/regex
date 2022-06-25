@@ -238,7 +238,7 @@ bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination)
     return false;
 }
 
-bool NFA::ContainsFinalState(const std::vector<StateId>& composite )
+bool NFA::ContainsFinalState(const std::vector<StateId>& composite )  //TODO clean up. Rename?
 {
     for(auto state1 : composite)
     {
@@ -286,7 +286,7 @@ DFA NFA::NFAToDFAConversion()
                 std::copy(destinations.begin(), destinations.end(), std::inserter(set, set.end()));
             }
 
-            std::vector<StateId> composite(set.begin(), set.end());  // call this union?
+            std::vector<StateId> composite(set.begin(), set.end());  // TODO call this union?
             auto newDfaState = StateId{kNullState};
             if(mapper.contains(composite))
             {
@@ -294,7 +294,7 @@ DFA NFA::NFAToDFAConversion()
             }
             else
             {
-                newDfaState = dfa.addState(false, ContainsFinalState(composite));  //TODO calculate if final state
+                newDfaState = dfa.addState(false, ContainsFinalState(composite));
                 mapper.insert(newDfaState, composite);
                 queue.push_back(newDfaState);
             }

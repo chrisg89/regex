@@ -33,10 +33,10 @@ BlackBox buildUnion(NFA& nfa, BlackBox& BB1, BlackBox& BB2)
 {
     auto entry = nfa.addState(false, false);
     auto exit = nfa.addState(false, false);
-    nfa.addTransition(epsilon, entry, BB1.entry);
-    nfa.addTransition(epsilon, entry, BB2.entry);
-    nfa.addTransition(epsilon, BB1.exit, exit);
-    nfa.addTransition(epsilon, BB2.exit, exit);
+    nfa.addTransition(fa::kEpsilon, entry, BB1.entry);
+    nfa.addTransition(fa::kEpsilon, entry, BB2.entry);
+    nfa.addTransition(fa::kEpsilon, BB1.exit, exit);
+    nfa.addTransition(fa::kEpsilon, BB2.exit, exit);
     return BlackBox(entry, exit);
 }
 
@@ -44,7 +44,7 @@ BlackBox buildConcatenation(NFA& nfa, BlackBox& BB1, BlackBox& BB2)
 {
     auto entry = BB1.entry;
     auto exit = BB2.exit;
-    nfa.addTransition(epsilon, BB1.exit, BB2.entry);
+    nfa.addTransition(fa::kEpsilon, BB1.exit, BB2.entry);
     return BlackBox(entry, exit);
 }
 
@@ -52,10 +52,10 @@ BlackBox buildKleeneStar(NFA& nfa, BlackBox& BB)
 {
     auto entry = nfa.addState(false, false);
     auto exit = nfa.addState(false, false);
-    nfa.addTransition(epsilon, entry, BB.entry);
-    nfa.addTransition(epsilon, entry, exit);
-    nfa.addTransition(epsilon, BB.exit, BB.entry);
-    nfa.addTransition(epsilon, BB.exit, exit);
+    nfa.addTransition(fa::kEpsilon, entry, BB.entry);
+    nfa.addTransition(fa::kEpsilon, entry, exit);
+    nfa.addTransition(fa::kEpsilon, BB.exit, BB.entry);
+    nfa.addTransition(fa::kEpsilon, BB.exit, exit);
     return BlackBox(entry, exit);
 }
 
@@ -483,12 +483,8 @@ void regexToNFA(NFA& nfa, std::string regex)
     auto bb = stack.top();
     auto start = nfa.addState(true, false);
     auto end = nfa.addState(false, true);
-    nfa.addTransition(epsilon, start, bb.entry);
-    nfa.addTransition(epsilon, bb.exit, end);
-
-    // TODO: need to add epsilon self-transition for each node?
-    // or can be assumed inplicitly to optimize?
-
+    nfa.addTransition(fa::kEpsilon, start, bb.entry);
+    nfa.addTransition(fa::kEpsilon, bb.exit, end);
 }
 
 // todo: add this to unit test?
@@ -508,8 +504,8 @@ void regexToNFA(NFA& nfa, std::string regex)
     auto& start = fsm.addState(true, false);
     auto& final = fsm.addState(false, true);
 
-    start.addTransitionTo(n10.entry, epsilon);
-    n10.exit.addTransitionTo(final, epsilon);
+    start.addTransitionTo(n10.entry, fa::kEpsilon);
+    n10.exit.addTransitionTo(final, fa::kEpsilon);
 
     std::cout << n8.exit << std::endl;
 

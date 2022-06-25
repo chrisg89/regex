@@ -32,7 +32,7 @@ private:
 
 
 
-constexpr char epsilon = 0; //TODO: map to definition in NFA
+
 
 bool isValidRegex(std::string regex);
 std::string PreprocessRegex(std::string regex);
