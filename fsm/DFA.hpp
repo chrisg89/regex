@@ -2,6 +2,7 @@
 #pragma once 
 #include <vector>
 #include <map>
+#include <string>
 
 namespace dfa
 {
@@ -33,6 +34,8 @@ public:
     StateId addState(bool isStart, bool isFinal);
 
     void addTransition(char input, StateId source, StateId destination);
+
+    std::string toPlantUML();
 
 private:
     std::vector<State> mStates;

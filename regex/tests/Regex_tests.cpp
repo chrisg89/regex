@@ -20,10 +20,8 @@ SCENARIO( "Empty", "[empty]" )
 
     auto plantNFA = nfa.toPlantUML();
 
-    //std::cout << plantNFA << std::endl;
-
     //TODO need to implement checks for other known NFAs as well
-    auto expected = std::string(
+    auto expectedNFA = std::string(
         "@startuml\n"
         "hide empty description\n"
         "[*] --> 6\n"
@@ -50,7 +48,26 @@ SCENARIO( "Empty", "[empty]" )
         "6 -> 3 : b\n"
         "7 : Final\n"
         "@enduml\n");
-    REQUIRE(plantNFA == expected);
+    REQUIRE(plantNFA == expectedNFA);
+
+    auto plantDFA = dfa.toPlantUML();
+    auto expectedDFA= std::string(
+        "@startuml\n"
+        "hide empty description\n"
+        "[*] --> 0\n"
+        "0 -> 1 : a\n"
+        "0 -> 2 : b\n"
+        "1 : Final\n"
+        "1 -> 3 : a\n"
+        "1 -> 3 : b\n"
+        "2 : Final\n"
+        "2 -> 3 : a\n"
+        "2 -> 3 : b\n"
+        "3 -> 3 : a\n"
+        "3 -> 3 : b\n"
+        "@enduml\n");
+    REQUIRE(plantDFA == expectedDFA);
+
 
 
 //TODO: unit test this stuff below.!
