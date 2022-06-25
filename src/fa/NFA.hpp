@@ -1,33 +1,32 @@
 
 #pragma once 
 
+#include "FA.hpp"
 #include "DFA.hpp"
 
 #include <vector>
 #include <iostream>
 #include <map>
 
-namespace nfa
+
+namespace fa
 {
 
 
 //forward declarations
-class State;
+class NFAState;
 class NFA;
 
-using DFA = dfa::DFA;
-using StateId = int;
-using Alphabet = std::vector<char>;
 using EpsilonClusureMap = std::map<StateId,std::vector<StateId>>;
 
 
-constexpr char kNullState = -1;
-constexpr char kEpsilon = 0;
 
-class State
+
+
+class NFAState
 {
 public:
-    State(StateId id, bool isStart, bool isFinal);
+    NFAState(StateId id, bool isStart, bool isFinal);
 
     void addTransition(char input, StateId destination);
 
@@ -60,7 +59,7 @@ private:
     DFA NFAToDFAConversion();
     bool ContainsFinalState(const std::vector<StateId>& composite );
 
-    std::vector<State> mStates;
+    std::vector<NFAState> mStates;
     Alphabet mAlphabet;
 
     StateId mStateCount;
@@ -70,6 +69,6 @@ private:
 };
 
 
-} //namespace nfa
+} //namespace fa
 
 

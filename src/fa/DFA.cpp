@@ -3,18 +3,18 @@
 #include <cassert>
 
 
-namespace dfa
+namespace fa
 {
 
 // TODO create generic state and then specialize it for NFA and DFA.
-State::State(StateId id, bool isStart, bool isFinal)
+DFAState::DFAState(StateId id, bool isStart, bool isFinal)
     : mId{id}
     , mIsStart{isStart}
     , mIsFinal{isFinal}
     , mTransitions{}
 {}
 
-void State::addTransition(char input, StateId destination)
+void DFAState::addTransition(char input, StateId destination)
 {
     mTransitions[input] = destination;
 }
@@ -90,4 +90,4 @@ std::string DFA::toPlantUML()
 }
 
 
-} //namespace dfa
+} //namespace fa

@@ -9,8 +9,8 @@
 
 namespace regex
 {
-    using NFA = nfa::NFA;
-    using StateId = nfa::StateId;
+    using NFA = fa::NFA;
+    using StateId = fa::StateId;
 
     constexpr char epsilon = 0; //TODO: map to definition in NFA
 

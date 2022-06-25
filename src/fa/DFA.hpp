@@ -1,20 +1,20 @@
 
 #pragma once 
+
+#include "FA.hpp"
+
 #include <vector>
 #include <map>
 #include <string>
 
-namespace dfa
+
+namespace fa
 {
 
-using StateId = int;
-using Alphabet = std::vector<char>;
-constexpr char kNullState = -1;
-
-class State
+class DFAState
 {
 public:
-    State(StateId id, bool isStart, bool isFinal);
+    DFAState(StateId id, bool isStart, bool isFinal);
 
     void addTransition(char input, StateId destination);
 
@@ -38,7 +38,7 @@ public:
     std::string toPlantUML();
 
 private:
-    std::vector<State> mStates;
+    std::vector<DFAState> mStates;
     Alphabet mAlphabet;
 
     StateId mStateCount;
@@ -47,6 +47,6 @@ private:
 };
 
 
-} //namespace dfa
+} //namespace fa
 
 

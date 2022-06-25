@@ -9,7 +9,7 @@ namespace {
 SCENARIO( "Empty", "[empty]" ) 
 {
     //TODO need to create routine for generating alphabet from regex
-    nfa::NFA nfa{nfa::Alphabet{'a','b'}};
+    NFA nfa{fa::Alphabet{'a','b'}};
 
     std::string regex("a|b");
     regex::regexToNFA(nfa, regex);

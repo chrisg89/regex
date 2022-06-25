@@ -8,7 +8,7 @@
 #include <set>
 #include <deque>
 
-namespace nfa
+namespace fa
 {
 
 struct VectorHasher {
@@ -35,14 +35,14 @@ using StateMapper = Bimap<std::vector<StateId>, StateId, VectorHasher>;  //TODO 
 
 
 
-State::State(StateId id, bool isStart, bool isFinal)
+NFAState::NFAState(StateId id, bool isStart, bool isFinal)
     : mId{id}
     , mIsStart{isStart}
     , mIsFinal{isFinal}
     , mTransitions{}
 {}
 
-void State::addTransition(char input, StateId destination)
+void NFAState::addTransition(char input, StateId destination)
 {
     mTransitions[input].emplace_back(destination);
 }
@@ -309,5 +309,5 @@ DFA NFA::NFAToDFAConversion()
 
 
 
-} //namespace nfa
+} //namespace fa
 

@@ -2,7 +2,7 @@
 #include "catch.hpp"
 #include "NFA.hpp"
 
-namespace fsm{
+namespace fa{
 namespace{
 
 //TODO backup on github
@@ -22,7 +22,7 @@ SCENARIO( "Empty", "[empty]" )
 SCENARIO( "API", "[api]" ) 
 {
 
-    nfa::NFA nfa{nfa::Alphabet{}};
+    NFA nfa{Alphabet{}};
 
     auto state1 = nfa.addState(true, false);
     auto state2 = nfa.addState(false, false);
@@ -118,4 +118,4 @@ SCENARIO( "FSM used in Deterministic Finite Automata", "[DFA]" )
 }
 
 } //namespace
-} //namespace fsm
+} //namespace fa
