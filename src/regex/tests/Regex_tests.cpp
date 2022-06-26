@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include "Regex.hpp"
+#include "TokenStream.hpp"
 
 namespace regex{
 
@@ -142,6 +143,90 @@ SCENARIO( "Empty", "[empty]" )
         REQUIRE(regex.match("abcde"));
         REQUIRE(regex.match("cdabe"));
     }
+
+    //Tokenstream tests
+    {
+        auto tokenStream = TokenStream{};
+
+        tokenStream.insert("hello");
+        REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, 'h'});
+        REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, 'e'});
+        REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, 'l'});
+        REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, 'l'});
+        REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, 'o'});
+    }
+
+    {
+        auto tokenStream = TokenStream{};
+
+        tokenStream.insert("123");
+        REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '2'});
+        tokenStream.get();
+        REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '3'});
+        tokenStream.get();
+        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+        tokenStream.get();
+    }
+
+    {
+        auto tokenStream = TokenStream{};
+
+        tokenStream.insert("\\\\");  // TODO: test exception on bad escape sequence
+        REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '\\'});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+    }
+
+    {
+        auto tokenStream = TokenStream{};
+
+        tokenStream.insert("\\*");
+        REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '*'});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+    }
+
+    {
+        auto tokenStream = TokenStream{};
+
+        tokenStream.insert("\\(");
+        REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '('});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+    }
+
+    {
+        auto tokenStream = TokenStream{};
+
+        tokenStream.insert("\\)");
+        REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, ')'});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+    }
+
+    {
+        auto tokenStream = TokenStream{};
+
+        tokenStream.insert("\\|");
+        REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '|'});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+    }
+
+    /* TODO: illegal escape sequence (escape followed by EOF)
+    {
+        auto tokenStream = TokenStream{};
+
+        tokenStream.insert("\\");  
+        REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '\\'});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+    }
+    */
+
+    /* TODO: illegal escape sequence (escape followed by unknow character)
+    {
+        auto tokenStream = TokenStream{};
+
+        tokenStream.insert("\\a");  
+        REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '\\'});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+    }
+    */
 
     
     //TODO add more here

@@ -1,4 +1,5 @@
 #include "Regex.hpp" 
+#include "TokenStream.hpp"
 
 #include <stack>
 #include <map> 
@@ -85,7 +86,9 @@ int priority(char c)
 
 
 
-std::string PreprocessRegex(std::string regex)
+
+
+std::string PreprocessRegex(std::string regex)  //TODO rename to insert???
 {
     std::stringstream ss;
 
@@ -562,11 +565,11 @@ void Regex::compile(std::string regex)
 
     regexToNFA(nfa, postfix);
 
-    std::cout << nfa.toPlantUML();
+    //std::cout << nfa.toPlantUML();
 
     mDFA = nfa.toDFA();
 
-    std::cout << nfa.toPlantUML();
+    //std::cout << nfa.toPlantUML();
 
 
 }
