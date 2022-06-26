@@ -1,7 +1,6 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include "Regex.hpp"
-#include "TokenStream.hpp"
 
 namespace regex{
 
@@ -160,52 +159,65 @@ SCENARIO( "Empty", "[empty]" )
         auto tokenStream = TokenStream{};
 
         tokenStream.insert("123");
+        REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '1'});
+        tokenStream.get();
         REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '2'});
         tokenStream.get();
         REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '3'});
         tokenStream.get();
         REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
         tokenStream.get();
+        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
     }
 
     {
         auto tokenStream = TokenStream{};
 
         tokenStream.insert("\\\\");  // TODO: test exception on bad escape sequence
+        REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '\\'});
         REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '\\'});
         REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.get() == Token{TokenType::eNull, ' '});
     }
 
     {
         auto tokenStream = TokenStream{};
 
         tokenStream.insert("\\*");
+        REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '*'});
         REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '*'});
         REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.get() == Token{TokenType::eNull, ' '});
     }
 
     {
         auto tokenStream = TokenStream{};
 
         tokenStream.insert("\\(");
+        REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '('});
         REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '('});
         REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.get() == Token{TokenType::eNull, ' '});
     }
 
     {
         auto tokenStream = TokenStream{};
 
         tokenStream.insert("\\)");
+        REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, ')'});
         REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, ')'});
         REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.get() == Token{TokenType::eNull, ' '});
     }
 
     {
         auto tokenStream = TokenStream{};
 
         tokenStream.insert("\\|");
+        REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '|'});
         REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '|'});
         REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.get() == Token{TokenType::eNull, ' '});
     }
 
     /* TODO: illegal escape sequence (escape followed by EOF)
@@ -393,11 +405,14 @@ SCENARIO( "Regex", "[regex]" )
 
             GIVEN( "a valid regex: " << goodRegex ) 
             {
+                auto tokenStream = TokenStream();
+                tokenStream.insert(goodRegex);
+
                 WHEN( "the regex is validated")
                 {
                     THEN( "the validator exits with success" ) 
                     {
-                        REQUIRE(isValidRegex(goodRegex));
+                        REQUIRE(isValidRegex(tokenStream));
                     }
                 }
             }
@@ -423,11 +438,15 @@ SCENARIO( "Regex", "[regex]" )
 
             GIVEN( "an invalid regex: " << badRegex ) 
             {
+
+                auto tokenStream = TokenStream();
+                tokenStream.insert(badRegex);
+
                 WHEN( "the regex is validated")
                 {
                     THEN( "the validator exits with error" ) 
                     {
-                        REQUIRE(!isValidRegex(badRegex));
+                        REQUIRE(!isValidRegex(tokenStream));
                     }
                 }
             }
@@ -500,7 +519,10 @@ SCENARIO( "Regex", "[regex]" )
             "a(a|b)a*aa"
         );
 
-        REQUIRE(isValidRegex(regex));
+        auto tokenStream = TokenStream();
+        tokenStream.insert(regex);
+
+        REQUIRE(isValidRegex(tokenStream));
 
         infix1 = PreprocessRegex(regex);
         //std::cout << "infix1: " << infix1 << std::endl;

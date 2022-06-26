@@ -12,7 +12,7 @@ namespace regex
 enum class TokenType{ 
     eControl, 
     eSymbol,
-    eNull
+    eNull // TODO: change to eEof?
 };
 
 using Token = std::pair<TokenType, char>;

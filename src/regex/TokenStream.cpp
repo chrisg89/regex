@@ -50,15 +50,18 @@ void TokenStream::insert(std::string regex)
 
 Token TokenStream::peek()
 {
-    if (mTokens.size() > 1)
-        return mTokens[1];
+    if (mTokens.empty())
+        return Token{TokenType::eNull, ' '};
 
-    return Token{TokenType::eNull, ' '};
+    return mTokens.front();
 }
 
 
 Token TokenStream::get()
 {
+    if (mTokens.empty())
+        return Token{TokenType::eNull, ' '};
+
     auto token = mTokens.front();
     mTokens.pop_front();
     return token;

@@ -1,5 +1,5 @@
 #include "Regex.hpp" 
-#include "TokenStream.hpp"
+
 
 #include <stack>
 #include <map> 
@@ -288,22 +288,23 @@ std::string RegexPostfixToInfix(std::string postfix)
     return infix;
 }
 
-bool isValidRegex(std::string regex)
+bool isValidRegex(TokenStream regex)
 {
-    std::stringstream ss(regex);
+
+    // TODO: there is prob a much more elegant way of writing this function. Refactor later?
     bool valid = true;
     int leftBracketCount = 0;
     int rightBracketCount = 0;
 
-    char current;
-    char next;
+    Token current;
+    Token next;
 
     while( true )
     {
-        current = ss.get();
-        next = ss.peek();
+        current = regex.get();
+        next = regex.peek();
 
-        if(current == EOF || !valid)
+        if(current.first == TokenType::eNull || !valid)
         {
             if (rightBracketCount != leftBracketCount)
             {
@@ -312,86 +313,86 @@ bool isValidRegex(std::string regex)
             break;
         }
 
-        if (current == '(')
+        if (current.first == TokenType::eControl && current.second == '(')
         {
             leftBracketCount++;
-            if(next == '('){
+            if(next.first == TokenType::eControl && next.second == '('){
                 valid = true;
             }
-            else if(next == ')'){
+            else if(next.first == TokenType::eControl && next.second == ')'){
                 valid = false;
             }
-            else if(next == '*'){
+            else if(next.first == TokenType::eControl && next.second == '*'){
                 valid = false;
             }
-            else if(next == '|'){
+            else if(next.first == TokenType::eControl && next.second == '|'){
                 valid = false;
             }
-            else if(next == EOF){
+            else if(next.first == TokenType::eNull){
                 valid = false;
             }
             else{
                 valid = true;
             }
         }
-        else if (current == ')')
+        else if (current.first == TokenType::eControl && current.second == ')')
         {
             rightBracketCount++;
-            if(next == '('){
+            if(next.first == TokenType::eControl && next.second == '('){
                 valid = true;
             }
-            else if(next == ')'){
+            else if(next.first == TokenType::eControl && next.second == ')'){
                 valid = true;
             }
-            else if(next == '*'){
+            else if(next.first == TokenType::eControl && next.second == '*'){
                 valid = true;
             }
-            else if(next == '|'){
+            else if(next.first == TokenType::eControl && next.second == '|'){
                 valid = true;
             }
-            else if(next == EOF){
-                valid = true;
-            }
-            else{
-                valid = true;
-            }
-        }
-        else if (current == '*')
-        {
-            if(next == '('){
-                valid = true;
-            }
-            else if(next == ')'){
-                valid = true;
-            }
-            else if(next == '*'){
-                valid = true;
-            }
-            else if(next == '|'){
-                valid = true;
-            }
-            else if(next == EOF){
+            else if(next.first == TokenType::eNull){
                 valid = true;
             }
             else{
                 valid = true;
             }
         }
-        else if (current == '|')
+        else if (current.first == TokenType::eControl &&  current.second == '*')
         {
-            if(next == '('){
+            if(next.first == TokenType::eControl && next.second == '('){
                 valid = true;
             }
-            else if(next == ')'){
+            else if(next.first == TokenType::eControl && next.second == ')'){
+                valid = true;
+            }
+            else if(next.first == TokenType::eControl && next.second == '*'){
+                valid = true;
+            }
+            else if(next.first == TokenType::eControl && next.second == '|'){
+                valid = true;
+            }
+            else if(next.first == TokenType::eNull){
+                valid = true;
+            }
+            else{
+                valid = true;
+            }
+        }
+        else if (current.first == TokenType::eControl && current.second == '|')
+        {
+            if(next.first == TokenType::eControl && next.second == '('){
+                valid = true;
+            }
+            else if(next.first == TokenType::eControl && next.second == ')'){
                 valid = false;
             }
-            else if(next == '*'){
+            else if(next.first == TokenType::eControl && next.second == '*'){
                 valid = false;
             }
-            else if(next == '|'){
+            else if(next.first == TokenType::eControl && next.second == '|'){
                 valid = false;
             }
-            else if(next == EOF){
+            else if(next.first == TokenType::eNull){
                 valid = false;
             }
             else{
@@ -400,19 +401,19 @@ bool isValidRegex(std::string regex)
         }
         else
         {
-            if(next == '('){
+            if(next.first == TokenType::eControl && next.second == '('){
                 valid = true;
             }
-            else if(next == ')'){
+            else if(next.first == TokenType::eControl && next.second == ')'){
                 valid = true;
             }
-            else if(next == '*'){
+            else if(next.first == TokenType::eControl && next.second == '*'){
                 valid = true;
             }
-            else if(next == '|'){
+            else if(next.first == TokenType::eControl && next.second == '|'){
                 valid = true;
             }
-            else if(next == EOF){
+            else if(next.first == TokenType::eNull){
                 valid = true;
             }
             else{
@@ -551,8 +552,11 @@ Regex::Regex()
 void Regex::compile(std::string regex)
 {
     
-    if (!isValidRegex(regex))
-    assert(false);
+    auto tokenStream = TokenStream();
+    tokenStream.insert(regex);
+
+    if (!isValidRegex(tokenStream))
+        assert(false);
 
     auto alphabet = getAlphabet(regex);
     

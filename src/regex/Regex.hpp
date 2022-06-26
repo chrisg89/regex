@@ -3,6 +3,7 @@
 
 #include "NFA.hpp"
 #include "DFA.hpp"
+#include "TokenStream.hpp"
 
 #include <string>
 
@@ -29,7 +30,7 @@ private:
 };
 
 //TODO encapsulate this stuff
-bool isValidRegex(std::string regex);
+bool isValidRegex(TokenStream regex);
 std::string PreprocessRegex(std::string regex);
 std::string RegexInfixToPostfix(std::string regex);
 std::string RegexPostfixToInfix(std::string postfix);
