@@ -31,10 +31,10 @@ private:
 
 //TODO encapsulate this stuff
 bool isValidRegex(TokenStream regex);
-std::string PreprocessRegex(std::string regex);
-std::string RegexInfixToPostfix(std::string regex);
+TokenStream PreprocessRegex(TokenStream regex);
+TokenStream RegexInfixToPostfix(TokenStream regex);
 std::string RegexPostfixToInfix(std::string postfix);
-void regexToNFA(NFA& nfa, std::string regex);
+void regexToNFA(NFA& nfa, TokenStream regex);
 
 
 } //namespace regex

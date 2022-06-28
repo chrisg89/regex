@@ -13,7 +13,9 @@ SCENARIO( "Empty", "[empty]" )
     {
 
         std::string regex("a|b");
-        auto preprocessed = PreprocessRegex(regex);
+        auto tokenStream = TokenStream();
+        tokenStream.insert(regex);
+        auto preprocessed = PreprocessRegex(tokenStream);
         auto postfix = RegexInfixToPostfix(preprocessed);
         regex::regexToNFA(nfa, postfix);
 
@@ -141,6 +143,24 @@ SCENARIO( "Empty", "[empty]" )
         REQUIRE(regex.match("cdcde"));
         REQUIRE(regex.match("abcde"));
         REQUIRE(regex.match("cdabe"));
+    }
+
+    {
+        auto regex = Regex();
+        regex.compile("A\\|\\|B");
+        REQUIRE(regex.match("A||B"));
+    }
+
+    {
+        auto regex = Regex();
+        regex.compile("A\\*B");
+        REQUIRE(regex.match("A*B"));
+    }
+
+    {
+        auto regex = Regex();
+        regex.compile("\\(1+2\\)");
+        REQUIRE(regex.match("(1+2)"));
     }
 
     //Tokenstream tests
@@ -481,12 +501,16 @@ SCENARIO( "Regex", "[regex]" )
             {
                 THEN( "the concatenation operator is inserted correctly" ) 
                 {
-                    REQUIRE(PreprocessRegex(input) == output);
+                    auto inputStream = TokenStream();
+                    inputStream.insert(input);
+                    auto preprocessed = PreprocessRegex(inputStream);
+                    REQUIRE(preprocessed.toString() == output);
                 }
             }
         }
     }
 
+    /*
     SECTION("Converting regex to postfix notation")
     {
         // In this test, we want to verify that a
@@ -554,6 +578,7 @@ SCENARIO( "Regex", "[regex]" )
             }
         }
     }
+    */
 }
 
 } // namespace 

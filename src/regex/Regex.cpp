@@ -88,64 +88,62 @@ int priority(char c)
 
 
 
-std::string PreprocessRegex(std::string regex)  //TODO rename to insert???
+TokenStream PreprocessRegex(TokenStream regex)  //TODO rename to insert???
 {
-    std::stringstream ss;
 
-    ss << regex;
-    std::string processed = "";
+    TokenStream processed;
     bool insert;
 
     while( true )
     {
-        char current = ss.get();
-        char next = ss.peek();
+        auto current = regex.get();
+        auto next = regex.peek();
         insert = false;
 
-        if(next == EOF)
+        if(next.first == TokenType::eNull)
         {
-            processed += current;
+            processed.insert(current);
             break;
         }
 
-        if(current == '*')
+        if(current.first == TokenType::eControl && current.second == '*')
         {
-            if(next == '*'){
+            if(next.first == TokenType::eControl && next.second == '*'){
                 insert = false;
             }
-            else if(next == '|'){
+            else if(next.first == TokenType::eControl && next.second == '|'){
                 insert = false;
             }
-            else if(next == '('){
+            else if(next.first == TokenType::eControl && next.second == '('){
                 insert = true;
             }
-            else if(next == ')'){
+            else if(next.first == TokenType::eControl && next.second == ')'){
                 insert = false;
             }
             else{
                 insert = true;
             }
         }
-        else if (current== '|')
+        else if (current.first == TokenType::eControl && current.second == '|')
         {
             insert = false;
         }
-        else if (current == '(')
+        else if (current.first == TokenType::eControl && current.second == '(')
         {
             insert = false;
         }
-        else if (current == ')')
+        else if (current.first == TokenType::eControl && current.second == ')')
         {
-            if(next == '*'){
+            if(next.first == TokenType::eControl && next.second == '*'){
                 insert = false;
             }
-            else if(next == '|'){
+            else if(next.first == TokenType::eControl && next.second == '|'){
                 insert = false;
             }
-            else if(next == '('){
+            else if(next.first == TokenType::eControl && next.second == '('){
                 insert = true;
             }
-            else if(next == ')'){
+            else if(next.first == TokenType::eControl && next.second == ')'){
                 insert = false;
             }
             else{
@@ -154,16 +152,16 @@ std::string PreprocessRegex(std::string regex)  //TODO rename to insert???
         }
         else
         {
-            if(next == '*'){
+            if(next.first == TokenType::eControl && next.second == '*'){
                 insert = false;
             }
-            else if(next == '|'){
+            else if(next.first == TokenType::eControl && next.second == '|'){
                 insert = false;
             }
-            else if(next == '('){
+            else if(next.first == TokenType::eControl && next.second == '('){
                 insert = true;
             }
-            else if(next == ')'){
+            else if(next.first == TokenType::eControl && next.second == ')'){
                 insert = false;
             }
             else{
@@ -171,10 +169,10 @@ std::string PreprocessRegex(std::string regex)  //TODO rename to insert???
             }
         }
 
-        processed += current;
+        processed.insert(current);
         if(insert)
         {
-            processed += '&';
+            processed.insert(Token{TokenType::eControl, '&'});
         }
 
     }
@@ -182,62 +180,54 @@ std::string PreprocessRegex(std::string regex)  //TODO rename to insert???
     return processed;
 }
 
-std::string RegexInfixToPostfix(std::string infix)
+TokenStream RegexInfixToPostfix(TokenStream infix)
 {
-    std::string postfix = "";
-    std::stack<char> stack;
+    TokenStream postfix;
+    std::stack<Token> stack;
 
-    for(char& c : infix) 
+    auto token = Token{};
+    while( token = infix.get(), token.first != TokenType::eNull )
     {
-        switch (c)  
+
+        if(token.first == TokenType::eControl && token.second == '(')
         {
-            case '(':
-            {
-                stack.push(c);
-                break;
-            }
-
-            case ')':
-            {
-                while(stack.top() != '(')
-                {
-                    postfix += stack.top();
-                    stack.pop();
-                }
-                stack.pop();
-                break;
-            }
-
-            case '|':
-                [[fallthrough]];
-            case '*':
-                [[fallthrough]];
-            case '&':
-            {
-                while(!stack.empty())
-                {
-                    if (stack.top() == '(')
-                        break;
-                    if (priority(stack.top()) < priority(c))
-                        break;
-
-                    postfix += stack.top();
-                    stack.pop();
-                }
-                stack.push(c);
-                break;
-            }
-
-            default:
-            {
-                postfix += c;
-            }
-
+            stack.push(token);
         }
+
+        else if(token.first == TokenType::eControl && token.second == ')')
+        {
+            while(stack.top().first == TokenType::eControl && stack.top().second != '(')
+            {
+                postfix.insert(stack.top());
+                stack.pop();
+            }
+            stack.pop();
+        }
+
+        else if(token.first == TokenType::eControl && ( token.second == '|' || token.second == '*' || token.second == '&'))
+        {
+            while(!stack.empty())
+            {
+                if (stack.top().first == TokenType::eControl && stack.top().second == '(')
+                    break;
+                if (priority(stack.top().second) < priority(token.second))
+                    break;
+
+                postfix.insert(stack.top());
+                stack.pop();
+            }
+            stack.push(token);
+        }
+
+        else
+        {
+            postfix.insert(token);
+        }
+
     }
     while(!stack.empty())
     {
-        postfix += stack.top();
+        postfix.insert(stack.top());
         stack.pop();
     }
 
@@ -452,46 +442,43 @@ fa::Alphabet getAlphabet(TokenStream regex)
 
 // maybe change to return FSM by value? Would this break the 
 // internal references? I think it would be a move...
-void regexToNFA(NFA& nfa, std::string regex)
+void regexToNFA(NFA& nfa, TokenStream regex)
 {
 
     std::stack<BlackBox> stack;
 
-    for(char& c : regex) 
+    auto token = Token{};
+    while( token = regex.get(), token.first != TokenType::eNull )
     {
-        switch (c)  
-        {
-            case '|':
-            {
-                auto op1 = stack.top();
-                stack.pop();
-                auto op2 = stack.top();
-                stack.pop();
-                stack.push(buildUnion(nfa, op2, op1));
-                break;
-            }
-            case '&':
-            {   
-                auto op1 = stack.top();
-                stack.pop();
-                auto op2 = stack.top();
-                stack.pop();
-                stack.push(buildConcatenation(nfa, op2, op1));
-                break;
-            }
-            case '*':
-            {
-                auto op1 = stack.top();
-                stack.pop();
-                stack.push(buildKleeneStar(nfa, op1));
-                break;
-            }
 
-            default:
-            {
-                stack.push(buildSymbol(nfa, c));
-            }
+        if(token.first == TokenType::eControl && token.second == '|')
+        {
+            auto op1 = stack.top();
+            stack.pop();
+            auto op2 = stack.top();
+            stack.pop();
+            stack.push(buildUnion(nfa, op2, op1));
         }
+        else if(token.first == TokenType::eControl && token.second == '&')
+        {   
+            auto op1 = stack.top();
+            stack.pop();
+            auto op2 = stack.top();
+            stack.pop();
+            stack.push(buildConcatenation(nfa, op2, op1));
+        }
+        else if(token.first == TokenType::eControl && token.second == '*')
+        {
+            auto op1 = stack.top();
+            stack.pop();
+            stack.push(buildKleeneStar(nfa, op1));
+        }
+
+        else
+        {
+            stack.push(buildSymbol(nfa, token.second));
+        }
+
     }
     assert(stack.size()==1);
 
@@ -565,7 +552,7 @@ void Regex::compile(std::string regex)
 
 
 
-    auto preprocessed = PreprocessRegex(regex);
+    auto preprocessed = PreprocessRegex(tokenStream);
     auto postfix = RegexInfixToPostfix(preprocessed);
 
     regexToNFA(nfa, postfix);

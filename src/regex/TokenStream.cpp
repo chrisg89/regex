@@ -13,6 +13,10 @@ TokenStream::TokenStream()
     : mTokens{}
 {}
 
+void TokenStream::insert(Token token)
+{
+    mTokens.emplace_back(token);
+}
 
 void TokenStream::insert(std::string regex)
 {
@@ -46,6 +50,15 @@ void TokenStream::insert(std::string regex)
             mTokens.emplace_back(TokenType::eSymbol, current);
         }
     }
+}
+
+std::string TokenStream::toString()
+{
+    std::string string = "";
+    for (auto const &token: mTokens) {  //TODO: does not print escape character
+        string+=token.second;
+    }
+    return string;
 }
 
 Token TokenStream::peek()
