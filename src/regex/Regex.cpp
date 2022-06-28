@@ -212,7 +212,7 @@ TokenStream RegexInfixToPostfix(TokenStream infix)
             {
                 if (stack.top().first == TokenType::eOpenBracket)
                     break;
-                if (priority(stack.top().second) < priority(token.second))
+                if (stack.top().second < token.second)
                     break;
 
                 postfix.insert(stack.top());

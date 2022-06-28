@@ -9,10 +9,14 @@
 namespace regex
 {
 
+constexpr uint8_t kPrioUnion = 0;
+constexpr uint8_t kPrioConcat = 1;
+constexpr uint8_t kPrioClosure = 2;
+
 enum class TokenType{ 
-    eUnion,
-    eClosure,
-    eConcat,
+    eUnion = kPrioUnion,
+    eConcat = kPrioConcat,
+    eClosure = kPrioClosure,
     eOpenBracket,
     eCloseBracket,
     eSymbol,
