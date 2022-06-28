@@ -430,15 +430,16 @@ bool isValidRegex(TokenStream regex)
     return valid;
 }
 
-fa::Alphabet getAlphabet(std::string regex)
+fa::Alphabet getAlphabet(TokenStream regex)
 {
     fa::Alphabet alphabet;
 
-    for(char& c: regex)
+    auto token = Token{};
+    while( token = regex.get(), token.first != TokenType::eNull )
     {
-        if (c != '|' && c != '(' && c != ')' && c != '*' )
+        if (token.first == TokenType::eSymbol)
         {
-            alphabet.insert(c);
+            alphabet.insert(token.second);
         }
 
     }
@@ -558,7 +559,7 @@ void Regex::compile(std::string regex)
     if (!isValidRegex(tokenStream))
         assert(false);
 
-    auto alphabet = getAlphabet(regex);
+    auto alphabet = getAlphabet(tokenStream); //TODO consider creating alphabet class
     
     NFA nfa{alphabet};
 
