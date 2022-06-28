@@ -28,9 +28,21 @@ void TokenStream::insert(std::string regex)
     {
         char current = ss.get();
         
-        if(current == '(' || current == ')' || current == '*' || current == '|')
+        if(current == '(')
         {
-            mTokens.emplace_back(TokenType::eControl, current);
+            mTokens.emplace_back(TokenType::eOpenBracket, '(');
+        }
+        else if (current == ')')
+        {
+            mTokens.emplace_back(TokenType::eCloseBracket, ')');
+        }
+        else if (current == '*')
+        {
+            mTokens.emplace_back(TokenType::eClosure, '*');
+        }
+        else if (current == '|')
+        {
+            mTokens.emplace_back(TokenType::eUnion, '|');
         }
         else if(current == '\\' )
         {

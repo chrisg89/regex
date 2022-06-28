@@ -10,7 +10,11 @@ namespace regex
 {
 
 enum class TokenType{ 
-    eControl, 
+    eUnion,
+    eClosure,
+    eConcat,
+    eOpenBracket,
+    eCloseBracket,
     eSymbol,
     eNull // TODO: change to eEof?
 };

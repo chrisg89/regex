@@ -106,44 +106,44 @@ TokenStream PreprocessRegex(TokenStream regex)  //TODO rename to insert???
             break;
         }
 
-        if(current.first == TokenType::eControl && current.second == '*')
+        if(current.first == TokenType::eClosure)
         {
-            if(next.first == TokenType::eControl && next.second == '*'){
+            if(next.first == TokenType::eClosure){
                 insert = false;
             }
-            else if(next.first == TokenType::eControl && next.second == '|'){
+            else if(next.first == TokenType::eUnion){
                 insert = false;
             }
-            else if(next.first == TokenType::eControl && next.second == '('){
+            else if(next.first == TokenType::eOpenBracket){
                 insert = true;
             }
-            else if(next.first == TokenType::eControl && next.second == ')'){
+            else if(next.first == TokenType::eCloseBracket){
                 insert = false;
             }
             else{
                 insert = true;
             }
         }
-        else if (current.first == TokenType::eControl && current.second == '|')
+        else if (current.first == TokenType::eUnion)
         {
             insert = false;
         }
-        else if (current.first == TokenType::eControl && current.second == '(')
+        else if (current.first == TokenType::eOpenBracket)
         {
             insert = false;
         }
-        else if (current.first == TokenType::eControl && current.second == ')')
+        else if (current.first == TokenType::eCloseBracket)
         {
-            if(next.first == TokenType::eControl && next.second == '*'){
+            if(next.first == TokenType::eClosure){
                 insert = false;
             }
-            else if(next.first == TokenType::eControl && next.second == '|'){
+            else if(next.first == TokenType::eUnion){
                 insert = false;
             }
-            else if(next.first == TokenType::eControl && next.second == '('){
+            else if(next.first == TokenType::eOpenBracket){
                 insert = true;
             }
-            else if(next.first == TokenType::eControl && next.second == ')'){
+            else if(next.first == TokenType::eCloseBracket){
                 insert = false;
             }
             else{
@@ -152,16 +152,16 @@ TokenStream PreprocessRegex(TokenStream regex)  //TODO rename to insert???
         }
         else
         {
-            if(next.first == TokenType::eControl && next.second == '*'){
+            if(next.first == TokenType::eClosure){
                 insert = false;
             }
-            else if(next.first == TokenType::eControl && next.second == '|'){
+            else if(next.first == TokenType::eUnion){
                 insert = false;
             }
-            else if(next.first == TokenType::eControl && next.second == '('){
+            else if(next.first == TokenType::eOpenBracket){
                 insert = true;
             }
-            else if(next.first == TokenType::eControl && next.second == ')'){
+            else if(next.first == TokenType::eCloseBracket){
                 insert = false;
             }
             else{
@@ -172,7 +172,7 @@ TokenStream PreprocessRegex(TokenStream regex)  //TODO rename to insert???
         processed.insert(current);
         if(insert)
         {
-            processed.insert(Token{TokenType::eControl, '&'});
+            processed.insert(Token{TokenType::eConcat, '&'});
         }
 
     }
@@ -189,14 +189,14 @@ TokenStream RegexInfixToPostfix(TokenStream infix)
     while( token = infix.get(), token.first != TokenType::eNull )
     {
 
-        if(token.first == TokenType::eControl && token.second == '(')
+        if(token.first == TokenType::eOpenBracket)
         {
             stack.push(token);
         }
 
-        else if(token.first == TokenType::eControl && token.second == ')')
+        else if(token.first == TokenType::eCloseBracket)
         {
-            while(stack.top().first == TokenType::eControl && stack.top().second != '(')
+            while(stack.top().first != TokenType::eOpenBracket)
             {
                 postfix.insert(stack.top());
                 stack.pop();
@@ -204,11 +204,13 @@ TokenStream RegexInfixToPostfix(TokenStream infix)
             stack.pop();
         }
 
-        else if(token.first == TokenType::eControl && ( token.second == '|' || token.second == '*' || token.second == '&'))
+        else if(token.first == TokenType::eUnion || 
+                token.first == TokenType::eConcat || 
+                token.first == TokenType::eClosure)
         {
             while(!stack.empty())
             {
-                if (stack.top().first == TokenType::eControl && stack.top().second == '(')
+                if (stack.top().first == TokenType::eOpenBracket)
                     break;
                 if (priority(stack.top().second) < priority(token.second))
                     break;
@@ -303,19 +305,19 @@ bool isValidRegex(TokenStream regex)
             break;
         }
 
-        if (current.first == TokenType::eControl && current.second == '(')
+        if (current.first == TokenType::eOpenBracket)
         {
             leftBracketCount++;
-            if(next.first == TokenType::eControl && next.second == '('){
+            if(next.first == TokenType::eOpenBracket){
                 valid = true;
             }
-            else if(next.first == TokenType::eControl && next.second == ')'){
+            else if(next.first == TokenType::eCloseBracket){
                 valid = false;
             }
-            else if(next.first == TokenType::eControl && next.second == '*'){
+            else if(next.first == TokenType::eClosure){
                 valid = false;
             }
-            else if(next.first == TokenType::eControl && next.second == '|'){
+            else if(next.first == TokenType::eUnion){
                 valid = false;
             }
             else if(next.first == TokenType::eNull){
@@ -325,40 +327,19 @@ bool isValidRegex(TokenStream regex)
                 valid = true;
             }
         }
-        else if (current.first == TokenType::eControl && current.second == ')')
+        else if (current.first == TokenType::eCloseBracket)
         {
             rightBracketCount++;
-            if(next.first == TokenType::eControl && next.second == '('){
+            if(next.first == TokenType::eOpenBracket){
                 valid = true;
             }
-            else if(next.first == TokenType::eControl && next.second == ')'){
+            else if(next.first == TokenType::eCloseBracket){
                 valid = true;
             }
-            else if(next.first == TokenType::eControl && next.second == '*'){
+            else if(next.first == TokenType::eClosure){
                 valid = true;
             }
-            else if(next.first == TokenType::eControl && next.second == '|'){
-                valid = true;
-            }
-            else if(next.first == TokenType::eNull){
-                valid = true;
-            }
-            else{
-                valid = true;
-            }
-        }
-        else if (current.first == TokenType::eControl &&  current.second == '*')
-        {
-            if(next.first == TokenType::eControl && next.second == '('){
-                valid = true;
-            }
-            else if(next.first == TokenType::eControl && next.second == ')'){
-                valid = true;
-            }
-            else if(next.first == TokenType::eControl && next.second == '*'){
-                valid = true;
-            }
-            else if(next.first == TokenType::eControl && next.second == '|'){
+            else if(next.first == TokenType::eUnion){
                 valid = true;
             }
             else if(next.first == TokenType::eNull){
@@ -368,18 +349,39 @@ bool isValidRegex(TokenStream regex)
                 valid = true;
             }
         }
-        else if (current.first == TokenType::eControl && current.second == '|')
+        else if (current.first == TokenType::eClosure)
         {
-            if(next.first == TokenType::eControl && next.second == '('){
+            if(next.first == TokenType::eOpenBracket){
                 valid = true;
             }
-            else if(next.first == TokenType::eControl && next.second == ')'){
+            else if(next.first == TokenType::eCloseBracket){
+                valid = true;
+            }
+            else if(next.first == TokenType::eClosure){
+                valid = true;
+            }
+            else if(next.first == TokenType::eUnion){
+                valid = true;
+            }
+            else if(next.first == TokenType::eNull){
+                valid = true;
+            }
+            else{
+                valid = true;
+            }
+        }
+        else if (current.first == TokenType::eUnion)
+        {
+            if(next.first == TokenType::eOpenBracket){
+                valid = true;
+            }
+            else if(next.first == TokenType::eCloseBracket){
                 valid = false;
             }
-            else if(next.first == TokenType::eControl && next.second == '*'){
+            else if(next.first == TokenType::eClosure){
                 valid = false;
             }
-            else if(next.first == TokenType::eControl && next.second == '|'){
+            else if(next.first == TokenType::eUnion){
                 valid = false;
             }
             else if(next.first == TokenType::eNull){
@@ -391,16 +393,16 @@ bool isValidRegex(TokenStream regex)
         }
         else
         {
-            if(next.first == TokenType::eControl && next.second == '('){
+            if(next.first == TokenType::eOpenBracket){
                 valid = true;
             }
-            else if(next.first == TokenType::eControl && next.second == ')'){
+            else if(next.first == TokenType::eCloseBracket){
                 valid = true;
             }
-            else if(next.first == TokenType::eControl && next.second == '*'){
+            else if(next.first == TokenType::eClosure){
                 valid = true;
             }
-            else if(next.first == TokenType::eControl && next.second == '|'){
+            else if(next.first == TokenType::eUnion){
                 valid = true;
             }
             else if(next.first == TokenType::eNull){
@@ -451,7 +453,7 @@ void regexToNFA(NFA& nfa, TokenStream regex)
     while( token = regex.get(), token.first != TokenType::eNull )
     {
 
-        if(token.first == TokenType::eControl && token.second == '|')
+        if(token.first == TokenType::eUnion)
         {
             auto op1 = stack.top();
             stack.pop();
@@ -459,7 +461,7 @@ void regexToNFA(NFA& nfa, TokenStream regex)
             stack.pop();
             stack.push(buildUnion(nfa, op2, op1));
         }
-        else if(token.first == TokenType::eControl && token.second == '&')
+        else if(token.first == TokenType::eConcat)
         {   
             auto op1 = stack.top();
             stack.pop();
@@ -467,7 +469,7 @@ void regexToNFA(NFA& nfa, TokenStream regex)
             stack.pop();
             stack.push(buildConcatenation(nfa, op2, op1));
         }
-        else if(token.first == TokenType::eControl && token.second == '*')
+        else if(token.first == TokenType::eClosure)
         {
             auto op1 = stack.top();
             stack.pop();
