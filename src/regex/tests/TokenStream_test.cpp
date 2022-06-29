@@ -17,8 +17,7 @@ SCENARIO( "TokenStream", "[TokenStream]" )
         {
             WHEN( "the string is tokenized")
             {
-                auto tokenStream = TokenStream{};
-                tokenStream.insert(string);
+                auto tokenStream = TokenStream{string};
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
@@ -39,8 +38,7 @@ SCENARIO( "TokenStream", "[TokenStream]" )
         {
             WHEN( "the string is tokenized")
             {
-                auto tokenStream = TokenStream{};
-                tokenStream.insert(string);
+                auto tokenStream = TokenStream{string};
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
@@ -65,8 +63,7 @@ SCENARIO( "TokenStream", "[TokenStream]" )
         {
             WHEN( "the string is tokenized")
             {
-                auto tokenStream = TokenStream{};
-                tokenStream.insert(string);
+                auto tokenStream = TokenStream{string};
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
@@ -87,8 +84,7 @@ SCENARIO( "TokenStream", "[TokenStream]" )
         {
             WHEN( "the string is tokenized")
             {
-                auto tokenStream = TokenStream{};
-                tokenStream.insert(string);
+                auto tokenStream = TokenStream{string};
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
@@ -108,8 +104,7 @@ SCENARIO( "TokenStream", "[TokenStream]" )
         {
             WHEN( "the string is tokenized")
             {
-                auto tokenStream = TokenStream{};
-                tokenStream.insert(string);
+                auto tokenStream = TokenStream{string};
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
@@ -129,8 +124,7 @@ SCENARIO( "TokenStream", "[TokenStream]" )
         {
             WHEN( "the string is tokenized")
             {
-                auto tokenStream = TokenStream{};
-                tokenStream.insert(string);
+                auto tokenStream = TokenStream{string};
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
@@ -152,8 +146,7 @@ SCENARIO( "TokenStream", "[TokenStream]" )
             {
                 THEN( "the correct tokens can be extracted") 
                 {
-                    auto tokenStream = TokenStream{};
-                    REQUIRE_THROWS_AS(tokenStream.insert(string), std::runtime_error);
+                    REQUIRE_THROWS_AS(TokenStream{string}, std::runtime_error);
                 }
             }
         }
@@ -165,8 +158,7 @@ SCENARIO( "TokenStream", "[TokenStream]" )
             {
                 THEN( "the correct tokens can be extracted") 
                 {
-                    auto tokenStream = TokenStream{};
-                    REQUIRE_THROWS_AS(tokenStream.insert(string), std::runtime_error);
+                    REQUIRE_THROWS_AS(TokenStream{string}, std::runtime_error);
                 }
             }
         }

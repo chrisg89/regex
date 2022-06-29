@@ -542,8 +542,7 @@ Regex::Regex()
 void Regex::compile(std::string regex)
 {
     
-    auto tokenStream = TokenStream();
-    tokenStream.insert(regex);
+    auto tokenStream = TokenStream(regex);
 
     if (!isValidRegex(tokenStream))
         assert(false);

@@ -31,9 +31,9 @@ class TokenStream
 public:
 
     TokenStream();
+    TokenStream(std::string regex);
     Token peek();
     Token get();
-    void insert(std::string regex); //TODO absorb this into constructor?
     void insert(Token token);
     std::string toString();
 

@@ -13,14 +13,9 @@ TokenStream::TokenStream()
     : mTokens{}
 {}
 
-void TokenStream::insert(Token token)
+TokenStream::TokenStream(std::string regex)
+    : mTokens{}
 {
-    mTokens.emplace_back(token);
-}
-
-void TokenStream::insert(std::string regex)
-{
-
     std::stringstream ss;
     ss << regex;
 
@@ -62,6 +57,11 @@ void TokenStream::insert(std::string regex)
             mTokens.emplace_back(TokenType::eSymbol, current);
         }
     }
+}
+
+void TokenStream::insert(Token token)
+{
+    mTokens.emplace_back(token);
 }
 
 std::string TokenStream::toString()

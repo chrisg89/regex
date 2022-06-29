@@ -13,8 +13,7 @@ SCENARIO( "Empty", "[empty]" )
     {
 
         std::string regex("a|b");
-        auto tokenStream = TokenStream();
-        tokenStream.insert(regex);
+        auto tokenStream = TokenStream(regex);
         auto preprocessed = PreprocessRegex(tokenStream);
         auto postfix = RegexInfixToPostfix(preprocessed);
         regex::regexToNFA(nfa, postfix);
@@ -325,8 +324,7 @@ SCENARIO( "Regex", "[regex]" )
 
             GIVEN( "a valid regex: " << goodRegex ) 
             {
-                auto tokenStream = TokenStream();
-                tokenStream.insert(goodRegex);
+                auto tokenStream = TokenStream(goodRegex);
 
                 WHEN( "the regex is validated")
                 {
@@ -359,8 +357,7 @@ SCENARIO( "Regex", "[regex]" )
             GIVEN( "an invalid regex: " << badRegex ) 
             {
 
-                auto tokenStream = TokenStream();
-                tokenStream.insert(badRegex);
+                auto tokenStream = TokenStream(badRegex);
 
                 WHEN( "the regex is validated")
                 {
@@ -401,8 +398,7 @@ SCENARIO( "Regex", "[regex]" )
             {
                 THEN( "the concatenation operator is inserted correctly" ) 
                 {
-                    auto inputStream = TokenStream();
-                    inputStream.insert(input);
+                    auto inputStream = TokenStream(input);
                     auto preprocessed = PreprocessRegex(inputStream);
                     REQUIRE(preprocessed.toString() == output);
                 }
@@ -443,8 +439,7 @@ SCENARIO( "Regex", "[regex]" )
             "a(a|b)a*aa"
         );
 
-        auto tokenStream = TokenStream();
-        tokenStream.insert(regex);
+        auto tokenStream = TokenStream(regex);
 
         REQUIRE(isValidRegex(tokenStream));
 
