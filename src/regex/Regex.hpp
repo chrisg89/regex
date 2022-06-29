@@ -34,8 +34,7 @@ private:
 bool isValidRegex(TokenStream regex);
 TokenStream PreprocessRegex(TokenStream regex);
 TokenStream RegexInfixToPostfix(TokenStream regex);
-std::string RegexPostfixToInfix(std::string postfix);
-void regexToNFA(NFA& nfa, TokenStream regex);
+NFA regexToNFA(TokenStream regex);
 
 
 } //namespace regex

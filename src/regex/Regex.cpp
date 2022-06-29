@@ -326,10 +326,12 @@ fa::Alphabet getAlphabet(TokenStream regex)
 
 // maybe change to return FSM by value? Would this break the 
 // internal references? I think it would be a move...
-void regexToNFA(NFA& nfa, TokenStream regex)
+NFA regexToNFA(TokenStream regex)
 {
-
     std::stack<BlackBox> stack;
+
+    auto alphabet = getAlphabet(regex);
+    NFA nfa{alphabet};
 
     auto token = Token{};
     while( token = regex.get(), token.first != TokenType::eEOF )
@@ -375,6 +377,8 @@ void regexToNFA(NFA& nfa, TokenStream regex)
     auto end = nfa.addState(false, true);
     nfa.addTransition(fa::kEpsilon, start, bb.entry);
     nfa.addTransition(fa::kEpsilon, bb.exit, end);
+
+    return nfa;
 }
 
 
@@ -390,16 +394,11 @@ void Regex::compile(std::string regex)
     if (!isValidRegex(tokenStream))
         assert(false);
 
-    auto alphabet = getAlphabet(tokenStream); //TODO consider creating alphabet class
-    
-    NFA nfa{alphabet};
-
-
 
     auto preprocessed = PreprocessRegex(tokenStream);
     auto postfix = RegexInfixToPostfix(preprocessed);
 
-    regexToNFA(nfa, postfix);
+    auto nfa = regexToNFA(postfix);
 
     //std::cout << nfa.toPlantUML();
 

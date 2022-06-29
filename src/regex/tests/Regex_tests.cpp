@@ -8,15 +8,13 @@ namespace {
 
 SCENARIO( "Empty", "[empty]" ) 
 {
-    //TODO need to create routine for generating alphabet from regex
-    NFA nfa{fa::Alphabet{'a','b'}};
     {
 
         std::string regex("a|b");
         auto tokenStream = TokenStream(regex);
         auto preprocessed = PreprocessRegex(tokenStream);
         auto postfix = RegexInfixToPostfix(preprocessed);
-        regex::regexToNFA(nfa, postfix);
+        auto nfa = regex::regexToNFA(postfix);
 
         //std::cout << nfa.toPlantUML();
 
