@@ -1,7 +1,7 @@
 
 #include "TokenStream.hpp"
 #include <sstream>
-#include <cassert>
+#include <stdexcept>
 
 
 // TODO unit test this class
@@ -54,7 +54,7 @@ void TokenStream::insert(std::string regex)
             }
             else
             {
-                assert(false); //TODO invalid escape sequence throw exception
+                throw std::runtime_error("invalid escape sequence detected");
             }
         }
         else

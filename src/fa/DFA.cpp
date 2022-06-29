@@ -6,7 +6,6 @@
 namespace fa
 {
 
-// TODO create generic state and then specialize it for NFA and DFA.
 DFAState::DFAState(StateId id, bool isStart, bool isFinal)
     : mId{id}
     , mIsStart{isStart}
