@@ -76,7 +76,7 @@ std::string TokenStream::toString()
 Token TokenStream::peek()
 {
     if (mTokens.empty())
-        return Token{TokenType::eNull, ' '};
+        return Token{TokenType::eEOF, ' '};
 
     return mTokens.front();
 }
@@ -85,7 +85,7 @@ Token TokenStream::peek()
 Token TokenStream::get()
 {
     if (mTokens.empty())
-        return Token{TokenType::eNull, ' '};
+        return Token{TokenType::eEOF, ' '};
 
     auto token = mTokens.front();
     mTokens.pop_front();

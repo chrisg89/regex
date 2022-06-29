@@ -185,9 +185,9 @@ SCENARIO( "Empty", "[empty]" )
         tokenStream.get();
         REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '3'});
         tokenStream.get();
-        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
         tokenStream.get();
-        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
     }
 
     {
@@ -196,8 +196,8 @@ SCENARIO( "Empty", "[empty]" )
         tokenStream.insert("\\\\");  // TODO: test exception on bad escape sequence
         REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '\\'});
         REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '\\'});
-        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
-        REQUIRE(tokenStream.get() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
+        REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
     }
 
     {
@@ -206,8 +206,8 @@ SCENARIO( "Empty", "[empty]" )
         tokenStream.insert("\\*");
         REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '*'});
         REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '*'});
-        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
-        REQUIRE(tokenStream.get() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
+        REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
     }
 
     {
@@ -216,8 +216,8 @@ SCENARIO( "Empty", "[empty]" )
         tokenStream.insert("\\(");
         REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '('});
         REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '('});
-        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
-        REQUIRE(tokenStream.get() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
+        REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
     }
 
     {
@@ -226,8 +226,8 @@ SCENARIO( "Empty", "[empty]" )
         tokenStream.insert("\\)");
         REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, ')'});
         REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, ')'});
-        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
-        REQUIRE(tokenStream.get() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
+        REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
     }
 
     {
@@ -236,8 +236,8 @@ SCENARIO( "Empty", "[empty]" )
         tokenStream.insert("\\|");
         REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '|'});
         REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '|'});
-        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
-        REQUIRE(tokenStream.get() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
+        REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
     }
 
     /* TODO: illegal escape sequence (escape followed by EOF)
@@ -246,7 +246,7 @@ SCENARIO( "Empty", "[empty]" )
 
         tokenStream.insert("\\");  
         REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '\\'});
-        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
     }
     */
 
@@ -256,7 +256,7 @@ SCENARIO( "Empty", "[empty]" )
 
         tokenStream.insert("\\a");  
         REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '\\'});
-        REQUIRE(tokenStream.peek() == Token{TokenType::eNull, ' '});
+        REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
     }
     */
 

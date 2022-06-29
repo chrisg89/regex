@@ -20,7 +20,7 @@ enum class TokenType{
     eOpenBracket,
     eCloseBracket,
     eSymbol,
-    eNull // TODO: change to eEof?
+    eEOF
 };
 
 using Token = std::pair<TokenType, char>;

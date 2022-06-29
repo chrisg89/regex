@@ -100,7 +100,7 @@ TokenStream PreprocessRegex(TokenStream regex)  //TODO rename to insert???
         auto next = regex.peek();
         insert = false;
 
-        if(next.first == TokenType::eNull)
+        if(next.first == TokenType::eEOF)
         {
             processed.insert(current);
             break;
@@ -186,7 +186,7 @@ TokenStream RegexInfixToPostfix(TokenStream infix)
     std::stack<Token> stack;
 
     auto token = Token{};
-    while( token = infix.get(), token.first != TokenType::eNull )
+    while( token = infix.get(), token.first != TokenType::eEOF )
     {
 
         if(token.first == TokenType::eOpenBracket)
@@ -296,7 +296,7 @@ bool isValidRegex(TokenStream regex)
         current = regex.get();
         next = regex.peek();
 
-        if(current.first == TokenType::eNull || !valid)
+        if(current.first == TokenType::eEOF || !valid)
         {
             if (rightBracketCount != leftBracketCount)
             {
@@ -320,7 +320,7 @@ bool isValidRegex(TokenStream regex)
             else if(next.first == TokenType::eUnion){
                 valid = false;
             }
-            else if(next.first == TokenType::eNull){
+            else if(next.first == TokenType::eEOF){
                 valid = false;
             }
             else{
@@ -342,7 +342,7 @@ bool isValidRegex(TokenStream regex)
             else if(next.first == TokenType::eUnion){
                 valid = true;
             }
-            else if(next.first == TokenType::eNull){
+            else if(next.first == TokenType::eEOF){
                 valid = true;
             }
             else{
@@ -363,7 +363,7 @@ bool isValidRegex(TokenStream regex)
             else if(next.first == TokenType::eUnion){
                 valid = true;
             }
-            else if(next.first == TokenType::eNull){
+            else if(next.first == TokenType::eEOF){
                 valid = true;
             }
             else{
@@ -384,7 +384,7 @@ bool isValidRegex(TokenStream regex)
             else if(next.first == TokenType::eUnion){
                 valid = false;
             }
-            else if(next.first == TokenType::eNull){
+            else if(next.first == TokenType::eEOF){
                 valid = false;
             }
             else{
@@ -405,7 +405,7 @@ bool isValidRegex(TokenStream regex)
             else if(next.first == TokenType::eUnion){
                 valid = true;
             }
-            else if(next.first == TokenType::eNull){
+            else if(next.first == TokenType::eEOF){
                 valid = true;
             }
             else{
@@ -427,7 +427,7 @@ fa::Alphabet getAlphabet(TokenStream regex)
     fa::Alphabet alphabet;
 
     auto token = Token{};
-    while( token = regex.get(), token.first != TokenType::eNull )
+    while( token = regex.get(), token.first != TokenType::eEOF )
     {
         if (token.first == TokenType::eSymbol)
         {
@@ -450,7 +450,7 @@ void regexToNFA(NFA& nfa, TokenStream regex)
     std::stack<BlackBox> stack;
 
     auto token = Token{};
-    while( token = regex.get(), token.first != TokenType::eNull )
+    while( token = regex.get(), token.first != TokenType::eEOF )
     {
 
         if(token.first == TokenType::eUnion)
