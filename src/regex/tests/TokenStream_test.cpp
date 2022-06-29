@@ -1,6 +1,6 @@
 
 #include "catch.hpp"
-#include "Regex.hpp"
+#include "TokenStream.hpp"
 
 #include <stdexcept>
 

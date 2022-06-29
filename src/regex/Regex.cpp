@@ -12,80 +12,6 @@
 namespace regex
 {
 
-struct BlackBox
-{
-    BlackBox(StateId entry, StateId exit)
-    : entry {entry}
-    , exit {exit}
-    {}
-
-    StateId entry;
-    StateId exit;
-};
-
-BlackBox buildSymbol(NFA& nfa, char c)
-{
-    auto entry = nfa.addState(false, false);
-    auto exit = nfa.addState(false, false);
-    nfa.addTransition(c, entry, exit);
-    return BlackBox(entry, exit);
-}
-
-BlackBox buildUnion(NFA& nfa, BlackBox& BB1, BlackBox& BB2)
-{
-    auto entry = nfa.addState(false, false);
-    auto exit = nfa.addState(false, false);
-    nfa.addTransition(fa::kEpsilon, entry, BB1.entry);
-    nfa.addTransition(fa::kEpsilon, entry, BB2.entry);
-    nfa.addTransition(fa::kEpsilon, BB1.exit, exit);
-    nfa.addTransition(fa::kEpsilon, BB2.exit, exit);
-    return BlackBox(entry, exit);
-}
-
-BlackBox buildConcatenation(NFA& nfa, BlackBox& BB1, BlackBox& BB2)
-{
-    auto entry = BB1.entry;
-    auto exit = BB2.exit;
-    nfa.addTransition(fa::kEpsilon, BB1.exit, BB2.entry);
-    return BlackBox(entry, exit);
-}
-
-BlackBox buildClosure(NFA& nfa, BlackBox& BB)
-{
-    auto entry = nfa.addState(false, false);
-    auto exit = nfa.addState(false, false);
-    nfa.addTransition(fa::kEpsilon, entry, BB.entry);
-    nfa.addTransition(fa::kEpsilon, entry, exit);
-    nfa.addTransition(fa::kEpsilon, BB.exit, BB.entry);
-    nfa.addTransition(fa::kEpsilon, BB.exit, exit);
-    return BlackBox(entry, exit);
-}
-
-int priority(char c)
-{
-    int prio;
-    if(c == '*')
-    {
-        prio=3;
-    }
-    else if (c == '&' )
-    {
-        prio=2;
-    }
-    else if (c == '|')
-    {
-        prio=1;
-    }
-    else
-    {
-        assert(false);
-    }
-
-    return prio;
-}
-
-
-
 
 
 TokenStream PreprocessRegex(TokenStream regex)  //TODO rename to insert???
@@ -495,31 +421,7 @@ void regexToNFA(NFA& nfa, TokenStream regex)
     nfa.addTransition(fa::kEpsilon, bb.exit, end);
 }
 
-// todo: add this to unit test?
-/*
-    //a(a|b|c)*a
-    auto n1  = buildSymbol(fsm, 'a');
-    auto n2  = buildSymbol(fsm, 'b');
-    auto n3  = buildUnion(fsm, n1, n2);
-    auto n4  = buildSymbol(fsm, 'c');
-    auto n5  = buildUnion(fsm, n3, n4);
-    auto n6  = buildClosure(fsm, n5);
-    auto n7  = buildSymbol(fsm, 'a');
-    auto n8  = buildConcatenation(fsm, n7, n6);
-    auto n9  = buildSymbol(fsm, 'a');
-    auto n10 = buildConcatenation(fsm, n8, n9);
-    
-    auto& start = fsm.addState(true, false);
-    auto& final = fsm.addState(false, true);
 
-    start.addTransitionTo(n10.entry, fa::kEpsilon);
-    n10.exit.addTransitionTo(final, fa::kEpsilon);
-
-    std::cout << n8.exit << std::endl;
-
-    return fsm;
-
-*/
 
 
 /*

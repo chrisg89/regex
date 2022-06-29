@@ -1,7 +1,8 @@
 
 add_library(regex_lib
     Regex.cpp
-    TokenStream.cpp)
+    TokenStream.cpp
+    ThompsonConstruction.cpp)
 
 TARGET_LINK_LIBRARIES( regex_lib
     fa_lib

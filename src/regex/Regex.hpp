@@ -4,6 +4,7 @@
 #include "NFA.hpp"
 #include "DFA.hpp"
 #include "TokenStream.hpp"
+#include "ThompsonConstruction.hpp"
 
 #include <string>
 
