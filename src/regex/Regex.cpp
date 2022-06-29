@@ -162,50 +162,6 @@ TokenStream RegexInfixToPostfix(TokenStream infix)
     return postfix;
 }
 
-std::string RegexPostfixToInfix(std::string postfix)
-{
-    std::string infix;
-    std::stack<std::string> stack;
-    std::string temp;
-    std::string op1;
-    std::string op2;
-
-    for(char& c : postfix) 
-    {
-        switch (c)  
-        {
-            case '|':
-                [[fallthrough]];
-            case '&':
-            {   
-                op1 = stack.top();
-                stack.pop();
-                op2 = stack.top();
-                stack.pop();
-                stack.push("(" + op2 + c + op1 + ")");
-                break;
-            }
-
-            case '*':
-            {
-                op1 = stack.top();
-                stack.pop();
-                stack.push("(" + op1+c + ")");
-                break;
-            }
-
-            default:
-            {
-                temp = c;
-                stack.push(temp);
-            }
-        }
-    }
-    assert(stack.size()==1);
-    infix = stack.top();
-    return infix;
-}
-
 bool isValidRegex(TokenStream regex)
 {
 
@@ -421,21 +377,6 @@ void regexToNFA(NFA& nfa, TokenStream regex)
     nfa.addTransition(fa::kEpsilon, bb.exit, end);
 }
 
-
-
-
-/*
-regex.compile()
-{
-    //validate
-    //proprocess
-    //toPostfix
-    //createEpsilonNFA
-    //createNFA
-    //createDFA
-    //minimizeDFA
-};
-*/
 
 Regex::Regex()
 : mDFA{{}} //TODO: create default constructor?

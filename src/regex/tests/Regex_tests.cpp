@@ -406,74 +406,46 @@ SCENARIO( "Regex", "[regex]" )
         }
     }
 
-    /*
+    
     SECTION("Converting regex to postfix notation")
     {
-        // In this test, we want to verify that a
-        // round trip from infix->postfix->infix
-        // does not alter the original expression.
-        // Unfortunatly, the conversion from 
-        // postfix -> infix generates brackets
-        // that make the comparision difficult.
-        // But, with one additional conversion back
-        // to postfix, we can compare the first
-        // and second postfix expressions for equality. 
-        // Such a test should provide good coverage.
+        const auto [ input, output ] = GENERATE(table<std::string, std::string>
+        ({
+            { "ab", "ab&"},
+            { "a|b", "ab|"},
+            { "a*b", "a*b&"},
+            { "(a)", "a"},
+            { "((a))", "a"},
+            { "(ab)", "ab&"},
+            { "(a)*", "a*"},
+            { "(a|b)", "ab|"},
+            { "(a*b)", "a*b&"},
+            { "(a)*b", "a*b&"},
+            { "(a)(b)", "ab&"},
+            { "(ab)*", "ab&*"},
+            { "a**", "a**"},
+            { "a|b|c", "ab|c|"},
+            { "abc", "ab&c&"},
+            { "a(b|c)", "abc|&"},
+        }));
 
-        //TODO this testing was not super useful and a bug slipped through
-        // regarding operator prio. Need to test differently
-
-        std::string infix1;
-        std::string postfix1;
-        std::string infix2;
-        std::string postfix2;
-        std::string preprocessed;
-
-        auto regex = GENERATE
-        (
-            "abc*a|b",
-            "((a))*|b",
-            "(ab)(a|b)*(a|b)|a",
-            "(ab*)a**|b",
-            "(ab)|a",
-            "a(a|b)a*aa"
-        );
-
-        auto tokenStream = TokenStream(regex);
-
-        REQUIRE(isValidRegex(tokenStream));
-
-        infix1 = PreprocessRegex(regex);
-        //std::cout << "infix1: " << infix1 << std::endl;
-
-        GIVEN( "the regex: " << infix1 ) 
+        GIVEN( "the infix regex: " << input ) 
         {
-            WHEN("the infix expression is converted to postfix ")
+            WHEN( "the regex is converted to postfix")
             {
-                postfix1 = RegexInfixToPostfix(infix1);
-                //std::cout << "postfix1: " <<postfix1 << std::endl;
+                auto tokenStream = TokenStream(input);
+                REQUIRE(isValidRegex(tokenStream));
+                auto infix = PreprocessRegex(tokenStream);
+                auto postfix = RegexInfixToPostfix(infix);
 
-                AND_THEN("the postfix expression is converted to infix ")
+                THEN( "the conversion yields the correct postfix expression" ) 
                 {
-                    infix2 = RegexPostfixToInfix(postfix1);
-                    //std::cout << "infix2: " << infix2 << std::endl;
-
-                    AND_THEN("the infix expression is converted to postfix ")
-                    {
-
-                        postfix2 = RegexInfixToPostfix(infix2);
-                        //std::cout << "postfix2: " <<postfix2 << std::endl;
-
-                        THEN( "the first and second postfix expression are identical" ) 
-                        {
-                            REQUIRE((postfix1 == postfix2));
-                        }
-                    }
+                    REQUIRE(postfix.toString() == output);
                 }
             }
         }
     }
-    */
+
 }
 
 } // namespace 
