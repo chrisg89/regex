@@ -50,7 +50,7 @@ BlackBox buildConcatenation(NFA& nfa, BlackBox& BB1, BlackBox& BB2)
     return BlackBox(entry, exit);
 }
 
-BlackBox buildKleeneStar(NFA& nfa, BlackBox& BB)
+BlackBox buildClosure(NFA& nfa, BlackBox& BB)
 {
     auto entry = nfa.addState(false, false);
     auto exit = nfa.addState(false, false);
@@ -473,7 +473,7 @@ void regexToNFA(NFA& nfa, TokenStream regex)
         {
             auto op1 = stack.top();
             stack.pop();
-            stack.push(buildKleeneStar(nfa, op1));
+            stack.push(buildClosure(nfa, op1));
         }
 
         else
@@ -503,7 +503,7 @@ void regexToNFA(NFA& nfa, TokenStream regex)
     auto n3  = buildUnion(fsm, n1, n2);
     auto n4  = buildSymbol(fsm, 'c');
     auto n5  = buildUnion(fsm, n3, n4);
-    auto n6  = buildKleeneStar(fsm, n5);
+    auto n6  = buildClosure(fsm, n5);
     auto n7  = buildSymbol(fsm, 'a');
     auto n8  = buildConcatenation(fsm, n7, n6);
     auto n9  = buildSymbol(fsm, 'a');
