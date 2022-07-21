@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+//TODO Unit test this class
+
 template <typename Type1, typename Type2, typename Type1Hasher, typename Type2Hasher>
 Bimap<Type1, Type2, Type1Hasher, Type2Hasher>::Bimap()
     : unordered_map1{}

@@ -403,6 +403,7 @@ void Regex::compile(std::string regex)
     //std::cout << nfa.toPlantUML();
 
     mDFA = nfa.toDFA();
+    mDFA.minimizeDFA();
 
     //std::cout << nfa.toPlantUML();
 

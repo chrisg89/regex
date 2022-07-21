@@ -3,9 +3,6 @@
 #include <sstream>
 #include <stdexcept>
 
-
-// TODO unit test this class
-
 namespace regex
 {
 

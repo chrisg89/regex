@@ -6,10 +6,14 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <unordered_map>
 
 
 namespace fa
 {
+
+using PartitionId = int;
+using ParitionMap = std::unordered_map<StateId,PartitionId>;  //todo change to vector?
 
 class DFAState
 {
@@ -39,13 +43,17 @@ public:
 
     bool run(std::string string);
 
+    void minimizeDFA();
+
 private:
     std::vector<DFAState> mStates;
     Alphabet mAlphabet; // Todo reference?
 
-    StateId mStateCount;
+    StateId mStateCount; //TODO this should be an int
     StateId mStartState;
     std::vector<StateId> mFinalStates;
+
+    bool checkEquivalence(ParitionMap paritionMap, StateId stateA, StateId stateB);
 };
 
 

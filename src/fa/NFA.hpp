@@ -13,7 +13,7 @@ namespace fa
 {
 
 
-//forward declarations
+//forward declarations TODO: is this required?
 class NFAState;
 class NFA;
 
