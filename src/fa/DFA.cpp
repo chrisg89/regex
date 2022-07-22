@@ -4,7 +4,6 @@
 #include <unordered_set>
 #include <iostream> //todo remove
 
-
 namespace fa
 {
 
@@ -181,18 +180,26 @@ void DFA::minimizeDFA()
     ParitionMap prevPartitionMap;
     ParitionMap currPartitionMap;
 
-    auto partition1 = pool.addPartition();
-    auto partition2 = pool.addPartition();
+    auto partitionFinal = kNullPartition;
+    auto partitionNonFinal = kNullPartition;
 
     for (auto state : mStates)
     {
         if (!state.mIsFinal)
         {
-            pool.Partitions[partition1].insert(state.mId);
+            if(partitionNonFinal == kNullState)
+            {
+                partitionNonFinal = pool.addPartition();
+            }
+            pool.Partitions[partitionNonFinal].insert(state.mId);
         }
         else
         {
-            pool.Partitions[partition2].insert(state.mId);
+            if(partitionFinal == kNullState)
+            {
+                partitionFinal = pool.addPartition();
+            }
+            pool.Partitions[partitionFinal].insert(state.mId);
         }
     }
 
@@ -237,7 +244,38 @@ void DFA::minimizeDFA()
         currPartitionMap = pool.makePartitionMap();
     }
 
-    std::cout << "asdasdad";
+
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    DFA newDFA(mAlphabet);
+
+    for (auto partition : pool.Partitions)
+    {
+        bool isStart = false;
+        bool isFinal = false;
+
+        for (auto state : pool.Partitions[partition.ID].States)
+        {
+            isStart |= mStates[state].mIsStart;
+            isFinal |= mStates[state].mIsFinal;
+        }
+
+        // parition id => new state id
+        auto newState = newDFA.addState(isStart, isFinal);
+
+        for(auto c : mAlphabet)
+        {
+            auto targetState = currPartitionMap[mStates[partition.Leader].mTransitions[c]];
+            newDFA.addTransition(c, newState, targetState);
+        }
+        
+
+
+    }
+
+    //STEP3: replace old DFA with new DFA
+    *this = newDFA;  // TODO: should use move semantics here?
 
 }
 

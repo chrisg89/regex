@@ -12,6 +12,7 @@
 namespace fa
 {
 
+constexpr char kNullPartition = -1;
 using PartitionId = int;
 using ParitionMap = std::unordered_map<StateId,PartitionId>;  //todo change to vector?
 
