@@ -6,6 +6,156 @@ namespace regex{
 
 namespace {
 
+SCENARIO( "Regex", "[regex]" ) 
+{
+    SECTION("Validate Regex")
+    {
+        SECTION("Valid (Good) Regex")
+        {
+            auto goodRegex = GENERATE
+            (
+                "(a)",
+                "((a))",
+                "(a)(b)",
+                "(a)*",
+                "(a)|(b)",
+                "(a)b",
+                "(a*)",
+                "a**",
+                "a|b",
+                "ab"
+            );
+
+            GIVEN( "a valid regex: " << goodRegex ) 
+            {
+                auto tokenStream = TokenStream(goodRegex);
+
+                WHEN( "the regex is validated")
+                {
+                    THEN( "the validator exits with success" ) 
+                    {
+                        REQUIRE(isValidRegex(tokenStream));
+                    }
+                }
+            }
+        }
+
+        SECTION("Invalid (Bad) Regex")
+        {
+            auto badRegex = GENERATE
+            (
+                "ab|",    // cant end in |
+                "ab(",    // cant end in (
+                "a(b",    // only one left bracket
+                "a)b",    // only one right bracket
+                "a)b(",   // right bracket before left bracket
+                "(a(b)",  // mismatching number of brackets
+                "a()b",   // () is invalid
+                "a(*b)",  // (* is invalid
+                "a(|b)",  // (| is invalid
+                "a(b|)",  // |) is invalid
+                "a|*b",   // |* is invalid
+                "a||b"    // || is invalid
+            );
+
+            GIVEN( "an invalid regex: " << badRegex ) 
+            {
+
+                auto tokenStream = TokenStream(badRegex);
+
+                WHEN( "the regex is validated")
+                {
+                    THEN( "the validator exits with error" ) 
+                    {
+                        REQUIRE(!isValidRegex(tokenStream));
+                    }
+                }
+            }
+        }
+    }
+
+    SECTION("Pre-processing inserts concatenation operator ")
+    {
+        const auto [ input, output ] = GENERATE(table<std::string, std::string>
+        ({
+            { "ab", "a&b"},
+            { "a*", "a*"},
+            { "a|b", "a|b"},
+            { "a(b)", "a&(b)"},
+            { "(a)", "(a)"},
+            { "a*b", "a*&b"},
+            { "a**", "a**"},
+            { "a*|b", "a*|b"},
+            { "a*(b)", "a*&(b)"},
+            { "(a*)", "(a*)"},
+            { "a|(b)", "a|(b)"},
+            { "((a))", "((a))"},
+            { "(a)b", "(a)&b"},
+            { "(a)*", "(a)*"},
+            { "(a)|b", "(a)|b"},
+            { "(a)(b)", "(a)&(b)"}
+        }));
+
+        GIVEN( "the regex: " << input ) 
+        {
+            WHEN( "the regex is pre-processed")
+            {
+                THEN( "the concatenation operator is inserted correctly" ) 
+                {
+                    auto inputStream = TokenStream(input);
+                    auto preprocessed = PreprocessRegex(inputStream);
+                    REQUIRE(preprocessed.toString() == output);
+                }
+            }
+        }
+    }
+
+    
+    SECTION("Converting regex to postfix notation")
+    {
+        const auto [ input, output ] = GENERATE(table<std::string, std::string>
+        ({
+            { "ab", "ab&"},
+            { "a|b", "ab|"},
+            { "a*b", "a*b&"},
+            { "(a)", "a"},
+            { "((a))", "a"},
+            { "(ab)", "ab&"},
+            { "(a)*", "a*"},
+            { "(a|b)", "ab|"},
+            { "(a*b)", "a*b&"},
+            { "(a)*b", "a*b&"},
+            { "(a)(b)", "ab&"},
+            { "(ab)*", "ab&*"},
+            { "a**", "a**"},
+            { "a|b|c", "ab|c|"},
+            { "abc", "ab&c&"},
+            { "a(b|c)", "abc|&"},
+            { "a|b|c", "ab|c|"},
+            { "aa|bb|cc", "aa&bb&|cc&|"},
+        }));
+
+        GIVEN( "the infix regex: " << input ) 
+        {
+            WHEN( "the regex is converted to postfix")
+            {
+                auto tokenStream = TokenStream(input);
+                REQUIRE(isValidRegex(tokenStream));
+                auto infix = PreprocessRegex(tokenStream);
+                auto postfix = RegexInfixToPostfix(infix);
+
+                THEN( "the conversion yields the correct postfix expression" ) 
+                {
+                    REQUIRE(postfix.toString() == output);
+                }
+            }
+        }
+    }
+
+}
+
+
+
 SCENARIO( "Empty", "[empty]" ) 
 {
 
@@ -203,200 +353,10 @@ hide empty description
     
 }
 
-SCENARIO( "NFA", "[empty]" ) 
-{
-    /*
-    SECTION("Check if a node is reachable from another on a* (a-closure) ")
-    {
-        FSM fsm;
-        auto& stateA = fsm.addState(true, false);
-        auto& stateB = fsm.addState(false, false);
-        auto& stateC = fsm.addState(false, false); 
-        auto& stateD = fsm.addState(false, false);  
-
-        stateA.addTransitionTo(stateB, 'a');
-        stateB.addTransitionTo(stateC, 'a');
-        stateB.addTransitionTo(stateD, 'b');
-        stateC.addTransitionTo(stateD, 'a');
-
-        std::function<bool(char)> aClosure = 
-        [](char c)
-        {
-            return (c == 'a');
-        };
-
-        // State A -> others
-        REQUIRE(fsm.isReachableIf(stateA, stateB, aClosure));
-        REQUIRE(fsm.isReachableIf(stateA, stateC, aClosure));
-        REQUIRE(fsm.isReachableIf(stateA, stateD, aClosure));
-
-        // State B -> others
-        REQUIRE(!fsm.isReachableIf(stateB, stateA, aClosure));
-        REQUIRE(fsm.isReachableIf(stateB, stateC, aClosure));
-        REQUIRE(fsm.isReachableIf(stateB, stateD, aClosure));
-
-        // State C -> others
-        REQUIRE(!fsm.isReachableIf(stateC, stateA, aClosure));
-        REQUIRE(!fsm.isReachableIf(stateC, stateB, aClosure));
-        REQUIRE(fsm.isReachableIf(stateC, stateD, aClosure));
-
-        // State D -> others
-        REQUIRE(!fsm.isReachableIf(stateD, stateA, aClosure));
-        REQUIRE(!fsm.isReachableIf(stateD, stateB, aClosure));
-        REQUIRE(!fsm.isReachableIf(stateD, stateC, aClosure));
-
-    }
-    */
-}
 
 
-SCENARIO( "Regex", "[regex]" ) 
-{
-    SECTION("Validate Regex")
-    {
-        SECTION("Valid (Good) Regex")
-        {
-            auto goodRegex = GENERATE
-            (
-                "(a)",
-                "((a))",
-                "(a)(b)",
-                "(a)*",
-                "(a)|(b)",
-                "(a)b",
-                "(a*)",
-                "a**",
-                "a|b",
-                "ab"
-            );
 
-            GIVEN( "a valid regex: " << goodRegex ) 
-            {
-                auto tokenStream = TokenStream(goodRegex);
 
-                WHEN( "the regex is validated")
-                {
-                    THEN( "the validator exits with success" ) 
-                    {
-                        REQUIRE(isValidRegex(tokenStream));
-                    }
-                }
-            }
-        }
-
-        SECTION("Invalid (Bad) Regex")
-        {
-            auto badRegex = GENERATE
-            (
-                "ab|",    // cant end in |
-                "ab(",    // cant end in (
-                "a(b",    // only one left bracket
-                "a)b",    // only one right bracket
-                "a)b(",   // right bracket before left bracket
-                "(a(b)",  // mismatching number of brackets
-                "a()b",   // () is invalid
-                "a(*b)",  // (* is invalid
-                "a(|b)",  // (| is invalid
-                "a(b|)",  // |) is invalid
-                "a|*b",   // |* is invalid
-                "a||b"    // || is invalid
-            );
-
-            GIVEN( "an invalid regex: " << badRegex ) 
-            {
-
-                auto tokenStream = TokenStream(badRegex);
-
-                WHEN( "the regex is validated")
-                {
-                    THEN( "the validator exits with error" ) 
-                    {
-                        REQUIRE(!isValidRegex(tokenStream));
-                    }
-                }
-            }
-        }
-    }
-
-    SECTION("Pre-processing inserts concatenation operator ")
-    {
-        const auto [ input, output ] = GENERATE(table<std::string, std::string>
-        ({
-            { "ab", "a&b"},
-            { "a*", "a*"},
-            { "a|b", "a|b"},
-            { "a(b)", "a&(b)"},
-            { "(a)", "(a)"},
-            { "a*b", "a*&b"},
-            { "a**", "a**"},
-            { "a*|b", "a*|b"},
-            { "a*(b)", "a*&(b)"},
-            { "(a*)", "(a*)"},
-            { "a|(b)", "a|(b)"},
-            { "((a))", "((a))"},
-            { "(a)b", "(a)&b"},
-            { "(a)*", "(a)*"},
-            { "(a)|b", "(a)|b"},
-            { "(a)(b)", "(a)&(b)"}
-        }));
-
-        GIVEN( "the regex: " << input ) 
-        {
-            WHEN( "the regex is pre-processed")
-            {
-                THEN( "the concatenation operator is inserted correctly" ) 
-                {
-                    auto inputStream = TokenStream(input);
-                    auto preprocessed = PreprocessRegex(inputStream);
-                    REQUIRE(preprocessed.toString() == output);
-                }
-            }
-        }
-    }
-
-    
-    SECTION("Converting regex to postfix notation")
-    {
-        const auto [ input, output ] = GENERATE(table<std::string, std::string>
-        ({
-            { "ab", "ab&"},
-            { "a|b", "ab|"},
-            { "a*b", "a*b&"},
-            { "(a)", "a"},
-            { "((a))", "a"},
-            { "(ab)", "ab&"},
-            { "(a)*", "a*"},
-            { "(a|b)", "ab|"},
-            { "(a*b)", "a*b&"},
-            { "(a)*b", "a*b&"},
-            { "(a)(b)", "ab&"},
-            { "(ab)*", "ab&*"},
-            { "a**", "a**"},
-            { "a|b|c", "ab|c|"},
-            { "abc", "ab&c&"},
-            { "a(b|c)", "abc|&"},
-            { "a|b|c", "ab|c|"},
-            { "aa|bb|cc", "aa&bb&|cc&|"},
-        }));
-
-        GIVEN( "the infix regex: " << input ) 
-        {
-            WHEN( "the regex is converted to postfix")
-            {
-                auto tokenStream = TokenStream(input);
-                REQUIRE(isValidRegex(tokenStream));
-                auto infix = PreprocessRegex(tokenStream);
-                auto postfix = RegexInfixToPostfix(infix);
-
-                THEN( "the conversion yields the correct postfix expression" ) 
-                {
-                    REQUIRE(postfix.toString() == output);
-                }
-            }
-        }
-    }
-
-}
 
 } // namespace 
 } // namespace regex
