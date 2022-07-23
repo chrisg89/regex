@@ -51,43 +51,33 @@ void DFA::addTransition(char input, StateId source, StateId destination)
     mStates[source].addTransition(input, destination);
 }
 
-std::string DFA::toPlantUML()
+std::string DFA::serialize()
 {
-
-    //TODO: plantuml does an awful job of positioning the
-    // states and its really hard to see useful details.
-    // maybe remove this?
-    std::string plantUML = "";
-
-    plantUML += "@startuml\n";
-    plantUML += "hide empty description\n";
-
-    plantUML += "[*] --> ";
-    plantUML += std::to_string(mStartState);
-    plantUML += "\n";
+    std::string out = "";
     
     for (auto state : mStates)
     {
-        if(state.mIsFinal)
-        {
-            plantUML += std::to_string(state.mId);
-            plantUML += " : Final\n";
-        }
+        out += std::to_string(state.mId);
+        out += " : Start =" ;
+        out += (state.mIsStart? "true" : "false");
+        out += " , Final = ";
+        out += (state.mIsFinal ? "true" : "false");
+        out += " , Dead = ";
+        out += (state.mIsDead ? "true" : "false");
+        out += "\n";
 
         for (auto const& [input, destination] : state.mTransitions)
         {
-            plantUML += std::to_string(state.mId);
-            plantUML += " -> ";
-            plantUML += std::to_string(destination);
-            plantUML += " : ";
-            plantUML += input;
-            plantUML += "\n";
+            out += std::to_string(state.mId);
+            out += " -> ";
+            out += std::to_string(destination);
+            out += " : ";
+            out += input;
+            out += "\n";
         }
     }
-    plantUML += "@enduml\n";
 
-
-    return plantUML;
+    return out;
 }
 
 bool DFA::run(std::string string)

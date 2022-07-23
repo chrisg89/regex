@@ -48,7 +48,7 @@ public:
 
     DFA toDFA();
 
-    std::string toPlantUML();
+    std::string serialize();
 
 private:
 

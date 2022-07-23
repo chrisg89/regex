@@ -41,7 +41,7 @@ public:
 
     void addTransition(char input, StateId source, StateId destination);
 
-    std::string toPlantUML();
+    std::string serialize();
 
     bool run(std::string string);
 

@@ -3,6 +3,8 @@
 #include <vector>
 #include <set>
 
+//TODO rename fa to fsa???
+
 namespace fa
 {
 

@@ -13,12 +13,74 @@ namespace{
 SCENARIO( "Empty", "[empty]" ) 
 {
 
+    /*
+    {
 
-    //iteratre over all states and find all final states
-    // assert only one final state
-    //fsm.isReachable(star, ) // move to fsm unit test and create manual state machine
+        std::string regex("a|b");
+        auto tokenStream = TokenStream(regex);
+        auto preprocessed = PreprocessRegex(tokenStream);
+        auto postfix = RegexInfixToPostfix(preprocessed);
+        auto nfa = regex::regexToNFA(postfix);
+
+        //std::cout << nfa.toPlantUML();
+
+        auto dfa = nfa.toDFA();
+
+        auto plantNFA = nfa.toPlantUML();
+
+        
+        //TODO need to implement checks for other known NFAs as well
+        auto expectedNFA = std::string(
+            "@startuml\n"
+            "hide empty description\n"
+            "[*] --> 6\n"
+            "0 -> 7 : a\n"
+            "0 -> 5 : a\n"
+            "0 -> 1 : a\n"
+            "1 : Final\n"
+            "2 -> 7 : b\n"
+            "2 -> 5 : b\n"
+            "2 -> 3 : b\n"
+            "3 : Final\n"
+            "4 -> 7 : a\n"
+            "4 -> 5 : a\n"
+            "4 -> 1 : a\n"
+            "4 -> 7 : b\n"
+            "4 -> 5 : b\n"
+            "4 -> 3 : b\n"
+            "5 : Final\n"
+            "6 -> 7 : a\n"
+            "6 -> 5 : a\n"
+            "6 -> 1 : a\n"
+            "6 -> 7 : b\n"
+            "6 -> 5 : b\n"
+            "6 -> 3 : b\n"
+            "7 : Final\n"
+            "@enduml\n");
+        REQUIRE(plantNFA == expectedNFA);
+
+        auto plantDFA = dfa.toPlantUML();
+        auto expectedDFA= std::string(
+            "@startuml\n"
+            "hide empty description\n"
+            "[*] --> 0\n"
+            "0 -> 1 : a\n"
+            "0 -> 2 : b\n"
+            "1 : Final\n"
+            "1 -> 3 : a\n"
+            "1 -> 3 : b\n"
+            "2 : Final\n"
+            "2 -> 3 : a\n"
+            "2 -> 3 : b\n"
+            "3 -> 3 : a\n"
+            "3 -> 3 : b\n"
+            "@enduml\n");
+        REQUIRE(plantDFA == expectedDFA);
+        
+    }
+    */
     
-    //std::cout << fsm.toPlantUML() << std::endl << regex << std::endl;
+
 }
 
 SCENARIO( "API", "[api]" ) 
