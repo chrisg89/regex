@@ -8,6 +8,8 @@ namespace {
 
 SCENARIO( "Empty", "[empty]" ) 
 {
+
+    /* TODO move to FA tests
     {
 
         std::string regex("a|b");
@@ -22,6 +24,7 @@ SCENARIO( "Empty", "[empty]" )
 
         auto plantNFA = nfa.toPlantUML();
 
+        
         //TODO need to implement checks for other known NFAs as well
         auto expectedNFA = std::string(
             "@startuml\n"
@@ -69,7 +72,9 @@ SCENARIO( "Empty", "[empty]" )
             "3 -> 3 : b\n"
             "@enduml\n");
         REQUIRE(plantDFA == expectedDFA);
+        
     }
+    */
 
     {
         auto regex = Regex();
@@ -159,6 +164,17 @@ SCENARIO( "Empty", "[empty]" )
         regex.compile("\\(1+2\\)");
         REQUIRE(regex.match("(1+2)"));
     }
+
+    {
+        auto regex = Regex();
+        regex.compile("while|if|void|break");
+        REQUIRE(regex.match("if"));
+        REQUIRE(regex.match("while"));
+        REQUIRE(regex.match("void"));
+        REQUIRE(regex.match("break"));
+
+    }
+
 
 
 //TODO: unit test this stuff below.!
@@ -425,6 +441,8 @@ SCENARIO( "Regex", "[regex]" )
             { "a|b|c", "ab|c|"},
             { "abc", "ab&c&"},
             { "a(b|c)", "abc|&"},
+            { "a|b|c", "ab|c|"},
+            { "aa|bb|cc", "aa&bb&|cc&|"},
         }));
 
         GIVEN( "the infix regex: " << input ) 

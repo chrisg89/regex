@@ -27,6 +27,7 @@ public:
     StateId mId;
     bool mIsStart;
     bool mIsFinal;
+    bool mIsDead;
     std::map<char, StateId> mTransitions;
 };
 
@@ -55,6 +56,7 @@ private:
     std::vector<StateId> mFinalStates;
 
     bool checkEquivalence(ParitionMap paritionMap, StateId stateA, StateId stateB);
+    void markDeadStates();
 };
 
 

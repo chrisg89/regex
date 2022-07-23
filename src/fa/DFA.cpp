@@ -12,6 +12,7 @@ DFAState::DFAState(StateId id, bool isStart, bool isFinal)
     , mIsStart{isStart}
     , mIsFinal{isFinal}
     , mTransitions{}
+    , mIsDead{true}
 {}
 
 void DFAState::addTransition(char input, StateId destination)
@@ -101,6 +102,11 @@ bool DFA::run(std::string string)
     for(char& c : string)
     {
         current = mStates[current].mTransitions[c];
+
+        if(mStates[current].mIsDead)
+        {
+            break;
+        }
     }
 
     return mStates[current].mIsFinal;
@@ -242,6 +248,8 @@ void DFA::minimizeDFA()
 
         prevPartitionMap = currPartitionMap;
         currPartitionMap = pool.makePartitionMap();
+
+        
     }
 
 
@@ -274,8 +282,13 @@ void DFA::minimizeDFA()
 
     }
 
+
+    std::cout << "before: " << mStates.size() << " after: " << newDFA.mStates.size() << std::endl; //TODO remove
+
     //STEP3: replace old DFA with new DFA
     *this = newDFA;  // TODO: should use move semantics here?
+
+    markDeadStates();
 
 }
 
@@ -296,6 +309,21 @@ bool DFA::checkEquivalence(ParitionMap paritionMap, StateId stateA, StateId stat
     }
 
     return true;
+}
+
+void DFA::markDeadStates()
+{
+    for(auto& state : mStates)
+    {
+        for(auto c : mAlphabet)
+        {
+            if (state.mTransitions[c] != state.mId)
+            {
+                state.mIsDead = false;
+                break;
+            }
+        }
+    }
 }
 
 } //namespace fa

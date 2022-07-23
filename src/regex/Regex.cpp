@@ -13,6 +13,106 @@ namespace regex
 {
 
 
+fa::Alphabet kAlphabet{' ',
+                   '!', 
+                   '"', 
+                   '#', 
+                   '$', 
+                   '%',
+                   '&', 
+                   '\'', 
+                   '(', 
+                   ')', 
+                   '*', 
+                   '+',
+                   ',', 
+                   '-', 
+                   '.', 
+                   '/', 
+                   '0', 
+                   '1', 
+                   '2', 
+                   '3', 
+                   '4', 
+                   '5', 
+                   '6', 
+                   '7', 
+                   '8', 
+                   '9', 
+                   ':', 
+                   ';', 
+                   '<',
+                   '=', 
+                   '>', 
+                   '?', 
+                   '@', 
+                   'A',
+                   'B', 
+                   'C', 
+                   'D', 
+                   'E', 
+                   'F', 
+                   'G', 
+                   'H', 
+                   'I', 
+                   'J', 
+                   'K', 
+                   'L', 
+                   'M', 
+                   'N', 
+                   'O', 
+                   'P', 
+                   'Q', 
+                   'R', 
+                   'S', 
+                   'T', 
+                   'U', 
+                   'V', 
+                   'W', 
+                   'X', 
+                   'Y', 
+                   'Z',
+                   '[', 
+                   '\\', 
+                   ']', 
+                   '^', 
+                   '_', 
+                   '`', 
+                   'a', 
+                   'b', 
+                   'c', 
+                   'd', 
+                   'e', 
+                   'f',
+                   'g', 
+                   'h', 
+                   'i', 
+                   'j', 
+                   'k', 
+                   'l',
+                   'm', 
+                   'n', 
+                   'o', 
+                   'p', 
+                   'q', 
+                   'r',
+                   's', 
+                   't', 
+                   'u', 
+                   'v', 
+                   'w', 
+                   'x',
+                   'y', 
+                   'z', 
+                   '{',  
+                   '|',  
+                   '}',  
+                   '~'
+                   };
+
+
+
+
 
 TokenStream PreprocessRegex(TokenStream regex)  //TODO rename to insert???
 {
@@ -138,7 +238,7 @@ TokenStream RegexInfixToPostfix(TokenStream infix)
             {
                 if (stack.top().first == TokenType::eOpenBracket)
                     break;
-                if (stack.top().second < token.second)
+                if (stack.top().first < token.first)
                     break;
 
                 postfix.insert(stack.top());
@@ -330,7 +430,7 @@ NFA regexToNFA(TokenStream regex)
 {
     std::stack<BlackBox> stack;
 
-    auto alphabet = getAlphabet(regex);
+    auto alphabet = kAlphabet; //getAlphabet(regex);
     NFA nfa{alphabet};
 
     auto token = Token{};
