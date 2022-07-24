@@ -62,7 +62,7 @@ private:
     std::vector<NFAState> mStates;
     Alphabet mAlphabet;
 
-    StateId mStateCount;
+    uint mStateCount;
     StateId mStartState;
     std::vector<StateId> mFinalStates;
     

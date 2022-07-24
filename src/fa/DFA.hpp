@@ -51,7 +51,7 @@ private:
     std::vector<DFAState> mStates;
     Alphabet mAlphabet; // Todo reference?
 
-    StateId mStateCount; //TODO this should be an int
+    uint mStateCount;
     StateId mStartState;
     std::vector<StateId> mFinalStates;
 
