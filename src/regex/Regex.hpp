@@ -1,19 +1,15 @@
 
 #pragma once
 
-#include "NFA.hpp"
-#include "DFA.hpp"
 #include "TokenStream.hpp"
-#include "ThompsonConstruction.hpp"
+#include "DFABuilder.hpp"
 
 #include <string>
 
 namespace regex
 {
 
-using NFA = fa::NFA;
 using DFA = fa::DFA;
-using StateId = fa::StateId;
 
 class Regex
 {
@@ -30,11 +26,6 @@ private:
 
 };
 
-//TODO encapsulate this stuff
 bool isValidRegex(TokenStream regex);
-TokenStream PreprocessRegex(TokenStream regex);
-TokenStream RegexInfixToPostfix(TokenStream regex);
-NFA regexToNFA(TokenStream regex);
-
 
 } //namespace regex

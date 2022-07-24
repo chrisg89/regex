@@ -117,6 +117,9 @@ DFA NFA::toDFA()
     // TODO: explain
     auto dfa = NFAToDFAConversion();
 
+    // TODO: explain
+    dfa.minimizeDFA();
+
     return dfa;
 
 }

@@ -1,13 +1,17 @@
 #pragma once
 
 #include "NFA.hpp"
+#include "TokenStream.hpp"
 
 namespace regex
 {
 
 using NFA = fa::NFA;
 using StateId = fa::StateId;
+using Alphabet = fa::Alphabet;
 
+
+NFA ThompsonConstruction(TokenStream regex, Alphabet alphabet); //TODO: need to unit test this 
 
 struct BlackBox
 {

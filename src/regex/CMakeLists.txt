@@ -1,6 +1,6 @@
 
 add_library(regex_lib
-    FSABuilder.cpp
+    DFABuilder.cpp
     Regex.cpp
     ThompsonConstruction.cpp
     TokenStream.cpp

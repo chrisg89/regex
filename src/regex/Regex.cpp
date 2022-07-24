@@ -1,11 +1,7 @@
 #include "Regex.hpp" 
 
 
-#include <stack>
-#include <map> 
-#include <sstream>
 #include <cassert> //todo try to replace with excpetion everywhere
-#include <algorithm>
 
 
 
@@ -114,153 +110,7 @@ fa::Alphabet kAlphabet{' ',
 
 
 
-TokenStream PreprocessRegex(TokenStream regex)  //TODO rename to insert???
-{
 
-    TokenStream processed;
-    bool insert;
-
-    while( true )
-    {
-        auto current = regex.get();
-        auto next = regex.peek();
-        insert = false;
-
-        if(next.first == TokenType::eEOF)
-        {
-            processed.insert(current);
-            break;
-        }
-
-        if(current.first == TokenType::eClosure)
-        {
-            if(next.first == TokenType::eClosure){
-                insert = false;
-            }
-            else if(next.first == TokenType::eUnion){
-                insert = false;
-            }
-            else if(next.first == TokenType::eOpenBracket){
-                insert = true;
-            }
-            else if(next.first == TokenType::eCloseBracket){
-                insert = false;
-            }
-            else{
-                insert = true;
-            }
-        }
-        else if (current.first == TokenType::eUnion)
-        {
-            insert = false;
-        }
-        else if (current.first == TokenType::eOpenBracket)
-        {
-            insert = false;
-        }
-        else if (current.first == TokenType::eCloseBracket)
-        {
-            if(next.first == TokenType::eClosure){
-                insert = false;
-            }
-            else if(next.first == TokenType::eUnion){
-                insert = false;
-            }
-            else if(next.first == TokenType::eOpenBracket){
-                insert = true;
-            }
-            else if(next.first == TokenType::eCloseBracket){
-                insert = false;
-            }
-            else{
-                insert = true;
-            }
-        }
-        else
-        {
-            if(next.first == TokenType::eClosure){
-                insert = false;
-            }
-            else if(next.first == TokenType::eUnion){
-                insert = false;
-            }
-            else if(next.first == TokenType::eOpenBracket){
-                insert = true;
-            }
-            else if(next.first == TokenType::eCloseBracket){
-                insert = false;
-            }
-            else{
-                insert = true;
-            }
-        }
-
-        processed.insert(current);
-        if(insert)
-        {
-            processed.insert(Token{TokenType::eConcat, '&'});
-        }
-
-    }
-
-    return processed;
-}
-
-TokenStream RegexInfixToPostfix(TokenStream infix)
-{
-    TokenStream postfix;
-    std::stack<Token> stack;
-
-    auto token = Token{};
-    while( token = infix.get(), token.first != TokenType::eEOF )
-    {
-
-        if(token.first == TokenType::eOpenBracket)
-        {
-            stack.push(token);
-        }
-
-        else if(token.first == TokenType::eCloseBracket)
-        {
-            while(stack.top().first != TokenType::eOpenBracket)
-            {
-                postfix.insert(stack.top());
-                stack.pop();
-            }
-            stack.pop();
-        }
-
-        else if(token.first == TokenType::eUnion || 
-                token.first == TokenType::eConcat || 
-                token.first == TokenType::eClosure)
-        {
-            while(!stack.empty())
-            {
-                if (stack.top().first == TokenType::eOpenBracket)
-                    break;
-                if (stack.top().first < token.first)
-                    break;
-
-                postfix.insert(stack.top());
-                stack.pop();
-            }
-            stack.push(token);
-        }
-
-        else
-        {
-            postfix.insert(token);
-        }
-
-    }
-    while(!stack.empty())
-    {
-        postfix.insert(stack.top());
-        stack.pop();
-    }
-
-    return postfix;
-}
 
 bool isValidRegex(TokenStream regex)
 {
@@ -424,62 +274,7 @@ fa::Alphabet getAlphabet(TokenStream regex)
 
 
 
-// maybe change to return FSM by value? Would this break the 
-// internal references? I think it would be a move...
-NFA regexToNFA(TokenStream regex)
-{
-    std::stack<BlackBox> stack;
 
-    auto alphabet = kAlphabet; //getAlphabet(regex);
-    NFA nfa{alphabet};
-
-    auto token = Token{};
-    while( token = regex.get(), token.first != TokenType::eEOF )
-    {
-
-        if(token.first == TokenType::eUnion)
-        {
-            auto op1 = stack.top();
-            stack.pop();
-            auto op2 = stack.top();
-            stack.pop();
-            stack.push(buildUnion(nfa, op2, op1));
-        }
-        else if(token.first == TokenType::eConcat)
-        {   
-            auto op1 = stack.top();
-            stack.pop();
-            auto op2 = stack.top();
-            stack.pop();
-            stack.push(buildConcatenation(nfa, op2, op1));
-        }
-        else if(token.first == TokenType::eClosure)
-        {
-            auto op1 = stack.top();
-            stack.pop();
-            stack.push(buildClosure(nfa, op1));
-        }
-
-        else
-        {
-            stack.push(buildSymbol(nfa, token.second));
-        }
-
-    }
-    assert(stack.size()==1);
-
-    // stack now contains the black box containing within it
-    // the FSA equivalent of the regex. Only need to connect
-    // the entry and exit states of the black box to the start
-    // and end states.
-    auto bb = stack.top();
-    auto start = nfa.addState(true, false);
-    auto end = nfa.addState(false, true);
-    nfa.addTransition(fa::kEpsilon, start, bb.entry);
-    nfa.addTransition(fa::kEpsilon, bb.exit, end);
-
-    return nfa;
-}
 
 
 Regex::Regex()
@@ -494,20 +289,7 @@ void Regex::compile(std::string regex)
     if (!isValidRegex(tokenStream))
         assert(false);
 
-
-    auto preprocessed = PreprocessRegex(tokenStream);
-    auto postfix = RegexInfixToPostfix(preprocessed);
-
-    auto nfa = regexToNFA(postfix);
-
-    //std::cout << nfa.toPlantUML();
-
-    mDFA = nfa.toDFA();
-    mDFA.minimizeDFA();
-
-    //std::cout << nfa.toPlantUML();
-
-
+    mDFA = build(tokenStream, kAlphabet);
 }
 
 bool Regex::match(std::string string)
