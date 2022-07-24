@@ -13,9 +13,7 @@ namespace fa
 {
 
 
-//forward declarations TODO: is this required?
-class NFAState;
-class NFA;
+
 
 using EpsilonClusureMap = std::map<StateId,std::vector<StateId>>;
 
