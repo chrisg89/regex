@@ -103,7 +103,7 @@ SCENARIO( "Regex", "[regex]" )
                 THEN( "the concatenation operator is inserted correctly" ) 
                 {
                     auto inputStream = TokenStream(input);
-                    auto preprocessed = PreprocessRegex(inputStream);
+                    auto preprocessed = InsertExplicitConcat(inputStream);
                     REQUIRE(preprocessed.toString() == output);
                 }
             }
@@ -141,8 +141,8 @@ SCENARIO( "Regex", "[regex]" )
             {
                 auto tokenStream = TokenStream(input);
                 REQUIRE(isValidRegex(tokenStream));
-                auto infix = PreprocessRegex(tokenStream);
-                auto postfix = RegexInfixToPostfix(infix);
+                auto infix = InsertExplicitConcat(tokenStream);
+                auto postfix = InfixToPostfix(infix);
 
                 THEN( "the conversion yields the correct postfix expression" ) 
                 {

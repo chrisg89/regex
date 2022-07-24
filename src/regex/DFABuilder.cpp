@@ -11,8 +11,8 @@ namespace regex
     
 DFA build(TokenStream regex, Alphabet alphabet)  //todo use alpha by ref
 {
-    auto preprocessed = PreprocessRegex(regex);
-    auto postfix = RegexInfixToPostfix(preprocessed);
+    auto preprocessed = InsertExplicitConcat(regex);
+    auto postfix = InfixToPostfix(preprocessed);
 
     // Construct the NFA from the regular expression
     auto nfa = ThompsonConstruction(postfix, alphabet);
@@ -23,7 +23,7 @@ DFA build(TokenStream regex, Alphabet alphabet)  //todo use alpha by ref
     return dfa;
 }
 
-TokenStream PreprocessRegex(TokenStream regex)  //TODO rename to insert???
+TokenStream InsertExplicitConcat(TokenStream regex)  //TODO rename to insert???
 {
 
     TokenStream processed;
@@ -115,7 +115,7 @@ TokenStream PreprocessRegex(TokenStream regex)  //TODO rename to insert???
     return processed;
 }
 
-TokenStream RegexInfixToPostfix(TokenStream infix)
+TokenStream InfixToPostfix(TokenStream infix)
 {
     TokenStream postfix;
     std::stack<Token> stack;

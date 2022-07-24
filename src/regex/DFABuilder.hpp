@@ -15,10 +15,10 @@ using Alphabet = fa::Alphabet;
 DFA build(TokenStream regex, Alphabet alphabet);
 
 // exposed for unit tests
-TokenStream PreprocessRegex(TokenStream regex);
+TokenStream InsertExplicitConcat(TokenStream regex);
 
 //exposed for unit tests
-TokenStream RegexInfixToPostfix(TokenStream regex);
+TokenStream InfixToPostfix(TokenStream regex);
 
 
 
