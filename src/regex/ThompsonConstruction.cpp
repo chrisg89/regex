@@ -6,7 +6,7 @@
 namespace regex
 {
 
-NFA ThompsonConstruction(TokenStream regex, Alphabet alphabet)  //todo alpha by refer
+NFA ThompsonConstruction(TokenStream regex, Alphabet& alphabet)
 {
     std::stack<BlackBox> stack;
 

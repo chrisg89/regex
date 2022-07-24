@@ -12,7 +12,7 @@ using NFA = fa::NFA;
 using DFA = fa::DFA;
 using Alphabet = fa::Alphabet;
 
-DFA build(TokenStream regex, Alphabet alphabet);
+DFA build(TokenStream regex, Alphabet& alphabet);
 
 // exposed for unit tests
 TokenStream InsertExplicitConcat(TokenStream regex);

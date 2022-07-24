@@ -9,7 +9,7 @@
 namespace regex
 {
     
-DFA build(TokenStream regex, Alphabet alphabet)  //todo use alpha by ref
+DFA build(TokenStream regex, Alphabet& alphabet)
 {
     auto preprocessed = InsertExplicitConcat(regex);
     auto postfix = InfixToPostfix(preprocessed);

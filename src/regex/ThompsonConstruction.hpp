@@ -11,7 +11,7 @@ using StateId = fa::StateId;
 using Alphabet = fa::Alphabet;
 
 
-NFA ThompsonConstruction(TokenStream regex, Alphabet alphabet); //TODO: need to unit test this 
+NFA ThompsonConstruction(TokenStream regex, Alphabet& alphabet);
 
 struct BlackBox
 {
