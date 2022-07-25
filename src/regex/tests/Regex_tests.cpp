@@ -259,6 +259,13 @@ SCENARIO( "Empty", "[empty]" )
 
     }
 
+    {
+        auto regex = Regex();
+        regex.compile("a.*b");
+        REQUIRE(regex.match("a123b"));
+        REQUIRE(regex.match("a456b"));
+    }
+
 
 
 //TODO: unit test this stuff below.!

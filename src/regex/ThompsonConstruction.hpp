@@ -22,6 +22,8 @@ struct BlackBox
 
 BlackBox buildSymbol(NFA& nfa, char c);
 
+BlackBox buildAny(NFA& nfa, Alphabet& alphabet);
+
 BlackBox buildUnion(NFA& nfa, BlackBox& BB1, BlackBox& BB2);
 
 BlackBox buildConcatenation(NFA& nfa, BlackBox& BB1, BlackBox& BB2);

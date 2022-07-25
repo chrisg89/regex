@@ -36,11 +36,15 @@ TokenStream::TokenStream(std::string regex)
         {
             mTokens.emplace_back(TokenType::eUnion, '|');
         }
+        else if (current == '.')
+        {
+            mTokens.emplace_back(TokenType::eAny, '.');
+        }
         else if(current == '\\' )
         {
             //escape sequence detected
             char next = ss.get();
-            if(next == '(' || next == ')' || next == '*' || next == '|' || next == '\\')
+            if(next == '(' || next == ')' || next == '*' || next == '|' || next == '\\' || next == '.' )
             {
                 mTokens.emplace_back(TokenType::eSymbol, next);
             }

@@ -20,6 +20,7 @@ enum class TokenType{
     eOpenBracket,
     eCloseBracket,
     eSymbol,
+    eAny,
     eEOF
 };
 
