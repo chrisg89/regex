@@ -203,6 +203,7 @@ BlackBox buildAny(NFA& nfa, Alphabet& alphabet)
 
     for (auto c : alphabet) 
     {
+        //TODO: some regex engines dont include new line in any.
         nfa.addTransition(c, entry, exit);
     }
 
