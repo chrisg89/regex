@@ -9,7 +9,7 @@ namespace fa
 {
 
 using StateId = int;
-using Alphabet = std::set<char>;
+using Alphabet = std::vector<char>;
 constexpr char kNullState = -1;
 constexpr char kEpsilon = 0;
 

@@ -254,28 +254,6 @@ bool isValidRegex(TokenStream regex)
     return valid;
 }
 
-fa::Alphabet getAlphabet(TokenStream regex)
-{
-    fa::Alphabet alphabet;
-
-    auto token = Token{};
-    while( token = regex.get(), token.first != TokenType::eEOF )
-    {
-        if (token.first == TokenType::eSymbol)
-        {
-            alphabet.insert(token.second);
-        }
-
-    }
-
-    return alphabet;
-}
-
-
-
-
-
-
 
 Regex::Regex()
 : mDFA{{}} //TODO: create default constructor?
@@ -289,7 +267,7 @@ void Regex::compile(std::string regex)
     if (!isValidRegex(tokenStream))
         assert(false);
 
-    mDFA = build(tokenStream, kAlphabet);
+        mDFA = build(tokenStream, kAlphabet);
 }
 
 bool Regex::match(std::string string)
