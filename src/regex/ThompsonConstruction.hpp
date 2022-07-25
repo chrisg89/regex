@@ -24,6 +24,18 @@ BlackBox buildSymbol(NFA& nfa, char c);
 
 BlackBox buildAny(NFA& nfa, Alphabet& alphabet);
 
+BlackBox buildDigit(NFA& nfa, Alphabet& alphabet);
+
+BlackBox buildNonDigit(NFA& nfa, Alphabet& alphabet);
+
+BlackBox buildWhitespace(NFA& nfa, Alphabet& alphabet);
+
+BlackBox buildNonWhitespace(NFA& nfa, Alphabet& alphabet);
+
+BlackBox buildWordCharacter(NFA& nfa, Alphabet& alphabet);
+
+BlackBox buildNonWordCharacter(NFA& nfa, Alphabet& alphabet);
+
 BlackBox buildUnion(NFA& nfa, BlackBox& BB1, BlackBox& BB2);
 
 BlackBox buildConcatenation(NFA& nfa, BlackBox& BB1, BlackBox& BB2);

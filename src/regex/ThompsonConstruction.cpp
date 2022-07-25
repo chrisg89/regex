@@ -42,6 +42,30 @@ NFA ThompsonConstruction(TokenStream regex, Alphabet& alphabet)
         {
             stack.push(buildAny(nfa, alphabet));
         }
+        else if(token.first == TokenType::eDigit)
+        {
+            stack.push(buildDigit(nfa, alphabet));
+        }
+        else if(token.first == TokenType::eNonDigit)
+        {
+            stack.push(buildNonDigit(nfa, alphabet));
+        }
+        else if(token.first == TokenType::eWhitespace)
+        {
+            stack.push(buildWhitespace(nfa, alphabet));
+        }
+        else if(token.first == TokenType::eNonWhitespace)
+        {
+            stack.push(buildNonWhitespace(nfa, alphabet));
+        }
+        else if(token.first == TokenType::eWordCharacter)
+        {
+            stack.push(buildWordCharacter(nfa, alphabet));
+        }
+        else if(token.first == TokenType::eNonWordCharacter)
+        {
+            stack.push(buildNonWordCharacter(nfa, alphabet));
+        }
         else
         {
             stack.push(buildSymbol(nfa, token.second));
@@ -73,6 +97,102 @@ BlackBox buildSymbol(NFA& nfa, char c)
     auto entry = nfa.addState(false, false);
     auto exit = nfa.addState(false, false);
     nfa.addTransition(c, entry, exit);
+    return BlackBox(entry, exit);
+}
+
+BlackBox buildDigit(NFA& nfa, Alphabet& alphabet)
+{
+    auto entry = nfa.addState(false, false);
+    auto exit = nfa.addState(false, false);
+
+    for (auto c : alphabet) 
+    {
+        if(isdigit(c))
+        {
+            nfa.addTransition(c, entry, exit);
+        }
+    }
+
+    return BlackBox(entry, exit);
+}
+
+BlackBox buildNonDigit(NFA& nfa, Alphabet& alphabet)
+{
+    auto entry = nfa.addState(false, false);
+    auto exit = nfa.addState(false, false);
+
+    for (auto c : alphabet) 
+    {
+        if(!isdigit(c))
+        {
+            nfa.addTransition(c, entry, exit);
+        }
+    }
+
+    return BlackBox(entry, exit);
+}
+
+BlackBox buildWhitespace(NFA& nfa, Alphabet& alphabet)
+{
+    auto entry = nfa.addState(false, false);
+    auto exit = nfa.addState(false, false);
+
+    for (auto c : alphabet) 
+    {
+        if(isspace(c))
+        {
+            nfa.addTransition(c, entry, exit);
+        }
+    }
+
+    return BlackBox(entry, exit);
+}
+
+BlackBox buildNonWhitespace(NFA& nfa, Alphabet& alphabet)
+{
+    auto entry = nfa.addState(false, false);
+    auto exit = nfa.addState(false, false);
+
+    for (auto c : alphabet) 
+    {
+        if(!isspace(c))
+        {
+            nfa.addTransition(c, entry, exit);
+        }
+    }
+
+    return BlackBox(entry, exit);
+}
+
+BlackBox buildWordCharacter(NFA& nfa, Alphabet& alphabet)
+{
+    auto entry = nfa.addState(false, false);
+    auto exit = nfa.addState(false, false);
+
+    for (auto c : alphabet) 
+    {
+        if(isalpha(c) || isdigit(c) || c == '_')
+        {
+            nfa.addTransition(c, entry, exit);
+        }
+    }
+
+    return BlackBox(entry, exit);
+}
+
+BlackBox buildNonWordCharacter(NFA& nfa, Alphabet& alphabet)
+{
+    auto entry = nfa.addState(false, false);
+    auto exit = nfa.addState(false, false);
+
+    for (auto c : alphabet) 
+    {
+        if(!isalpha(c) && !isdigit(c) && c != '_')
+        {
+            nfa.addTransition(c, entry, exit);
+        }
+    }
+
     return BlackBox(entry, exit);
 }
 

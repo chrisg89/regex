@@ -259,11 +259,94 @@ SCENARIO( "Empty", "[empty]" )
 
     }
 
+    //  ANY (.)
     {
         auto regex = Regex();
         regex.compile("a.*b");
         REQUIRE(regex.match("a123b"));
         REQUIRE(regex.match("a456b"));
+    }
+
+    //  Digit (\d)
+    {
+        auto regex = Regex();
+        regex.compile("a\\db");
+        REQUIRE(regex.match("a0b"));
+        REQUIRE(regex.match("a1b"));
+        REQUIRE(regex.match("a2b"));
+        REQUIRE(regex.match("a4b"));
+        REQUIRE(regex.match("a5b"));
+        REQUIRE(regex.match("a6b"));
+        REQUIRE(regex.match("a7b"));
+        REQUIRE(regex.match("a8b"));
+        REQUIRE(regex.match("a9b"));
+        REQUIRE(!regex.match("aab"));
+    }
+
+    //  NonDigit (\D)
+    {
+        auto regex = Regex();
+        regex.compile("a\\Db");
+        REQUIRE(!regex.match("a0b"));
+        REQUIRE(!regex.match("a1b"));
+        REQUIRE(!regex.match("a2b"));
+        REQUIRE(!regex.match("a4b"));
+        REQUIRE(!regex.match("a5b"));
+        REQUIRE(!regex.match("a6b"));
+        REQUIRE(!regex.match("a7b"));
+        REQUIRE(!regex.match("a8b"));
+        REQUIRE(!regex.match("a9b"));
+        REQUIRE(regex.match("aab"));
+    }
+
+        //  Whitespace (\s)
+    {
+        auto regex = Regex();
+        regex.compile("a\\sb");
+        REQUIRE(regex.match("a b"));
+        REQUIRE(regex.match("a\tb"));
+        REQUIRE(regex.match("a\nb"));
+        REQUIRE(regex.match("a\vb"));
+        REQUIRE(regex.match("a\fb"));
+        REQUIRE(regex.match("a\rb"));
+        REQUIRE(!regex.match("aab"));
+    }
+
+    //  Whitespace (\s)
+    {
+        auto regex = Regex();
+        regex.compile("a\\Sb");
+        REQUIRE(!regex.match("a b"));
+        REQUIRE(!regex.match("a\tb"));
+        REQUIRE(!regex.match("a\nb"));
+        REQUIRE(!regex.match("a\vb"));
+        REQUIRE(!regex.match("a\fb"));
+        REQUIRE(!regex.match("a\rb"));
+        REQUIRE(regex.match("aab"));
+    }
+
+    //  Word Character (\w)
+    {
+        auto regex = Regex();
+        regex.compile("a\\wb");
+        REQUIRE(regex.match("aab"));
+        REQUIRE(regex.match("a1b"));
+        REQUIRE(regex.match("a_b"));
+        REQUIRE(!regex.match("a\vb"));
+        REQUIRE(!regex.match("a.b"));
+        REQUIRE(!regex.match("a+b"));
+    }
+
+    //  Non Word Character (\W)
+    {
+        auto regex = Regex();
+        regex.compile("a\\Wb");
+        REQUIRE(!regex.match("aab"));
+        REQUIRE(!regex.match("a1b"));
+        REQUIRE(!regex.match("a_b"));
+        REQUIRE(regex.match("a\vb"));
+        REQUIRE(regex.match("a.b"));
+        REQUIRE(regex.match("a+b"));
     }
 
 

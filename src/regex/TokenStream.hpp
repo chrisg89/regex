@@ -21,6 +21,12 @@ enum class TokenType{
     eCloseBracket,
     eSymbol,
     eAny,
+    eDigit,
+    eNonDigit,
+    eWhitespace,
+    eNonWhitespace,
+    eWordCharacter,
+    eNonWordCharacter,
     eEOF
 };
 

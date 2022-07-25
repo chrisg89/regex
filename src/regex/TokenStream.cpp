@@ -48,6 +48,30 @@ TokenStream::TokenStream(std::string regex)
             {
                 mTokens.emplace_back(TokenType::eSymbol, next);
             }
+            else if(next == 'd')
+            {
+                mTokens.emplace_back(TokenType::eDigit, 'd');
+            }
+            else if(next == 'D')
+            {
+                mTokens.emplace_back(TokenType::eNonDigit, 'D');
+            }
+            else if(next == 's')
+            {
+                mTokens.emplace_back(TokenType::eWhitespace, 's');
+            }
+            else if(next == 'S')
+            {
+                mTokens.emplace_back(TokenType::eNonWhitespace, 'S');
+            }
+            else if(next == 'w')
+            {
+                mTokens.emplace_back(TokenType::eWordCharacter, 'w');
+            }
+            else if(next == 'W')
+            {
+                mTokens.emplace_back(TokenType::eNonWordCharacter, 'W');
+            }
             else
             {
                 throw std::runtime_error("invalid escape sequence detected");
