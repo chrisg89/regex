@@ -70,6 +70,9 @@ bool isValidRegex(TokenStream regex)
             else if(next.first == TokenType::eClosurePlus){
                 valid = false;
             }
+            else if(next.first == TokenType::eOptional){
+                valid = false;
+            }
             else if(next.first == TokenType::eUnion){
                 valid = false;
             }
@@ -93,6 +96,9 @@ bool isValidRegex(TokenStream regex)
                 valid = true;
             }
             else if(next.first == TokenType::eClosurePlus){
+                valid = true;
+            }
+            else if(next.first == TokenType::eOptional){
                 valid = true;
             }
             else if(next.first == TokenType::eUnion){
@@ -119,6 +125,9 @@ bool isValidRegex(TokenStream regex)
             else if(next.first == TokenType::eClosurePlus){
                 valid = true;
             }
+            else if(next.first == TokenType::eOptional){
+                valid = true;
+            }
             else if(next.first == TokenType::eUnion){
                 valid = true;
             }
@@ -141,6 +150,36 @@ bool isValidRegex(TokenStream regex)
                 valid = true;
             }
             else if(next.first == TokenType::eClosurePlus){
+                valid = true;
+            }
+            else if(next.first == TokenType::eOptional){
+                valid = true;
+            }
+            else if(next.first == TokenType::eUnion){
+                valid = true;
+            }
+            else if(next.first == TokenType::eEOF){
+                valid = true;
+            }
+            else{
+                valid = true;
+            }
+        }
+        else if (current.first == TokenType::eOptional)
+        {
+            if(next.first == TokenType::eOpenBracket){
+                valid = true;
+            }
+            else if(next.first == TokenType::eCloseBracket){
+                valid = true;
+            }
+            else if(next.first == TokenType::eClosure){
+                valid = true;
+            }
+            else if(next.first == TokenType::eClosurePlus){
+                valid = true;
+            }
+            else if(next.first == TokenType::eOptional){
                 valid = true;
             }
             else if(next.first == TokenType::eUnion){
@@ -167,6 +206,9 @@ bool isValidRegex(TokenStream regex)
             else if(next.first == TokenType::eClosurePlus){
                 valid = false;
             }
+            else if(next.first == TokenType::eOptional){
+                valid = false;
+            }
             else if(next.first == TokenType::eUnion){
                 valid = false;
             }
@@ -189,6 +231,9 @@ bool isValidRegex(TokenStream regex)
                 valid = true;
             }
             else if(next.first == TokenType::eClosurePlus){
+                valid = true;
+            }
+            else if(next.first == TokenType::eOptional){
                 valid = true;
             }
             else if(next.first == TokenType::eUnion){

@@ -44,4 +44,6 @@ BlackBox buildClosure(NFA& nfa, BlackBox& BB);
 
 BlackBox buildClosurePlus(NFA& nfa, BlackBox& BB);
 
+BlackBox buildOptional(NFA& nfa, BlackBox& BB);
+
 } //namespace regex

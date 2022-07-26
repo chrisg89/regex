@@ -51,6 +51,9 @@ TokenStream InsertExplicitConcat(TokenStream regex)  //TODO rename to insert???
             else if(next.first == TokenType::eClosurePlus){
                 insert = false;
             }
+            else if(next.first == TokenType::eOptional){
+                insert = false;
+            }
             else if(next.first == TokenType::eUnion){
                 insert = false;
             }
@@ -70,6 +73,33 @@ TokenStream InsertExplicitConcat(TokenStream regex)  //TODO rename to insert???
                 insert = false;
             }
             else if(next.first == TokenType::eClosurePlus){
+                insert = false;
+            }
+            else if(next.first == TokenType::eOptional){
+                insert = false;
+            }
+            else if(next.first == TokenType::eUnion){
+                insert = false;
+            }
+            else if(next.first == TokenType::eOpenBracket){
+                insert = true;
+            }
+            else if(next.first == TokenType::eCloseBracket){
+                insert = false;
+            }
+            else{
+                insert = true;
+            }
+        }
+        else if(current.first == TokenType::eOptional)
+        {
+            if(next.first == TokenType::eClosure){
+                insert = false;
+            }
+            else if(next.first == TokenType::eClosurePlus){
+                insert = false;
+            }
+            else if(next.first == TokenType::eOptional){
                 insert = false;
             }
             else if(next.first == TokenType::eUnion){
@@ -101,6 +131,9 @@ TokenStream InsertExplicitConcat(TokenStream regex)  //TODO rename to insert???
             else if(next.first == TokenType::eClosurePlus){
                 insert = false;
             }
+            else if(next.first == TokenType::eOptional){
+                insert = false;
+            }
             else if(next.first == TokenType::eUnion){
                 insert = false;
             }
@@ -120,6 +153,9 @@ TokenStream InsertExplicitConcat(TokenStream regex)  //TODO rename to insert???
                 insert = false;
             }
             else if(next.first == TokenType::eClosurePlus){
+                insert = false;
+            }
+            else if(next.first == TokenType::eOptional){
                 insert = false;
             }
             else if(next.first == TokenType::eUnion){

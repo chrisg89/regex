@@ -36,6 +36,10 @@ TokenStream::TokenStream(std::string regex)
         {
             mTokens.emplace_back(TokenType::eClosurePlus, '+');
         }
+        else if (current == '?')
+        {
+            mTokens.emplace_back(TokenType::eOptional, '?');
+        }
         else if (current == '|')
         {
             mTokens.emplace_back(TokenType::eUnion, '|');
@@ -48,7 +52,7 @@ TokenStream::TokenStream(std::string regex)
         {
             //escape sequence detected
             char next = ss.get();
-            if(next == '(' || next == ')' || next == '*' || next == '+' || next == '|' || next == '\\' || next == '.' )
+            if(next == '(' || next == ')' || next == '*' || next == '+' || next == '?' || next == '|' || next == '\\' || next == '.' )
             {
                 mTokens.emplace_back(TokenType::eSymbol, next);
             }

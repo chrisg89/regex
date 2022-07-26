@@ -180,6 +180,26 @@ SCENARIO( "TokenStream", "[TokenStream]" )
         }
     }
 
+    SECTION("Tokenstream from escape sequence '\\?'")
+    {
+        std::string string = "\\?";
+        GIVEN( "a string: " << string) 
+        {
+            WHEN( "the string is tokenized")
+            {
+                auto tokenStream = TokenStream{string};
+
+                THEN( "the correct tokens can be extracted" ) 
+                {
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '?'});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '?'});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
+                }
+            }
+        }
+    }
+
     SECTION("Tokenstream from illegal escape sequence throws")
     {
         GIVEN( "a string containing escape character followed by EOF") 

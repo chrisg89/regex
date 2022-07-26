@@ -44,6 +44,12 @@ NFA ThompsonConstruction(TokenStream regex, Alphabet& alphabet)
             stack.pop();
             stack.push(buildClosurePlus(nfa, op1));
         }
+        else if(token.first == TokenType::eOptional)
+        {
+            auto op1 = stack.top();
+            stack.pop();
+            stack.push(buildOptional(nfa, op1));
+        }
         else if(token.first == TokenType::eAny)
         {
             stack.push(buildAny(nfa, alphabet));
@@ -252,6 +258,16 @@ BlackBox buildClosurePlus(NFA& nfa, BlackBox& BB)
     auto exit = nfa.addState(false, false);
     nfa.addTransition(fa::kEpsilon, entry, BB.entry);
     nfa.addTransition(fa::kEpsilon, BB.exit, BB.entry);
+    nfa.addTransition(fa::kEpsilon, BB.exit, exit);
+    return BlackBox(entry, exit);
+}
+
+BlackBox buildOptional(NFA& nfa, BlackBox& BB)
+{
+    auto entry = nfa.addState(false, false);
+    auto exit = nfa.addState(false, false);
+    nfa.addTransition(fa::kEpsilon, entry, BB.entry);
+    nfa.addTransition(fa::kEpsilon, entry, exit);
     nfa.addTransition(fa::kEpsilon, BB.exit, exit);
     return BlackBox(entry, exit);
 }

@@ -5,6 +5,9 @@
 
 namespace regex {
 
+//TODO test each construction seperately
+//TODO test top level seperately
+
 namespace {
 
 SCENARIO( "ThompsonConstruction", "[ThompsonConstruction]" ) 

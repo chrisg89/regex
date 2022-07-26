@@ -58,10 +58,12 @@ SCENARIO( "Regex", "[regex]" )
                 "a()b",   // () is invalid
                 "a(*b)",  // (* is invalid
                 "a(+b)",  // (+ is invalid
+                "a(?b)",  // (? is invalid
                 "a(|b)",  // (| is invalid
                 "a(b|)",  // |) is invalid
                 "a|*b",   // |* is invalid
                 "a|+b",   // |+ is invalid
+                "a|?b",   // |+ is invalid
                 "a||b"    // || is invalid
             );
 
@@ -110,6 +112,13 @@ SCENARIO( "Regex", "[regex]" )
             { "a+(b)", "a+&(b)"},
             { "(a+)", "(a+)"},
             { "a+b", "a+&b"},
+            { "a*?", "a*?"},
+            { "a?*", "a?*"},
+            { "a??", "a??"},
+            { "a?|b", "a?|b"},
+            { "a?(b)", "a?&(b)"},
+            { "(a?)", "(a?)"},
+            { "a?b", "a?&b"},
         }));
 
         GIVEN( "the regex: " << input ) 
@@ -226,6 +235,15 @@ SCENARIO( "Empty", "[empty]" )
         REQUIRE(regex.match("a"));
         REQUIRE(regex.match("aa"));
         REQUIRE(regex.match("aaa"));
+    }
+
+    {
+        auto regex = Regex();
+        regex.compile("a?");
+        REQUIRE(regex.match(""));
+        REQUIRE(regex.match("a"));
+        REQUIRE(!regex.match("aa"));
+        REQUIRE(!regex.match("aaa"));
     }
 
     {
@@ -410,7 +428,7 @@ SCENARIO( "Empty", "[empty]" )
         REQUIRE(regex.match("\t"));
     }
 
-    //  Virtical Tab
+    //  Vertical Tab
     {
         auto regex = Regex();
         regex.compile("\\v");
