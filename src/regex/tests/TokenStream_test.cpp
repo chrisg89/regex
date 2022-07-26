@@ -8,6 +8,9 @@ namespace regex {
 
 namespace {
 
+//TODO extraction of meta characters not tested
+//TODO most of the new metacharacters and escapes are not tested
+
 SCENARIO( "TokenStream", "[TokenStream]" ) 
 {
     SECTION("Basic token extraction")
@@ -130,6 +133,46 @@ SCENARIO( "TokenStream", "[TokenStream]" )
                 {
                     REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '|'});
                     REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '|'});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
+                }
+            }
+        }
+    }
+
+    SECTION("Tokenstream from escape sequence '\\*'")
+    {
+        std::string string = "\\*";
+        GIVEN( "a string: " << string) 
+        {
+            WHEN( "the string is tokenized")
+            {
+                auto tokenStream = TokenStream{string};
+
+                THEN( "the correct tokens can be extracted" ) 
+                {
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '*'});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '*'});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
+                }
+            }
+        }
+    }
+
+    SECTION("Tokenstream from escape sequence '\\+'")
+    {
+        std::string string = "\\+";
+        GIVEN( "a string: " << string) 
+        {
+            WHEN( "the string is tokenized")
+            {
+                auto tokenStream = TokenStream{string};
+
+                THEN( "the correct tokens can be extracted" ) 
+                {
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '+'});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '+'});
                     REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
                     REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
                 }

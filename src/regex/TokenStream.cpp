@@ -32,6 +32,10 @@ TokenStream::TokenStream(std::string regex)
         {
             mTokens.emplace_back(TokenType::eClosure, '*');
         }
+        else if (current == '+')
+        {
+            mTokens.emplace_back(TokenType::eClosurePlus, '+');
+        }
         else if (current == '|')
         {
             mTokens.emplace_back(TokenType::eUnion, '|');
@@ -44,7 +48,7 @@ TokenStream::TokenStream(std::string regex)
         {
             //escape sequence detected
             char next = ss.get();
-            if(next == '(' || next == ')' || next == '*' || next == '|' || next == '\\' || next == '.' )
+            if(next == '(' || next == ')' || next == '*' || next == '+' || next == '|' || next == '\\' || next == '.' )
             {
                 mTokens.emplace_back(TokenType::eSymbol, next);
             }
@@ -71,6 +75,26 @@ TokenStream::TokenStream(std::string regex)
             else if(next == 'W')
             {
                 mTokens.emplace_back(TokenType::eNonWordCharacter, 'W');
+            }
+            else if(next == 'n')
+            {
+                mTokens.emplace_back(TokenType::eNewLine, '\n');
+            }
+            else if(next == 'f')
+            {
+                mTokens.emplace_back(TokenType::eFormFeed, '\f');
+            }
+            else if(next == 'r')
+            {
+                mTokens.emplace_back(TokenType::eCarriageReturn, '\r');
+            }
+            else if(next == 't')
+            {
+                mTokens.emplace_back(TokenType::eHorizonalTab, '\t');
+            }
+            else if(next == 'v')
+            {
+                mTokens.emplace_back(TokenType::eVerticalTab, '\v');
             }
             else
             {

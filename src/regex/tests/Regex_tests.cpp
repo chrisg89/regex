@@ -18,10 +18,15 @@ SCENARIO( "Regex", "[regex]" )
                 "((a))",
                 "(a)(b)",
                 "(a)*",
+                "(a)+",
                 "(a)|(b)",
                 "(a)b",
                 "(a*)",
+                "(a+)",
                 "a**",
+                "a++",
+                "a*+",
+                "a+*",
                 "a|b",
                 "ab"
             );
@@ -52,9 +57,11 @@ SCENARIO( "Regex", "[regex]" )
                 "(a(b)",  // mismatching number of brackets
                 "a()b",   // () is invalid
                 "a(*b)",  // (* is invalid
+                "a(+b)",  // (+ is invalid
                 "a(|b)",  // (| is invalid
                 "a(b|)",  // |) is invalid
                 "a|*b",   // |* is invalid
+                "a|+b",   // |+ is invalid
                 "a||b"    // || is invalid
             );
 
@@ -85,6 +92,7 @@ SCENARIO( "Regex", "[regex]" )
             { "(a)", "(a)"},
             { "a*b", "a*&b"},
             { "a**", "a**"},
+            { "a*+", "a*+"},
             { "a*|b", "a*|b"},
             { "a*(b)", "a*&(b)"},
             { "(a*)", "(a*)"},
@@ -92,8 +100,16 @@ SCENARIO( "Regex", "[regex]" )
             { "((a))", "((a))"},
             { "(a)b", "(a)&b"},
             { "(a)*", "(a)*"},
+            { "(a)+", "(a)+"},
             { "(a)|b", "(a)|b"},
-            { "(a)(b)", "(a)&(b)"}
+            { "(a)(b)", "(a)&(b)"},
+            { "a*+", "a*+"},
+            { "a+*", "a+*"},
+            { "a++", "a++"},
+            { "a+|b", "a+|b"},
+            { "a+(b)", "a+&(b)"},
+            { "(a+)", "(a+)"},
+            { "a+b", "a+&b"},
         }));
 
         GIVEN( "the regex: " << input ) 
@@ -162,6 +178,14 @@ SCENARIO( "Empty", "[empty]" )
     
     {
         auto regex = Regex();
+        regex.compile("a");
+        REQUIRE(!regex.match(""));
+        REQUIRE(regex.match("a"));
+        REQUIRE(!regex.match("aa"));
+    }
+
+    {
+        auto regex = Regex();
         regex.compile("a|b");
         REQUIRE(regex.match("a"));
         REQUIRE(regex.match("b"));
@@ -190,6 +214,15 @@ SCENARIO( "Empty", "[empty]" )
         auto regex = Regex();
         regex.compile("a*");
         REQUIRE(regex.match(""));
+        REQUIRE(regex.match("a"));
+        REQUIRE(regex.match("aa"));
+        REQUIRE(regex.match("aaa"));
+    }
+
+    {
+        auto regex = Regex();
+        regex.compile("a+");
+        REQUIRE(!regex.match(""));
         REQUIRE(regex.match("a"));
         REQUIRE(regex.match("aa"));
         REQUIRE(regex.match("aaa"));
@@ -245,8 +278,8 @@ SCENARIO( "Empty", "[empty]" )
 
     {
         auto regex = Regex();
-        regex.compile("\\(1+2\\)");
-        REQUIRE(regex.match("(1+2)"));
+        regex.compile("\\(abc\\)");
+        REQUIRE(regex.match("(abc)"));
     }
 
     {
@@ -348,6 +381,42 @@ SCENARIO( "Empty", "[empty]" )
         REQUIRE(regex.match("a.b"));
         REQUIRE(regex.match("a+b"));
     }
+
+    //  Newline
+    {
+        auto regex = Regex();
+        regex.compile("\\n");
+        REQUIRE(regex.match("\n"));
+    }
+
+    //  FormFeed
+    {
+        auto regex = Regex();
+        regex.compile("\\f");
+        REQUIRE(regex.match("\f"));
+    }
+
+    //  CarriageReturn
+    {
+        auto regex = Regex();
+        regex.compile("\\r");
+        REQUIRE(regex.match("\r"));
+    }
+
+    //  Horizontal Tab
+    {
+        auto regex = Regex();
+        regex.compile("\\t");
+        REQUIRE(regex.match("\t"));
+    }
+
+    //  Virtical Tab
+    {
+        auto regex = Regex();
+        regex.compile("\\v");
+        REQUIRE(regex.match("\v"));
+    }
+
 
 
 

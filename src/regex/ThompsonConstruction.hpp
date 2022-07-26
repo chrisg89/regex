@@ -42,4 +42,6 @@ BlackBox buildConcatenation(NFA& nfa, BlackBox& BB1, BlackBox& BB2);
 
 BlackBox buildClosure(NFA& nfa, BlackBox& BB);
 
+BlackBox buildClosurePlus(NFA& nfa, BlackBox& BB);
+
 } //namespace regex

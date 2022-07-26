@@ -41,9 +41,35 @@ TokenStream InsertExplicitConcat(TokenStream regex)  //TODO rename to insert???
             break;
         }
 
+        //TODO should throw exception on illegal combinations?
+
         if(current.first == TokenType::eClosure)
         {
             if(next.first == TokenType::eClosure){
+                insert = false;
+            }
+            else if(next.first == TokenType::eClosurePlus){
+                insert = false;
+            }
+            else if(next.first == TokenType::eUnion){
+                insert = false;
+            }
+            else if(next.first == TokenType::eOpenBracket){
+                insert = true;
+            }
+            else if(next.first == TokenType::eCloseBracket){
+                insert = false;
+            }
+            else{
+                insert = true;
+            }
+        }
+        else if(current.first == TokenType::eClosurePlus)
+        {
+            if(next.first == TokenType::eClosure){
+                insert = false;
+            }
+            else if(next.first == TokenType::eClosurePlus){
                 insert = false;
             }
             else if(next.first == TokenType::eUnion){
@@ -72,6 +98,9 @@ TokenStream InsertExplicitConcat(TokenStream regex)  //TODO rename to insert???
             if(next.first == TokenType::eClosure){
                 insert = false;
             }
+            else if(next.first == TokenType::eClosurePlus){
+                insert = false;
+            }
             else if(next.first == TokenType::eUnion){
                 insert = false;
             }
@@ -88,6 +117,9 @@ TokenStream InsertExplicitConcat(TokenStream regex)  //TODO rename to insert???
         else
         {
             if(next.first == TokenType::eClosure){
+                insert = false;
+            }
+            else if(next.first == TokenType::eClosurePlus){
                 insert = false;
             }
             else if(next.first == TokenType::eUnion){
@@ -141,7 +173,8 @@ TokenStream InfixToPostfix(TokenStream infix)
 
         else if(token.first == TokenType::eUnion || 
                 token.first == TokenType::eConcat || 
-                token.first == TokenType::eClosure)
+                token.first == TokenType::eClosure ||
+                token.first == TokenType::eClosurePlus)
         {
             while(!stack.empty())
             {
