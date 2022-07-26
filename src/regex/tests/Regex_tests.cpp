@@ -435,7 +435,14 @@ SCENARIO( "Empty", "[empty]" )
         REQUIRE(regex.match("\v"));
     }
 
-
+    //  Realistic tests using dates
+    {
+        auto regex = Regex();
+        regex.compile("\\d\\d-(\\d\\d|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)-\\d\\d(\\d\\d)?");
+        REQUIRE(regex.match("12-12-22"));
+        REQUIRE(regex.match("12-12-2022"));
+        REQUIRE(regex.match("12-OCT-2022"));
+    }
 
 
 //TODO: unit test this stuff below.!
