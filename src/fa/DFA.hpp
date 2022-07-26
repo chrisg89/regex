@@ -56,7 +56,6 @@ private:
     std::vector<StateId> mFinalStates;
 
     bool checkEquivalence(ParitionMap paritionMap, StateId stateA, StateId stateB);
-    void markDeadStates();
 };
 
 

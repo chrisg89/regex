@@ -18,6 +18,11 @@ DFAState::DFAState(StateId id, bool isStart, bool isFinal)
 void DFAState::addTransition(char input, StateId destination)
 {
     mTransitions[input] = destination;
+
+    if(destination != mId)
+    {
+        mIsDead = false;
+    }
 }
 
 DFA::DFA(Alphabet alphabet)
@@ -278,8 +283,6 @@ void DFA::minimizeDFA()
     //STEP3: replace old DFA with new DFA
     *this = newDFA;  // TODO: should use move semantics here?
 
-    markDeadStates();
-
 }
 
 bool DFA::checkEquivalence(ParitionMap paritionMap, StateId stateA, StateId stateB)
@@ -299,21 +302,6 @@ bool DFA::checkEquivalence(ParitionMap paritionMap, StateId stateA, StateId stat
     }
 
     return true;
-}
-
-void DFA::markDeadStates()
-{
-    for(auto& state : mStates)
-    {
-        for(auto c : mAlphabet)
-        {
-            if (state.mTransitions[c] != state.mId)
-            {
-                state.mIsDead = false;
-                break;
-            }
-        }
-    }
 }
 
 } //namespace fa
