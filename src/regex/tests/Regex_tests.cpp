@@ -445,6 +445,36 @@ SCENARIO( "Empty", "[empty]" )
     }
 
 
+    {
+        auto regex = Regex();
+        regex.compile("c");
+        regex.search("abcde");
+    }
+
+    {
+        auto regex = Regex();
+        regex.compile("abc");
+        regex.search("abcde");
+    }
+
+    {
+        auto regex = Regex();
+        regex.compile("abc");
+        regex.search("abcabcabc");
+    }
+
+    {
+        auto regex = Regex();
+        regex.compile("cat|hat");
+        regex.search("the cat has a hat");
+    }
+
+    {
+        auto regex = Regex();
+        regex.compile("cat|hat|h.s");
+        regex.search("the cat has a hat");
+    }
+
 //TODO: unit test this stuff below.!
 
     //ab (correct)

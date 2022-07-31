@@ -44,6 +44,9 @@ public:
     std::string serialize();
 
     bool run(std::string string);
+    DFAState step(DFAState current, char input);
+
+    std::vector<std::string> search(std::string string);
 
     void minimizeDFA();
 

@@ -21,6 +21,11 @@ public:
 
     bool match(std::string string);
 
+    //TODO with match results
+    //TODO should there be DFA builder and DFA Runner classes?
+    bool search(std::string string);
+
+
 private:
     DFA mDFA;
 

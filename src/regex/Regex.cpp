@@ -278,5 +278,16 @@ bool Regex::match(std::string string)
 }
 
 
+bool Regex::search(std::string string)
+{
+    for(auto result : mDFA.search(string))
+    {
+        std::cout << result << std::endl;
+    }
+
+    return true; //todo
+}
+
+
 
 } //namespace regex

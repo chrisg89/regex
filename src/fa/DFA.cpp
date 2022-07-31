@@ -108,6 +108,77 @@ bool DFA::run(std::string string)
 }
 
 
+DFAState DFA::step(DFAState current, char input)
+{
+    auto next = mStates[current.mId].mTransitions[input];
+    return mStates[next];
+}
+
+
+std::vector<std::string> DFA::search(std::string string)
+{
+
+    string += '\0'; //TODO change?
+
+    std::vector<std::string> results;
+
+    std::string matched = "";
+    std::string accumulator = "";
+    std::string::iterator input = string.begin();
+    std::string::iterator backtrack = string.begin();
+
+    auto startState = mStates[mStartState];
+    auto state = startState;
+
+    while(*input != '\0')
+    {
+        if(state.mIsFinal)
+        {
+            matched += accumulator;
+            accumulator.clear();
+            backtrack = input;
+        }
+
+        if(state.mIsDead)
+        {
+            if(!matched.empty())
+            {
+                results.push_back(matched);
+                matched.clear();
+                input = backtrack;
+            }
+            else
+            {
+                backtrack++;
+                input = backtrack;
+            }
+
+            state = startState;
+            accumulator.clear();
+            
+        }
+        else
+        {
+            accumulator += *input;
+            state = step(state, *input);
+            input++;
+        }
+    }
+
+    if(state.mIsFinal)
+    {
+        matched += accumulator;
+    }
+
+    if(!matched.empty())
+    {
+        results.push_back(matched);
+    }
+
+    return results;
+}
+
+
 struct Partition
 {
     Partition(PartitionId id)
