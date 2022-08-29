@@ -33,6 +33,14 @@ DFA::DFA(Alphabet alphabet)
     , mAlphabet{alphabet}
 {}
 
+DFA::DFA()
+    : mStates{}
+    , mStateCount{0}
+    , mStartState{kNullState}
+    , mFinalStates{}
+    , mAlphabet{}
+{}
+
 StateId DFA::addState(bool isStart, bool isFinal)
 {
     if(isStart)
@@ -85,7 +93,7 @@ std::string DFA::serialize()
     return out;
 }
 
-bool DFA::run(std::string string)
+bool DFA::run(std::string string) const
 {
 
     StateId current;
@@ -96,7 +104,7 @@ bool DFA::run(std::string string)
 
     for(char& c : string)
     {
-        current = mStates[current].mTransitions[c];
+        current = mStates[current].mTransitions.at(c);
 
         if(mStates[current].mIsDead)
         {

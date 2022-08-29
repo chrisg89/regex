@@ -1,8 +1,6 @@
 #include "Regex.hpp" 
 
 
-#include <cassert> //todo try to replace with excpetion everywhere
-
 
 
 namespace regex
@@ -256,26 +254,6 @@ bool isValidRegex(TokenStream regex)
     return valid;
 }
 
-
-Regex::Regex()
-: mDFA{{}} //TODO: create default constructor?
-{}
-
-void Regex::compile(std::string regex)
-{
-    
-    auto tokenStream = TokenStream(regex);
-
-    if (!isValidRegex(tokenStream))
-        assert(false);
-
-        mDFA = build(tokenStream, kAlphabet);
-}
-
-bool Regex::match(std::string string)
-{
-    return mDFA.run(string);
-}
 
 
 bool Regex::search(std::string string)

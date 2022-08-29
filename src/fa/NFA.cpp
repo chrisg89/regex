@@ -124,6 +124,12 @@ DFA NFA::toDFA()
 
 }
 
+
+//TODO: This function consumes by far the most amount of run-time based according to callgrind
+// Most time is spent in fa::NFAState::~NFAState() and fa::NFAState::NFAState(fa::NFAState const&)
+// I suspect I am using range based loops wrong. Should be using references instead of values
+// I want to understand alittle bit more about callgrind before I make changes. It would be nice
+// to understand how many instruction cycles or time is saved by optimizing this (callgrind measures everything relatively it seems)
 void NFA::EpsilonNFAToNFAConversion()
 {
     NFA newNFA(mAlphabet);

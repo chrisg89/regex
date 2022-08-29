@@ -82,23 +82,23 @@ TokenStream::TokenStream(std::string regex)
             }
             else if(next == 'n')
             {
-                mTokens.emplace_back(TokenType::eNewLine, '\n');
+                mTokens.emplace_back(TokenType::eSymbol, '\n');
             }
             else if(next == 'f')
             {
-                mTokens.emplace_back(TokenType::eFormFeed, '\f');
+                mTokens.emplace_back(TokenType::eSymbol, '\f');
             }
             else if(next == 'r')
             {
-                mTokens.emplace_back(TokenType::eCarriageReturn, '\r');
+                mTokens.emplace_back(TokenType::eSymbol, '\r');
             }
             else if(next == 't')
             {
-                mTokens.emplace_back(TokenType::eHorizonalTab, '\t');
+                mTokens.emplace_back(TokenType::eSymbol, '\t');
             }
             else if(next == 'v')
             {
-                mTokens.emplace_back(TokenType::eVerticalTab, '\v');
+                mTokens.emplace_back(TokenType::eSymbol, '\v');
             }
             else
             {

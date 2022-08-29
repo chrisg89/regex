@@ -23,7 +23,7 @@ DFA build(TokenStream regex, Alphabet& alphabet)
     return dfa;
 }
 
-TokenStream InsertExplicitConcat(TokenStream regex)  //TODO rename to insert???
+TokenStream InsertExplicitConcat(TokenStream regex)
 {
 
     TokenStream processed;

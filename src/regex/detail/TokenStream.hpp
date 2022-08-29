@@ -31,11 +31,6 @@ enum class TokenType{
     eNonWhitespace,
     eWordCharacter,
     eNonWordCharacter,
-    eNewLine,
-    eFormFeed,
-    eCarriageReturn,
-    eHorizonalTab,
-    eVerticalTab,
     eEOF
 };
 

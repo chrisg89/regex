@@ -35,6 +35,7 @@ public:
 class DFA
 {
 public:
+    DFA();
     DFA(Alphabet alphabet);
 
     StateId addState(bool isStart, bool isFinal);
@@ -43,7 +44,7 @@ public:
 
     std::string serialize();
 
-    bool run(std::string string);
+    bool run(std::string string) const;
     DFAState step(DFAState current, char input);
 
     std::vector<std::string> search(std::string string);
