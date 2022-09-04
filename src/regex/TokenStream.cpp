@@ -1,5 +1,6 @@
 
 #include "TokenStream.hpp"
+#include "Utf8Iterator.hpp"
 #include <sstream>
 #include <stdexcept>
 
@@ -10,93 +11,90 @@ TokenStream::TokenStream()
     : mTokens{}
 {}
 
-TokenStream::TokenStream(std::string regex)
+TokenStream::TokenStream(const std::string regex) //TODO this should be a reference
     : mTokens{}
 {
-    std::stringstream ss;
-    ss << regex;
+    Utf8Iterator current = regex.begin();
 
-    while( ss.peek() != EOF )
-    {
-        char current = ss.get();
-        
-        if(current == '(')
+    while( current != regex.end() )
+    { 
+        if(*current == '(')
         {
             mTokens.emplace_back(TokenType::eOpenBracket, '(');
         }
-        else if (current == ')')
+        else if (*current == ')')
         {
             mTokens.emplace_back(TokenType::eCloseBracket, ')');
         }
-        else if (current == '*')
+        else if (*current == '*')
         {
             mTokens.emplace_back(TokenType::eClosure, '*');
         }
-        else if (current == '+')
+        else if (*current == '+')
         {
             mTokens.emplace_back(TokenType::eClosurePlus, '+');
         }
-        else if (current == '?')
+        else if (*current == '?')
         {
             mTokens.emplace_back(TokenType::eOptional, '?');
         }
-        else if (current == '|')
+        else if (*current == '|')
         {
             mTokens.emplace_back(TokenType::eUnion, '|');
         }
-        else if (current == '.')
+        else if (*current == '.')
         {
             mTokens.emplace_back(TokenType::eAny, '.');
         }
-        else if(current == '\\' )
+        else if(*current == '\\' )
         {
             //escape sequence detected
-            char next = ss.get();
-            if(next == '(' || next == ')' || next == '*' || next == '+' || next == '?' || next == '|' || next == '\\' || next == '.' )
+            current++;
+            if(*current == '(' || *current == ')' || *current == '*' || *current == '+' || *current == '?' || *current == '|' || *current == '\\' || *current == '.' )
             {
-                mTokens.emplace_back(TokenType::eSymbol, next);
+                mTokens.emplace_back(TokenType::eSymbol, *current);
             }
-            else if(next == 'd')
+            else if(*current == 'd')
             {
                 mTokens.emplace_back(TokenType::eDigit, 'd');
             }
-            else if(next == 'D')
+            else if(*current == 'D')
             {
                 mTokens.emplace_back(TokenType::eNonDigit, 'D');
             }
-            else if(next == 's')
+            else if(*current == 's')
             {
                 mTokens.emplace_back(TokenType::eWhitespace, 's');
             }
-            else if(next == 'S')
+            else if(*current == 'S')
             {
                 mTokens.emplace_back(TokenType::eNonWhitespace, 'S');
             }
-            else if(next == 'w')
+            else if(*current == 'w')
             {
                 mTokens.emplace_back(TokenType::eWordCharacter, 'w');
             }
-            else if(next == 'W')
+            else if(*current == 'W')
             {
                 mTokens.emplace_back(TokenType::eNonWordCharacter, 'W');
             }
-            else if(next == 'n')
+            else if(*current == 'n')
             {
                 mTokens.emplace_back(TokenType::eSymbol, '\n');
             }
-            else if(next == 'f')
+            else if(*current == 'f')
             {
                 mTokens.emplace_back(TokenType::eSymbol, '\f');
             }
-            else if(next == 'r')
+            else if(*current == 'r')
             {
                 mTokens.emplace_back(TokenType::eSymbol, '\r');
             }
-            else if(next == 't')
+            else if(*current == 't')
             {
                 mTokens.emplace_back(TokenType::eSymbol, '\t');
             }
-            else if(next == 'v')
+            else if(*current == 'v')
             {
                 mTokens.emplace_back(TokenType::eSymbol, '\v');
             }
@@ -107,8 +105,9 @@ TokenStream::TokenStream(std::string regex)
         }
         else
         {
-            mTokens.emplace_back(TokenType::eSymbol, current);
+            mTokens.emplace_back(TokenType::eSymbol, *current);
         }
+        current++;
     }
 }
 

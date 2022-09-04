@@ -4,6 +4,7 @@ add_library(regex_lib
     Regex.cpp
     ThompsonConstruction.cpp
     TokenStream.cpp
+    Utf8Iterator.cpp
     )
 
 TARGET_LINK_LIBRARIES( regex_lib
