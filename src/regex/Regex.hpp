@@ -6,10 +6,23 @@
 
 #include <string>
 
+//TODO clean this up
+// start range
+#include <algorithm>
+#include <queue>
+
+using range = std::pair<char32_t, char32_t>; //TODO Range
+using ranges = std::vector<range>; //TODO Ranges
+constexpr auto min = char32_t(0);
+constexpr auto max = char32_t(0x1FFFF);
+// end range
+
 namespace regex
 {
 
 using DFA = fa::DFA;
+
+void DisjoinOverlap(ranges& ranges, char32_t min, char32_t max);
 
 class Regex
 {

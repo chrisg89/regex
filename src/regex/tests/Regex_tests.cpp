@@ -2,9 +2,101 @@
 #include "catch.hpp"
 #include "Regex.hpp"
 
+
+
 namespace regex{
 
 namespace {
+
+
+
+
+
+
+SCENARIO( "XXX", "[xxxx]" )  
+{
+    // TODO: unit test this or remove
+
+    {
+    auto myRanges = ranges{{2,2},{3,5}, {0,1}, {33,44},{33,37}, {31, 40}, {33,39}};
+    DisjoinOverlap(myRanges, 0, 255);
+
+    for (auto x : myRanges)
+    {
+        //std::cout << x.first << " " << x.second << std::endl;
+    }
+
+    CHECK((myRanges == ranges({{0,1}, {2,2}, {3,5}, {6,30}, {31,32}, {33,37}, {38,39}, {40,40}, {41,44}, {45, 255}})));
+
+    /*
+    0 1
+    2 2
+    3 5
+    6 30
+    31 32
+    33 37
+    38 39
+    40 40
+    41 44
+    45 255
+    */
+    }
+
+    {
+    auto myRanges = ranges{{2,2},{3,5}, {0,1}, {33,44},{33,37}, {31, 40}, {33,39}};
+    DisjoinOverlap(myRanges, 0, 255);
+
+    for (auto x : myRanges)
+    {
+        //std::cout << x.first << " " << x.second << std::endl;
+    }
+
+    CHECK((myRanges == ranges({{0,1}, {2,2}, {3,5}, {6,30}, {31,32}, {33,37}, {38,39}, {40,40}, {41,44}, {45, 255}})));
+
+    /*
+    0 1
+    2 2
+    3 5
+    6 30
+    31 32
+    33 37
+    38 39
+    40 40
+    41 44
+    45 255
+    */
+    }
+
+
+    
+
+
+    {
+    auto myRanges = ranges{{65,65},{124,124}, {124,124}, {66,66}, {255,255}/*,{255,255}*/};
+    DisjoinOverlap(myRanges, 0, 255);
+
+    for (auto x : myRanges)
+    {
+        //std::cout << x.first << " " << x.second << " --- " << std::endl;
+    }
+
+    CHECK((myRanges == ranges({{0,64}, {65,65}, {66,66}, {67,123}, {124,124}, {125,254}, {255,255}})));
+
+    /*
+    0 1
+    2 2
+    3 5
+    6 30
+    31 32
+    33 37
+    38 39
+    40 40
+    41 44
+    45 255
+    */
+    }
+    
+}
 
 SCENARIO( "Regex", "[regex]" ) 
 {
