@@ -26,13 +26,13 @@ class NFAState
 public:
     NFAState(StateId id, bool isStart, bool isFinal);
 
-    void addTransition(char input, StateId destination);
+    void addTransition(InputType input, StateId destination);
 
 //private:
     StateId mId;
     bool mIsStart;
     bool mIsFinal;
-    std::map<char, std::vector<StateId>> mTransitions;
+    std::map<InputType, std::vector<StateId>> mTransitions;
 };
 
 class NFA
@@ -42,7 +42,7 @@ public:
 
     StateId addState(bool isStart, bool isFinal);
 
-    void addTransition(char input, StateId source, StateId destination);
+    void addTransition(InputType input, StateId source, StateId destination);
 
     DFA toDFA();
 

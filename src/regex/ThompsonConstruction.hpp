@@ -2,14 +2,13 @@
 
 #include "NFA.hpp"
 #include "TokenStream.hpp"
+#include "Alphabet.hpp"
 
 namespace regex
 {
 
 using NFA = fa::NFA;
 using StateId = fa::StateId;
-using Alphabet = fa::Alphabet;
-
 
 NFA ThompsonConstruction(TokenStream regex, Alphabet& alphabet);
 
@@ -20,21 +19,7 @@ struct BlackBox
     StateId exit;
 };
 
-BlackBox buildSymbol(NFA& nfa, char c);
-
-BlackBox buildAny(NFA& nfa, Alphabet& alphabet);
-
-BlackBox buildDigit(NFA& nfa, Alphabet& alphabet);
-
-BlackBox buildNonDigit(NFA& nfa, Alphabet& alphabet);
-
-BlackBox buildWhitespace(NFA& nfa, Alphabet& alphabet);
-
-BlackBox buildNonWhitespace(NFA& nfa, Alphabet& alphabet);
-
-BlackBox buildWordCharacter(NFA& nfa, Alphabet& alphabet);
-
-BlackBox buildNonWordCharacter(NFA& nfa, Alphabet& alphabet);
+BlackBox buildSymbol(NFA& nfa, Alphabet& alphabet, CodePointInterval& interval);
 
 BlackBox buildUnion(NFA& nfa, BlackBox& BB1, BlackBox& BB2);
 

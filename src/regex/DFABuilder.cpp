@@ -8,7 +8,7 @@
 
 namespace regex
 {
-    
+
 DFA build(TokenStream regex, Alphabet& alphabet)
 {
     auto preprocessed = InsertExplicitConcat(regex);
@@ -175,7 +175,7 @@ TokenStream InsertExplicitConcat(TokenStream regex)  //TODO rename to insert???
         processed.insert(current);
         if(insert)
         {
-            processed.insert(Token{TokenType::eConcat, '&'});
+            processed.insert(Token{TokenType::eConcat, {'&', '&'}});
         }
 
     }

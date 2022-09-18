@@ -42,7 +42,7 @@ NFAState::NFAState(StateId id, bool isStart, bool isFinal)
     , mTransitions{}
 {}
 
-void NFAState::addTransition(char input, StateId destination)
+void NFAState::addTransition(InputType input, StateId destination)
 {
     mTransitions[input].emplace_back(destination);
 }
@@ -73,9 +73,9 @@ StateId NFA::addState(bool isStart, bool isFinal)
     return mStateCount++;
 }
 
-void NFA::addTransition(char input, StateId source, StateId destination)
+void NFA::addTransition(InputType input, StateId source, StateId destination)
 {
-    mStates[source].addTransition(input, destination);
+    mStates.at(source).addTransition(input, destination);
 }
 
 std::string NFA::serialize()
@@ -99,7 +99,7 @@ std::string NFA::serialize()
                 out += " -> ";
                 out += std::to_string(destination);
                 out += " : ";
-                out += (input == kEpsilon ? std::string{"null"} : std::string{input});
+                out += (input == kEpsilon ? std::string{"null"} : std::to_string(input));
                 out += "\n";
             }
         }
@@ -144,15 +144,15 @@ void NFA::EpsilonNFAToNFAConversion()
     // STEP2: Calculate the new transitions and insert
     // them into the new NFA
     std::unordered_set<StateId> reachableByEpsilonClosureSet;
-    for(auto character : mAlphabet)
+    for(auto c : mAlphabet)
     {
         for (auto state : mStates)
         {
-            for (auto reachableByEpsilonClosure1 : map[state.mId])
+            for (auto reachableByEpsilonClosure1 : map.at(state.mId))
             {
-                for(auto destination : mStates[reachableByEpsilonClosure1].mTransitions[character])
+                for(auto destination : mStates.at(reachableByEpsilonClosure1).mTransitions[c])
                 {
-                    for (auto reachableByEpsilonClosure2 : map[destination])
+                    for (auto reachableByEpsilonClosure2 : map.at(destination))
                     {
                         reachableByEpsilonClosureSet.insert(reachableByEpsilonClosure2);
                     }
@@ -162,7 +162,7 @@ void NFA::EpsilonNFAToNFAConversion()
             // insert into new nfa
             for (auto reachableByEpsilon : reachableByEpsilonClosureSet)
             {
-                newNFA.addTransition(character, state.mId, reachableByEpsilon);
+                newNFA.addTransition(c, state.mId, reachableByEpsilon);
             }
             reachableByEpsilonClosureSet.clear();
         }
@@ -209,7 +209,7 @@ bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination)
         auto state = stack.top();
         stack.pop();
 
-        for (auto transition : mStates[state].mTransitions[kEpsilon])
+        for (auto transition : mStates.at(state).mTransitions[kEpsilon])  //mTransitions[kEpsilon] will create empy vector. Could optimize
         {
             auto adjacent = transition; //TODO rename transition to something better
 
@@ -253,7 +253,7 @@ DFA NFA::NFAToDFAConversion()
     std::set<StateId> set;
 
 
-    auto dfaState = dfa.addState(true, mStates[mStartState].mIsFinal);
+    auto dfaState = dfa.addState(true, mStates.at(mStartState).mIsFinal);
     mapper.insert(dfaState, {mStartState});
     queue.push_back(dfaState);
 
@@ -265,7 +265,7 @@ DFA NFA::NFAToDFAConversion()
 
         auto nfaStates = mapper.get(dfaState);
 
-        for(auto character : mAlphabet)
+        for(auto c : mAlphabet)
         {
 
             set.clear();
@@ -273,7 +273,7 @@ DFA NFA::NFAToDFAConversion()
             for(auto nfaState : nfaStates)
             {
                 // calc  union of all dest states
-                auto destinations = mStates[nfaState].mTransitions[character];
+                auto destinations = mStates.at(nfaState).mTransitions[c];
                 std::copy(destinations.begin(), destinations.end(), std::inserter(set, set.end()));
             }
 
@@ -290,7 +290,7 @@ DFA NFA::NFAToDFAConversion()
                 queue.push_back(newDfaState);
             }
 
-            dfa.addTransition(character, dfaState, newDfaState);
+            dfa.addTransition(c, dfaState, newDfaState);
         }
     }
 

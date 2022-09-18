@@ -12,23 +12,24 @@
 namespace fa
 {
 
-constexpr char kNullPartition = -1;
+
 using PartitionId = int;
 using ParitionMap = std::unordered_map<StateId,PartitionId>;  //todo change to vector?
+constexpr PartitionId kNullPartition = -1;
 
 class DFAState
 {
 public:
     DFAState(StateId id, bool isStart, bool isFinal);
 
-    void addTransition(char input, StateId destination);
+    void addTransition(InputType input, StateId destination);
 
 //private:
     StateId mId;
     bool mIsStart;
     bool mIsFinal;
     bool mIsDead;
-    std::map<char, StateId> mTransitions;
+    std::map<InputType, StateId> mTransitions;
 };
 
 
@@ -39,20 +40,22 @@ public:
 
     StateId addState(bool isStart, bool isFinal);
 
-    void addTransition(char input, StateId source, StateId destination);
+    void addTransition(InputType input, StateId source, StateId destination);
 
     std::string serialize();
 
-    bool run(std::string string);
-    DFAState step(DFAState current, char input);
-
-    std::vector<std::string> search(std::string string);
+    StateId step(StateId current, InputType input);
+    StateId getFirst();
+    bool isDeadState(StateId current);
+    bool isFinalState(StateId current);
 
     void minimizeDFA();
 
+
+
 private:
     std::vector<DFAState> mStates;
-    Alphabet mAlphabet; // Todo reference?
+    Alphabet mAlphabet;
 
     uint mStateCount;
     StateId mStartState;

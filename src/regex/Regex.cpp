@@ -3,124 +3,49 @@
 
 #include <cassert> //todo try to replace with excpetion everywhere
 
-
+#include "Utf8Iterator.hpp"
 
 namespace regex
 {
 
-
-fa::Alphabet kAlphabet
-{
-    '\t', '\n', '\v', '\f', '\r',
-    ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', 
-    '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', 
-    '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', 
-    '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 
-    'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 
-    'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', 
-    '\\', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 
-    'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 
-    'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 
-    'z', '{', '|', '}', '~'
-};
-
-
-
-void DisjoinOverlap_debug(ranges& ranges, char32_t min, char32_t max)
+void DisjoinOverlap(Alphabet& alphabet, CodePoint min, CodePoint max)
 {
     enum class EndpointType { eStart , eEnd};
-    using Point = std::pair<char32_t, EndpointType>;
+    using Point = std::pair<CodePoint, EndpointType>;
     using Points = std::set<Point>;
 
     auto points = Points{};
 
-    for (auto& range : ranges)
+    for (auto& codePointInterval : alphabet)
     {
-        points.emplace(range.first, EndpointType::eStart);
-        points.emplace(range.second, EndpointType::eEnd);
+        points.emplace(codePointInterval.first, EndpointType::eStart);
+        points.emplace(codePointInterval.second, EndpointType::eEnd);
     }
-    ranges.clear();
+    alphabet.clear();
 
-    auto current = min;
-    for (auto& point : points)
-    {
+    // this needs to be large enough to prevent overflow errors
+    unsigned long long int current = min;
 
-        std::cout << "--------------------------" << std::endl;
-        std::cout << "current = " << current << std::endl;
-        if(point.second  == EndpointType::eStart)
-        {
-            std::cout << "point = " << point.first << " " << "start" << std::endl;
-        }
-        else
-        {
-            std::cout << "point = " << point.first << " " << "end" << std::endl;
-        }
-
-        if(point.second == EndpointType::eStart)
-        {
-            if(current < point.first )
-            {
-                ranges.emplace_back(current, point.first-1);
-                std::cout << "adds= " << current << "-" << point.first-1 << std::endl;
-                current = point.first;
-            }
-            else
-            {
-                std::cout << "Ignore " << std::endl;
-            }
-
-        }
-        else
-        {
-            ranges.emplace_back(current, point.first);
-            std::cout << "insert point y= " << current << "-" << point.first << std::endl;
-            current = point.first+1;
-            //std::cout << "current = " << current << std::endl;
-        }
-    }
-
-    if(current < max)
-    {
-        ranges.emplace_back(current, max);
-    }
-}
-
-void DisjoinOverlap(ranges& ranges, char32_t min, char32_t max)
-{
-    enum class EndpointType { eStart , eEnd};
-    using Point = std::pair<char32_t, EndpointType>;
-    using Points = std::set<Point>;
-
-    auto points = Points{};
-
-    for (auto& range : ranges)
-    {
-        points.emplace(range.first, EndpointType::eStart);
-        points.emplace(range.second, EndpointType::eEnd);
-    }
-    ranges.clear();
-
-    auto current = min;
     for (auto& point : points)
     {
         if(point.second == EndpointType::eStart)
         {
             if(current < point.first )
             {
-                ranges.emplace_back(current, point.first-1);
+                alphabet.emplace_back(current, point.first-1);
                 current = point.first;
             }
         }
         else
         {
-            ranges.emplace_back(current, point.first);
+            alphabet.emplace_back(current, point.first);
             current = point.first+1;
         }
     }
 
     if(current < max)
     {
-        ranges.emplace_back(current, max);
+        alphabet.emplace_back(current, max);
     }
 }
 
@@ -361,9 +286,9 @@ Regex::Regex()
 : mDFA{{}} //TODO: create default constructor?
 {}
 
-ranges makeCompressedAlphabet(TokenStream regex)
+void Regex::makeAlphabet(TokenStream regex)
 {
-    ranges compressedAlphabet;
+    Alphabet alphabet;
 
     Token current;
     Token next;
@@ -379,12 +304,13 @@ ranges makeCompressedAlphabet(TokenStream regex)
         }
         if(current.first == TokenType::eSymbol)
         {
-            compressedAlphabet.emplace_back(current.second, current.second); //TODO use real ranges here later
+            alphabet.emplace_back(current.second);
         }
     }
 
-    DisjoinOverlap(compressedAlphabet, 0, 255); //TODO use min and max constexpr here later
-    return compressedAlphabet;
+    DisjoinOverlap(alphabet, kCodePointMin, kCodePointMax);
+    
+    mAlphabet = alphabet;
 }
 
 void Regex::compile(std::string regex)
@@ -392,32 +318,64 @@ void Regex::compile(std::string regex)
     
     auto tokenStream = TokenStream(regex);
 
-    auto compressedAlphabet = makeCompressedAlphabet(regex);
-    
-    std::cout << "---------compressed alphabet---------" << std::endl;
-    for (auto x : compressedAlphabet)
-    {
-        std::cout << x.first << " - " << x.second << std::endl;
-    }
-
-    if (!isValidRegex(tokenStream))
+    if (!isValidRegex(tokenStream)) // TODO rename to validateRegex and void. Throw exception inside
         assert(false);
 
-        mDFA = build(tokenStream, kAlphabet);
+    makeAlphabet(tokenStream);
+    
+    mDFA = build(tokenStream, mAlphabet);
 }
 
-bool Regex::match(std::string string)
+fa::InputType Regex::findInAlphabet(CodePoint input)
 {
-    return mDFA.run(string);
+    int index = 0;
+    for(auto& x : mAlphabet)
+    {
+        if(input>= x.first && input <= x.second)
+        {
+            return index;
+        }
+        index++;
+    }
+
+    assert(false); //TODO throw exception
+    return 0;
+}
+
+bool Regex::match(const std::string string)
+{
+
+    auto current = mDFA.getFirst();
+
+    Utf8Iterator utf8It = string.cbegin();
+
+    while( utf8It != string.end() ) //TODO chnage to for loop
+    {
+        //Translate CP to int
+        auto input = findInAlphabet(*utf8It);
+        current = mDFA.step(current, input);
+        
+        if(mDFA.isDeadState(current))
+        {
+            break;
+        }
+
+        utf8It++;
+    }
+
+    return mDFA.isFinalState(current);
 }
 
 
 bool Regex::search(std::string string)
 {
+    //TODO broken
+    /*
     for(auto result : mDFA.search(string))
     {
         std::cout << result << std::endl;
     }
+    */
 
     return true; //todo
 }

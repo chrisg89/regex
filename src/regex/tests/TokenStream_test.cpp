@@ -24,11 +24,11 @@ SCENARIO( "TokenStream", "[TokenStream]" )
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
-                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, 'h'});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, 'e'});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, 'l'});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, 'l'});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, 'o'});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, CodePointInterval('h','h')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, CodePointInterval('e','e')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, CodePointInterval('l','l')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, CodePointInterval('l','l')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, CodePointInterval('o','o')});
                 }
             }
         }
@@ -45,15 +45,15 @@ SCENARIO( "TokenStream", "[TokenStream]" )
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '1'});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, CodePointInterval('1','1')});
                     tokenStream.get();
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '2'});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, CodePointInterval('2','2')});
                     tokenStream.get();
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '3'});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, CodePointInterval('3','3')});
                     tokenStream.get();
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
                     tokenStream.get();
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
                 }
             }
         }
@@ -70,10 +70,10 @@ SCENARIO( "TokenStream", "[TokenStream]" )
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '\\'});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '\\'});
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, CodePointInterval('\\','\\')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, CodePointInterval('\\','\\')});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
                 }
             }
         }
@@ -91,10 +91,10 @@ SCENARIO( "TokenStream", "[TokenStream]" )
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '('});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '('});
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, CodePointInterval('(','(')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, CodePointInterval('(','(')});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
                 }
             }
         }
@@ -111,10 +111,10 @@ SCENARIO( "TokenStream", "[TokenStream]" )
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, ')'});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, ')'});
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, CodePointInterval(')',')')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, CodePointInterval(')',')')});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
                 }
             }
         }
@@ -131,10 +131,10 @@ SCENARIO( "TokenStream", "[TokenStream]" )
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '|'});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '|'});
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, CodePointInterval('|','|')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, CodePointInterval('|','|')});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
                 }
             }
         }
@@ -151,10 +151,10 @@ SCENARIO( "TokenStream", "[TokenStream]" )
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '*'});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '*'});
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, CodePointInterval('*','*')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, CodePointInterval('*','*')});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
                 }
             }
         }
@@ -171,10 +171,10 @@ SCENARIO( "TokenStream", "[TokenStream]" )
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '+'});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '+'});
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, CodePointInterval('+','+')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, CodePointInterval('+','+')});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
                 }
             }
         }
@@ -191,10 +191,10 @@ SCENARIO( "TokenStream", "[TokenStream]" )
 
                 THEN( "the correct tokens can be extracted" ) 
                 {
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, '?'});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, '?'});
-                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, ' '});
-                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, ' '});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eSymbol, CodePointInterval('?','?')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eSymbol, CodePointInterval('?','?')});
+                    REQUIRE(tokenStream.peek() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
+                    REQUIRE(tokenStream.get() == Token{TokenType::eEOF, CodePointInterval(' ',' ')});
                 }
             }
         }

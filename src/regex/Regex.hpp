@@ -1,28 +1,23 @@
 
 #pragma once
 
+#include "Alphabet.hpp"
+#include "CodePoint.hpp"
 #include "TokenStream.hpp"
 #include "DFABuilder.hpp"
 
 #include <string>
 
-//TODO clean this up
-// start range
-#include <algorithm>
-#include <queue>
 
-using range = std::pair<char32_t, char32_t>; //TODO Range
-using ranges = std::vector<range>; //TODO Ranges
-constexpr auto min = char32_t(0);
-constexpr auto max = char32_t(0x1FFFF);
-// end range
+
+
 
 namespace regex
 {
 
 using DFA = fa::DFA;
 
-void DisjoinOverlap(ranges& ranges, char32_t min, char32_t max);
+void DisjoinOverlap(Alphabet& alphabet, CodePoint min, CodePoint max);   //TODO do not expose this interface. How to test? Its complex enough...
 
 class Regex
 {
@@ -41,6 +36,9 @@ public:
 
 private:
     DFA mDFA;
+    Alphabet mAlphabet;
+    fa::InputType findInAlphabet(CodePoint input);
+    void makeAlphabet(TokenStream regex);
 
 };
 

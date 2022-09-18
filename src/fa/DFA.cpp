@@ -15,7 +15,7 @@ DFAState::DFAState(StateId id, bool isStart, bool isFinal)
     , mIsDead{true}
 {}
 
-void DFAState::addTransition(char input, StateId destination)
+void DFAState::addTransition(InputType input, StateId destination)
 {
     mTransitions[input] = destination;
 
@@ -51,9 +51,9 @@ StateId DFA::addState(bool isStart, bool isFinal)
     return mStateCount++;
 }
 
-void DFA::addTransition(char input, StateId source, StateId destination)
+void DFA::addTransition(InputType input, StateId source, StateId destination)
 {
-    mStates[source].addTransition(input, destination);
+    mStates.at(source).addTransition(input, destination);
 }
 
 std::string DFA::serialize()
@@ -85,99 +85,27 @@ std::string DFA::serialize()
     return out;
 }
 
-bool DFA::run(std::string string)
+StateId DFA::getFirst()
 {
-
-    StateId current;
-
     assert(mStartState != kNullState);
-
-    current = mStartState;
-
-    for(char& c : string)
-    {
-        current = mStates[current].mTransitions[c];
-
-        if(mStates[current].mIsDead)
-        {
-            break;
-        }
-    }
-
-    return mStates[current].mIsFinal;
+    return mStartState;
 }
 
-
-DFAState DFA::step(DFAState current, char input)
+StateId DFA::step(StateId current, InputType input)
 {
-    auto next = mStates[current.mId].mTransitions[input];
-    return mStates[next];
+    auto next = mStates.at(current).mTransitions.at(input);
+    return mStates.at(next).mId;
 }
 
-
-std::vector<std::string> DFA::search(std::string string)
+bool DFA::isDeadState(StateId current)
 {
-
-    string += '\0'; //TODO change?
-
-    std::vector<std::string> results;
-
-    std::string matched = "";
-    std::string accumulator = "";
-    std::string::iterator input = string.begin();
-    std::string::iterator backtrack = string.begin();
-
-    auto startState = mStates[mStartState];
-    auto state = startState;
-
-    while(*input != '\0')
-    {
-        if(state.mIsFinal)
-        {
-            matched += accumulator;
-            accumulator.clear();
-            backtrack = input;
-        }
-
-        if(state.mIsDead)
-        {
-            if(!matched.empty())
-            {
-                results.push_back(matched);
-                matched.clear();
-                input = backtrack;
-            }
-            else
-            {
-                backtrack++;
-                input = backtrack;
-            }
-
-            state = startState;
-            accumulator.clear();
-            
-        }
-        else
-        {
-            accumulator += *input;
-            state = step(state, *input);
-            input++;
-        }
-    }
-
-    if(state.mIsFinal)
-    {
-        matched += accumulator;
-    }
-
-    if(!matched.empty())
-    {
-        results.push_back(matched);
-    }
-
-    return results;
+    return mStates.at(current).mIsDead;
 }
 
+bool DFA::isFinalState(StateId current)
+{
+    return mStates.at(current).mIsFinal;
+}
 
 struct Partition
 {
@@ -267,7 +195,7 @@ void DFA::minimizeDFA()
         }
         else
         {
-            if(partitionFinal == kNullState)
+            if(partitionFinal == kNullPartition)
             {
                 partitionFinal = pool.addPartition();
             }
@@ -331,8 +259,8 @@ void DFA::minimizeDFA()
 
         for (auto state : pool.Partitions[partition.ID].States)
         {
-            isStart |= mStates[state].mIsStart;
-            isFinal |= mStates[state].mIsFinal;
+            isStart |= mStates.at(state).mIsStart;
+            isFinal |= mStates.at(state).mIsFinal;
         }
 
         // parition id => new state id
@@ -340,7 +268,7 @@ void DFA::minimizeDFA()
 
         for(auto c : mAlphabet)
         {
-            auto targetState = currPartitionMap[mStates[partition.Leader].mTransitions[c]];
+            auto targetState = currPartitionMap.at(mStates.at(partition.Leader).mTransitions.at(c));
             newDFA.addTransition(c, newState, targetState);
         }
         
@@ -360,8 +288,8 @@ bool DFA::checkEquivalence(ParitionMap paritionMap, StateId stateA, StateId stat
 {
     for(auto c : mAlphabet)
     {
-        auto stateADest = mStates[stateA].mTransitions[c];
-        auto stateBDest = mStates[stateB].mTransitions[c];
+        auto stateADest = mStates.at(stateA).mTransitions.at(c);
+        auto stateBDest = mStates.at(stateB).mTransitions.at(c);
 
         if (stateADest != stateBDest)
         {

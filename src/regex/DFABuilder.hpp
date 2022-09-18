@@ -4,13 +4,13 @@
 #include "NFA.hpp"
 #include "DFA.hpp"
 #include "TokenStream.hpp"
+#include "Alphabet.hpp"
 
 namespace regex
 {
 
 using NFA = fa::NFA;
 using DFA = fa::DFA;
-using Alphabet = fa::Alphabet;
 
 DFA build(TokenStream regex, Alphabet& alphabet);
 

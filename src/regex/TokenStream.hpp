@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "CodePoint.hpp"
+
 #include <string>
 
 #include <deque>
@@ -24,17 +26,10 @@ enum class TokenType{
     eOpenBracket,
     eCloseBracket,
     eSymbol,
-    eAny,
-    eDigit,
-    eNonDigit,
-    eWhitespace,
-    eNonWhitespace,
-    eWordCharacter,
-    eNonWordCharacter,
     eEOF
 };
 
-using Token = std::pair<TokenType, char>;
+using Token = std::pair<TokenType, CodePointInterval>;
 
 class TokenStream
 {

@@ -8,9 +8,10 @@
 namespace fa
 {
 
+using InputType = int;
 using StateId = int;
-using Alphabet = std::vector<char>;
-constexpr char kNullState = -1;
-constexpr char kEpsilon = 0;
+using Alphabet = std::vector<InputType>;
+constexpr StateId kNullState = -1;
+constexpr InputType kEpsilon = -1;
 
 }

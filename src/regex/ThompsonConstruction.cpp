@@ -2,20 +2,25 @@
 
 #include <cassert>
 #include <stack>
+#include <numeric>
 
 namespace regex
 {
+
+using NfaAlphabet = fa::Alphabet;
+
 
 NFA ThompsonConstruction(TokenStream regex, Alphabet& alphabet)
 {
     std::stack<BlackBox> stack;
 
-    NFA nfa{alphabet};
+    auto nfaAlphabet = NfaAlphabet(alphabet.size());
+    std::iota(std::begin(nfaAlphabet), std::end(nfaAlphabet), 0);
+    auto nfa = NFA(nfaAlphabet);
 
     auto token = Token{};
     while( token = regex.get(), token.first != TokenType::eEOF )
     {
-
         if(token.first == TokenType::eUnion)
         {
             auto op1 = stack.top();
@@ -50,37 +55,9 @@ NFA ThompsonConstruction(TokenStream regex, Alphabet& alphabet)
             stack.pop();
             stack.push(buildOptional(nfa, op1));
         }
-        else if(token.first == TokenType::eAny)
-        {
-            stack.push(buildAny(nfa, alphabet));
-        }
-        else if(token.first == TokenType::eDigit)
-        {
-            stack.push(buildDigit(nfa, alphabet));
-        }
-        else if(token.first == TokenType::eNonDigit)
-        {
-            stack.push(buildNonDigit(nfa, alphabet));
-        }
-        else if(token.first == TokenType::eWhitespace)
-        {
-            stack.push(buildWhitespace(nfa, alphabet));
-        }
-        else if(token.first == TokenType::eNonWhitespace)
-        {
-            stack.push(buildNonWhitespace(nfa, alphabet));
-        }
-        else if(token.first == TokenType::eWordCharacter)
-        {
-            stack.push(buildWordCharacter(nfa, alphabet));
-        }
-        else if(token.first == TokenType::eNonWordCharacter)
-        {
-            stack.push(buildNonWordCharacter(nfa, alphabet));
-        }
         else
         {
-            stack.push(buildSymbol(nfa, token.second));
+            stack.push(buildSymbol(nfa, alphabet, token.second));
         }
 
     }
@@ -104,119 +81,29 @@ BlackBox::BlackBox(StateId entry, StateId exit)
 , exit {exit}
 {}
 
-BlackBox buildSymbol(NFA& nfa, char c)
+bool isSubset(CodePointInterval& outer, CodePointInterval& inner)
 {
-    auto entry = nfa.addState(false, false);
-    auto exit = nfa.addState(false, false);
-    nfa.addTransition(c, entry, exit);
-    return BlackBox(entry, exit);
-}
-
-BlackBox buildDigit(NFA& nfa, Alphabet& alphabet)
-{
-    auto entry = nfa.addState(false, false);
-    auto exit = nfa.addState(false, false);
-
-    for (auto c : alphabet) 
+    if(outer.first <= inner.first && outer.second >= inner.second)
     {
-        if(isdigit(c))
-        {
-            nfa.addTransition(c, entry, exit);
-        }
+        return true;
     }
 
-    return BlackBox(entry, exit);
+    return false;
 }
 
-BlackBox buildNonDigit(NFA& nfa, Alphabet& alphabet)
+BlackBox buildSymbol(NFA& nfa, Alphabet& alphabet, CodePointInterval& interval)
 {
     auto entry = nfa.addState(false, false);
     auto exit = nfa.addState(false, false);
 
-    for (auto c : alphabet) 
+    int index = 0;
+    for (auto& c : alphabet)
     {
-        if(!isdigit(c))
+        if(isSubset(interval, c))
         {
-            nfa.addTransition(c, entry, exit);
+            nfa.addTransition(index, entry, exit);
         }
-    }
-
-    return BlackBox(entry, exit);
-}
-
-BlackBox buildWhitespace(NFA& nfa, Alphabet& alphabet)
-{
-    auto entry = nfa.addState(false, false);
-    auto exit = nfa.addState(false, false);
-
-    for (auto c : alphabet) 
-    {
-        if(isspace(c))
-        {
-            nfa.addTransition(c, entry, exit);
-        }
-    }
-
-    return BlackBox(entry, exit);
-}
-
-BlackBox buildNonWhitespace(NFA& nfa, Alphabet& alphabet)
-{
-    auto entry = nfa.addState(false, false);
-    auto exit = nfa.addState(false, false);
-
-    for (auto c : alphabet) 
-    {
-        if(!isspace(c))
-        {
-            nfa.addTransition(c, entry, exit);
-        }
-    }
-
-    return BlackBox(entry, exit);
-}
-
-BlackBox buildWordCharacter(NFA& nfa, Alphabet& alphabet)
-{
-    auto entry = nfa.addState(false, false);
-    auto exit = nfa.addState(false, false);
-
-    for (auto c : alphabet) 
-    {
-        if(isalpha(c) || isdigit(c) || c == '_')
-        {
-            nfa.addTransition(c, entry, exit);
-        }
-    }
-
-    return BlackBox(entry, exit);
-}
-
-BlackBox buildNonWordCharacter(NFA& nfa, Alphabet& alphabet)
-{
-    auto entry = nfa.addState(false, false);
-    auto exit = nfa.addState(false, false);
-
-    for (auto c : alphabet) 
-    {
-        if(!isalpha(c) && !isdigit(c) && c != '_')
-        {
-            nfa.addTransition(c, entry, exit);
-        }
-    }
-
-    return BlackBox(entry, exit);
-}
-
-BlackBox buildAny(NFA& nfa, Alphabet& alphabet)
-{
-    auto entry = nfa.addState(false, false);
-    auto exit = nfa.addState(false, false);
-
-    for (auto c : alphabet) 
-    {
-        //TODO: some regex engines dont include new line in any.
-        nfa.addTransition(c, entry, exit);
+        index++;
     }
 
     return BlackBox(entry, exit);

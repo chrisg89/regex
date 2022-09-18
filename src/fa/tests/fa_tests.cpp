@@ -6,8 +6,6 @@
 namespace fa{
 namespace{
 
-//TODO backup on github
-
 //TODO rename to PLantUml to serialize()
 
 SCENARIO( "Empty", "[empty]" ) 
