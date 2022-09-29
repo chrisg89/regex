@@ -1,5 +1,6 @@
 
 add_library(regex_lib
+    CharacterClassStream.cpp
     DFABuilder.cpp
     Regex.cpp
     ThompsonConstruction.cpp

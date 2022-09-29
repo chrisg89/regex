@@ -6,11 +6,11 @@
 namespace regex
 {
 
-using CodePoint = unsigned char;
-using CodePointInterval = std::pair<CodePoint, CodePoint>;
+using CodePoint = char32_t; //TODO
+using CodePointInterval = std::pair<CodePoint, CodePoint>; 
 
-constexpr CodePoint kCodePointMin = 0x00U;
-constexpr CodePoint kCodePointMax = 0xFFU;
+constexpr CodePoint kCodePointMin = 0x0000'0000U;  //TODO
+constexpr CodePoint kCodePointMax = 0x0010'FFFFU; //TODO
 
 //TODO Add calculation logic here for Codepoints?
 

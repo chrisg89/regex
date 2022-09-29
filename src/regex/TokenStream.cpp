@@ -3,6 +3,7 @@
 #include "Utf8Iterator.hpp"
 #include <sstream>
 #include <stdexcept>
+#include "CharacterClassStream.hpp"
 
 namespace regex
 {
@@ -34,7 +35,7 @@ void insertNonWhitespace(std::deque<Token>& Tokens )
 
 void insertAny(std::deque<Token>& Tokens )
 {
-    Tokens.emplace_back(TokenType::eSymbol, CodePointInterval(0x00, 0xFF));
+    Tokens.emplace_back(TokenType::eSymbol, CodePointInterval(0x00, 0xFF)); //TODO should not include new line
 }
 
 void insertDigit(std::deque<Token>& Tokens )
@@ -98,6 +99,46 @@ void insertNonWordCharacter(std::deque<Token>& Tokens )
 }
 
 
+void insertNormalCharClass(std::deque<Token>& Tokens, CharacterClassStream& CC)
+{
+    CCToken current;
+    CCToken next;
+
+    Tokens.emplace_back(TokenType::eOpenBracket, CodePointInterval('(', '('));
+
+    while( true )
+    {
+        current = CC.get();
+        next = CC.peek();
+
+        if(current.type == CCTokenType::eEOF)
+        {
+            break;
+        }
+
+        if(current.type == CCTokenType::eInterval)
+        {
+            Tokens.emplace_back(TokenType::eSymbol, CodePointInterval(current.start, current.end));
+        
+            if(next.type != CCTokenType::eEOF)
+            {
+                Tokens.emplace_back(TokenType::eUnion, CodePointInterval('|', '|'));
+            }
+        }
+    }
+
+    Tokens.emplace_back(TokenType::eCloseBracket, CodePointInterval(')', ')'));
+}
+
+void insertCharacterClass(std::deque<Token>& Tokens, Utf8Iterator& it, const std::string& regex)
+{
+    auto CCStream = CharacterClassStream(it, regex); 
+
+    insertNormalCharClass(Tokens, CCStream);  //todo rename
+
+}
+
+
 
 TokenStream::TokenStream()
     : mTokens{}
@@ -138,6 +179,10 @@ TokenStream::TokenStream(const std::string regex) //TODO this should be a refere
         {
             insertAny(mTokens);
         }
+        else if (*current == '[')
+        {
+            insertCharacterClass(mTokens, current, regex);
+        }
         else if(*current == '\\' )
         {
             //escape sequence detected
@@ -149,6 +194,11 @@ TokenStream::TokenStream(const std::string regex) //TODO this should be a refere
             else if(*current == 'd')
             {
                 insertDigit(mTokens);
+                //TODO Should use this??:
+                // delegate this work to characterclass
+                //const std::string digit = "[0-9]";
+                //Utf8Iterator xxxx = digit.begin();
+                //insertCharacterClass(mTokens, xxxx, digit);
             }
             else if(*current == 'D')
             {
@@ -189,6 +239,14 @@ TokenStream::TokenStream(const std::string regex) //TODO this should be a refere
             else if(*current == 'v')
             {
                 mTokens.emplace_back(TokenType::eSymbol, CodePointInterval('\v','\v'));
+            }
+            else if(*current == '[')
+            {
+                mTokens.emplace_back(TokenType::eSymbol, CodePointInterval('[','['));
+            }
+            else if(*current == ']')
+            {
+                mTokens.emplace_back(TokenType::eSymbol, CodePointInterval(']',']'));
             }
             else
             {

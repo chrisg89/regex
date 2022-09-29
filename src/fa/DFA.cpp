@@ -276,9 +276,6 @@ void DFA::minimizeDFA()
 
     }
 
-
-    std::cout << "before: " << mStates.size() << " after: " << newDFA.mStates.size() << std::endl; //TODO remove
-
     //STEP3: replace old DFA with new DFA
     *this = newDFA;  // TODO: should use move semantics here?
 
