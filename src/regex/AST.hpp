@@ -70,6 +70,11 @@ private:
 
 class KleeneStar : public Node
 {
+public:
+    KleeneStar(NodePtr& inner)
+    : inner {inner.release()}
+    {}
+
 private:
     void eval() final
     {}
@@ -85,6 +90,11 @@ private:
 
 class KleenePlus : public Node
 {
+public:
+    KleenePlus(NodePtr& inner)
+    : inner {inner.release()}
+    {}
+
 private:
     void eval() final
     {}
@@ -100,6 +110,11 @@ private:
 
 class Optional : public Node
 {
+public:
+    Optional(NodePtr& inner)
+    : inner {inner.release()}
+    {}
+
 private:
     void eval() final
     {}
@@ -115,6 +130,14 @@ private:
 
 class RangeQuantifier : public Node
 {
+public:
+    RangeQuantifier(NodePtr& inner, uint64_t min, uint64_t max, bool isMaxBounded)
+    : inner {inner.release()}
+    , min {min}
+    , max {max}
+    , isMaxBounded {isMaxBounded}
+    {}
+
 private:
     void eval() final
     {}
@@ -136,8 +159,8 @@ private:
         }
     }
 
-    int min;
-    int max;
+    uint64_t min;
+    uint64_t max;
     bool isMaxBounded;
      
     NodePtr inner; // use NodePtr

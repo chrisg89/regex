@@ -18,6 +18,7 @@ namespace tags
     struct GroupTag{};
     struct AnchorTag{};
     struct BackreferenceTag{};
+    struct BackreferenceStartTag{};
 
     struct GroupNonCapturingModifierTag{};
     struct QuantifierTag{};
@@ -46,6 +47,9 @@ namespace tags
     struct RangeQuantifierTag{};
     struct RangeQuantifierLowerBoundTag{};
     struct RangeQuantifierUpperBoundTag{};
+    struct RangeOpenTag{};
+    struct RangeCloseTag{};
+    struct RangeCommaDelimiterTag{};
     struct StartOfStringAnchorTag{};
     struct AnchorWordBoundaryTag{};
     struct AnchorNonWordBoundaryTag{};
@@ -56,6 +60,8 @@ namespace tags
     struct AnchorEndOfStringTag{};
     struct IntegerTag{};
     struct LettersTag{};
+    struct DigitTag{};
+
 
 
     struct AlternativeTag{};
@@ -85,28 +91,31 @@ private:
     bool parse(tags::MatchItemTag, NodePtr&);
     bool parse(tags::QuantifierTag, NodePtr&, NodePtr&);
 
+    bool parse(tags::QuantifierTypeTag, NodePtr&, NodePtr&);
+    
+
     bool parse(tags::MatchCharacterClassTag, NodePtr&);
+    bool parse(tags::RangeQuantifierLowerBoundTag, uint64_t&, bool& );
+    bool parse(tags::RangeQuantifierUpperBoundTag, uint64_t&, bool& );
 
 
+    bool parse(tags::IntegerTag, uint64_t&, bool& );
 
+
+    bool parse(tags::RangeQuantifierTag, uint64_t&, uint64_t&, bool&);
 
     bool parse(tags::MatchCharacterTag, CodePoint&);
     bool parse(tags::MatchCharacterEscapeTag, CodePoint&);
-    //bool parse(tags::RegexTag, NodePtr&);
-    //bool parse(tags::RegexTag, NodePtr&);
-    //bool parse(tags::RegexTag, NodePtr&);
-    //bool parse(tags::RegexTag, NodePtr&);
-    //bool parse(tags::RegexTag, NodePtr&);
-    //bool parse(tags::RegexTag, NodePtr&);
-    //bool parse(tags::RegexTag, NodePtr&);
-    //bool parse(tags::RegexTag, NodePtr&);
-    //bool parse(tags::RegexTag, NodePtr&);
-    //bool parse(tags::RegexTag, NodePtr&);
-    //bool parse(tags::RegexTag, NodePtr&);
- 
 
+    bool parse(tags::DigitTag, uint8_t&);
     bool parse(tags::StartOfStringAnchorTag);
     bool parse(tags::AlternativeTag);
+
+    bool parse(tags::RangeOpenTag);
+    bool parse(tags::RangeCloseTag);
+    bool parse(tags::RangeCommaDelimiterTag);
+
+    bool parse(tags::LazyModifierTag);
     bool parse(tags::AnchorWordBoundaryTag);
     bool parse(tags::AnchorNonWordBoundaryTag);
     bool parse(tags::AnchorStartOfStringOnlyTag);
@@ -115,6 +124,13 @@ private:
     bool parse(tags::AnchorPreviousMatchEndTag);
     bool parse(tags::AnchorEndOfStringTag);
     bool parse(tags::MatchAnyCharacterTag);
+    bool parse(tags::BackreferenceStartTag);
+
+    
+
+    bool parse(tags::ZeroOrMoreQuantifierTag);
+    bool parse(tags::OneOrMoreQuantifierTag);
+    bool parse(tags::ZeroOrOneQuantifierTag);
     
     Utf8Iterator mCurser; //TODO why can this not be const?
     const Utf8Iterator mBegin;

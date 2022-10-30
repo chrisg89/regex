@@ -2,6 +2,7 @@
 #include "Parser.hpp"
 #include <stdexcept>
 #include <iostream>
+#include <limits>
 
 namespace regex::parser
 {
@@ -13,7 +14,7 @@ int Parser::pos() const
 
 void Parser::error(const std::string& msg) const
 {
-    throw("error at position " + pos() + msg);
+    throw("Error at position " + std::to_string(pos()) + ". Message: " + msg);
 }
 
 bool Parser::get(CodePoint & value)
@@ -173,8 +174,15 @@ bool Parser::parse(tags::MatchAnyCharacterTag)
     return (get(cp) == true && cp == '.');
 }
 
+bool Parser::parse(tags::BackreferenceStartTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '\\');
+}
+
 bool Parser::parse(tags::MatchCharacterClassTag, NodePtr&)
 {
+    //TODO: Work on this next
     return false;
 }
 
@@ -239,7 +247,7 @@ bool Parser::parse(tags::MatchCharacterEscapeTag, CodePoint& cp)
     }
 
     error("This token has no special meaning and has thus been rendered erroneous");
-    return false; // supress compiler warning
+    return false; // to supress compiler warning
 }
 
 bool Parser::parse(tags::MatchCharacterTag, CodePoint& cp)
@@ -271,13 +279,190 @@ bool Parser::parse(tags::MatchCharacterTag, CodePoint& cp)
 
 bool Parser::parse(tags::QuantifierTag, NodePtr& astNode, NodePtr& inner)
 {
-    //TODO
+    if(!parse<tags::QuantifierTypeTag>(astNode, inner))
+    {
+        return false;
+    }
+
+    if(parse<tags::LazyModifierTag>())
+    {
+        error("Lazy modifier is not supported ");
+    }
+
+    return true;
+}
+
+bool Parser::parse(tags::QuantifierTypeTag, NodePtr& astNode, NodePtr& inner)
+{
+    if(parse<tags::ZeroOrMoreQuantifierTag>())
+    {
+        astNode = std::make_unique<ast::KleeneStar>(inner);
+        return true;
+    }
+
+    if(parse<tags::OneOrMoreQuantifierTag>())
+    {
+        astNode = std::make_unique<ast::KleenePlus>(inner);
+        return true;
+    }
+
+    if(parse<tags::ZeroOrOneQuantifierTag>())
+    {
+        astNode = std::make_unique<ast::Optional>(inner);
+        return true;
+    }
+
+    uint64_t min = 0;
+    uint64_t max = 0;
+    bool isMaxBounded = false;;
+
+    if(parse<tags::RangeQuantifierTag>(min, max, isMaxBounded))
+    {
+        astNode = std::make_unique<ast::RangeQuantifier>(inner, min, max, isMaxBounded);
+        return true;
+    }
+
     return false;
+}
+
+bool Parser::parse(tags::RangeQuantifierTag, uint64_t& min, uint64_t& max, bool& isMaxBounded)
+{
+
+    bool minOverflow = false;
+    bool maxOverflow = false;
+
+    if(!parse<tags::RangeOpenTag>())
+    {
+        return false;
+    }
+
+    if(!parse<tags::RangeQuantifierLowerBoundTag>(min, minOverflow))
+    {
+        return false;
+    }
+
+    max = min;
+
+    if(parse<tags::RangeCommaDelimiterTag>())
+    {
+        if(parse<tags::RangeQuantifierUpperBoundTag>(max, maxOverflow))
+        {
+            isMaxBounded = true;
+        }
+        else
+        {
+            isMaxBounded = false;
+        }
+    }
+
+    if(!parse<tags::RangeCloseTag>())
+    {
+        return false;
+    }
+
+    if(minOverflow)
+    {
+        error("min value on range is too large"); // TODO specify limit
+    }
+
+    if(minOverflow)
+    {
+        error("max value on range is too large"); // TODO specify limit
+    }
+
+    if(min > max && isMaxBounded)
+    {
+        error("min value is greater than max value on range"); // TODO reword this
+    }
+
+    return true;
+}
+
+bool Parser::parse(tags::RangeQuantifierLowerBoundTag, uint64_t& min, bool& overflow)
+{
+    if(parse<tags::IntegerTag>(min, overflow))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Parser::parse(tags::RangeQuantifierUpperBoundTag, uint64_t& max, bool& overflow)
+{
+    if(parse<tags::IntegerTag>(max, overflow))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Parser::parse(tags::IntegerTag, uint64_t& integer, bool& overflow)
+{
+    integer = 0;
+    overflow = false;
+
+    uint8_t digit; 
+
+    if(!parse<tags::DigitTag>(digit))
+    {
+        return false;
+    }
+    integer = digit;
+
+    while(parse<tags::DigitTag>(digit))
+    {
+        integer *= 10;
+        integer += digit;
+
+        if(integer > std::numeric_limits<uint32_t>::max())
+        {
+            overflow = true;
+        }
+    }
+
+    return true;
+}
+
+bool Parser::parse(tags::DigitTag, uint8_t& digit)
+{
+    CodePoint cp; 
+    if(get(cp) == true && isdigit(cp))
+    {
+        digit = cp - '0';
+        return true;
+    }
+    return false;
+}
+
+
+bool Parser::parse(tags::LazyModifierTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '?');
+}
+
+bool Parser::parse(tags::ZeroOrMoreQuantifierTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '*');
+}
+
+bool Parser::parse(tags::OneOrMoreQuantifierTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '+');
+}
+
+bool Parser::parse(tags::ZeroOrOneQuantifierTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '?');
 }
 
 
 bool Parser::parse(tags::GroupTag, NodePtr& astNode)
 {
+    //TODO Work on this after character class
     return false;
 }
 
@@ -285,8 +470,25 @@ bool Parser::parse(tags::GroupTag, NodePtr& astNode)
 
 bool Parser::parse(tags::BackreferenceTag, NodePtr& astNode)
 {
-    //TODO
-    return false;
+    uint64_t integer = 0;
+    bool overflow = false;
+
+    if(!parse<tags::BackreferenceStartTag>())
+    {
+        return false;
+    }
+
+    if(!parse<tags::IntegerTag>(integer, overflow))
+    {
+        return false;
+    }
+    
+    if(overflow)
+    {
+        error("back reference is too large"); // TODO specify limit
+    }
+
+    return true;
 }
 
 bool Parser::parse(tags::AnchorTag, NodePtr& astNode)
@@ -390,6 +592,25 @@ bool Parser::parse(tags::AnchorEndOfStringTag)
     CodePoint cp; 
     return (get(cp) == true && cp == '$');
 }
+
+bool Parser::parse(tags::RangeOpenTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '{');
+}
+
+bool Parser::parse(tags::RangeCloseTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '}');
+}
+
+bool Parser::parse(tags::RangeCommaDelimiterTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == ',');
+}
+
 
 }
 
