@@ -84,12 +84,86 @@ SCENARIO( "Parse Ranged Qalifier 4", "[Parse]" )
     auto end = hello.end();
 
     auto ast = ast::AST();
+    REQUIRE_THROWS_AS(Parser(ast, begin, end), std::runtime_error);
+}
+
+SCENARIO( "Shorthand character class \\d", "[Parse]" ) 
+{
+    const std::string hello = R"(\d)";
+
+    auto begin = hello.begin();
+    auto end = hello.end();
+
+    auto ast = ast::AST();
     auto parser = Parser(ast, begin, end);
 
     std::cout << ast.print() << std::endl;
 }
 
+SCENARIO( "Shorthand character class \\D", "[Parse]" ) 
+{
+    const std::string hello = R"(\D)";
 
+    auto begin = hello.begin();
+    auto end = hello.end();
+
+    auto ast = ast::AST();
+    auto parser = Parser(ast, begin, end);
+
+    std::cout << ast.print() << std::endl;
+}
+
+SCENARIO( "Shorthand character class \\w", "[Parse]" ) 
+{
+    const std::string hello = R"(\w)";
+
+    auto begin = hello.begin();
+    auto end = hello.end();
+
+    auto ast = ast::AST();
+    auto parser = Parser(ast, begin, end);
+
+    std::cout << ast.print() << std::endl;
+}
+
+SCENARIO( "Shorthand character class \\W", "[Parse]" ) 
+{
+    const std::string hello = R"(\W)";
+
+    auto begin = hello.begin();
+    auto end = hello.end();
+
+    auto ast = ast::AST();
+    auto parser = Parser(ast, begin, end);
+
+    std::cout << ast.print() << std::endl;
+}
+
+SCENARIO( "Character class", "[Parse]" ) 
+{
+    const std::string hello = R"([abc])";
+
+    auto begin = hello.begin();
+    auto end = hello.end();
+
+    auto ast = ast::AST();
+    auto parser = Parser(ast, begin, end);
+
+    std::cout << ast.print() << std::endl;
+}
+
+SCENARIO( "Character class with range", "[Parse]" ) 
+{
+    const std::string hello = R"([a-bc\d])";
+
+    auto begin = hello.begin();
+    auto end = hello.end();
+
+    auto ast = ast::AST();
+    auto parser = Parser(ast, begin, end);
+
+    std::cout << ast.print() << std::endl;
+}
 
 }
 }

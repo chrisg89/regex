@@ -29,15 +29,18 @@ namespace tags
     struct MatchCharacterEscapeTag{};
     struct CharacterGroupTag{};
     struct CharacterClassTag{};
-    struct CharacterClassFromUnicodeCategoryTag{};
     struct CharacterGroupNegativeModifierTag{};
     struct CharacterGroupItemTag{};
     struct CharacterRangeTag{};
+
+    struct CharacterRangeHyphenTag{};
     struct CharTag{};
     struct CharacterClassAnyWordTag{};
     struct CharacterClassAnyWordInvertedTag{};
     struct CharacterClassAnyDecimalDigitTag{};
     struct CharacterClassAnyDecimalDigitInvertedTag{};
+    struct CharacterGroupOpenTag{};
+    struct CharacterGroupCloseTag{};
     struct UnicodeCategoryNameTag{};
     struct QuantifierTypeTag{};
     struct LazyModifierTag{};
@@ -91,6 +94,9 @@ private:
     bool parse(tags::MatchItemTag, NodePtr&);
     bool parse(tags::QuantifierTag, NodePtr&, NodePtr&);
 
+
+    bool parse(tags::CharacterGroupItemTag, NodePtr&);
+
     bool parse(tags::QuantifierTypeTag, NodePtr&, NodePtr&);
     
 
@@ -115,6 +121,11 @@ private:
     bool parse(tags::RangeCloseTag);
     bool parse(tags::RangeCommaDelimiterTag);
 
+    bool parse(tags::CharacterGroupOpenTag);
+    bool parse(tags::CharacterGroupCloseTag);
+
+    bool parse(tags::CharacterGroupNegativeModifierTag);
+
     bool parse(tags::LazyModifierTag);
     bool parse(tags::AnchorWordBoundaryTag);
     bool parse(tags::AnchorNonWordBoundaryTag);
@@ -125,8 +136,21 @@ private:
     bool parse(tags::AnchorEndOfStringTag);
     bool parse(tags::MatchAnyCharacterTag);
     bool parse(tags::BackreferenceStartTag);
+    bool parse(tags::CharacterRangeHyphenTag);
 
     
+
+    bool parse(tags::CharacterClassAnyWordTag);
+    bool parse(tags::CharacterClassAnyWordInvertedTag);
+    bool parse(tags::CharacterClassAnyDecimalDigitTag);
+    bool parse(tags::CharacterClassAnyDecimalDigitInvertedTag);
+
+    
+    bool parse(tags::CharacterGroupTag, NodePtr&);    
+    bool parse(tags::CharacterClassTag, NodePtr&);
+    bool parse(tags::CharacterRangeTag, NodePtr&);
+
+
 
     bool parse(tags::ZeroOrMoreQuantifierTag);
     bool parse(tags::OneOrMoreQuantifierTag);

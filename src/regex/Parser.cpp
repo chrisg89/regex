@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <limits>
+#include <vector>
 
 namespace regex::parser
 {
@@ -14,7 +15,7 @@ int Parser::pos() const
 
 void Parser::error(const std::string& msg) const
 {
-    throw("Error at position " + std::to_string(pos()) + ". Message: " + msg);
+    throw std::runtime_error("Error at position " + std::to_string(pos()) + ". Message: " + msg);
 }
 
 bool Parser::get(CodePoint & value)
@@ -138,7 +139,6 @@ bool Parser::parse(tags::MatchTag, NodePtr& astNode)
     return true;
 }
 
-
 bool Parser::parse(tags::MatchItemTag, NodePtr& astNode)
 {
     if(parse<tags::MatchAnyCharacterTag>())
@@ -174,17 +174,223 @@ bool Parser::parse(tags::MatchAnyCharacterTag)
     return (get(cp) == true && cp == '.');
 }
 
+bool Parser::parse(tags::CharacterClassAnyWordTag)
+{
+    CodePoint cp;
+    if(!get(cp))
+    {
+        return false;
+    }
+
+    if(cp != '\\')
+    {
+        return false;
+    }
+
+    return (get(cp) == true && cp == 'w');
+}
+
+bool Parser::parse(tags::CharacterClassAnyWordInvertedTag)
+{
+    CodePoint cp;
+    if(!get(cp))
+    {
+        return false;
+    }
+
+    if(cp != '\\')
+    {
+        return false;
+    }
+
+    return (get(cp) == true && cp == 'W');
+}
+
+bool Parser::parse(tags::CharacterClassAnyDecimalDigitTag)
+{
+    CodePoint cp;
+    if(!get(cp))
+    {
+        return false;
+    }
+
+    if(cp != '\\')
+    {
+        return false;
+    }
+
+    return (get(cp) == true && cp == 'd');
+}
+
+bool Parser::parse(tags::CharacterClassAnyDecimalDigitInvertedTag)
+{
+    CodePoint cp;
+    if(!get(cp))
+    {
+        return false;
+    }
+
+    if(cp != '\\')
+    {
+        return false;
+    }
+
+    return (get(cp) == true && cp == 'D');
+}
+
 bool Parser::parse(tags::BackreferenceStartTag)
 {
     CodePoint cp; 
     return (get(cp) == true && cp == '\\');
 }
 
-bool Parser::parse(tags::MatchCharacterClassTag, NodePtr&)
+bool Parser::parse(tags::MatchCharacterClassTag, NodePtr& node)
 {
-    //TODO: Work on this next
+    if(parse<tags::CharacterGroupTag>(node))
+    {
+        return true;
+    }
+
+    if(parse<tags::CharacterClassTag>(node))
+    {
+        return true;
+    }
+
     return false;
 }
+
+bool Parser::parse(tags::CharacterGroupTag, NodePtr& node)
+{
+    bool negated = false;
+
+    if(!parse<tags::CharacterGroupOpenTag>())
+    {
+        return false;
+    }
+
+    if(parse<tags::CharacterGroupNegativeModifierTag>())
+    {
+        negated = true;
+    }
+
+    auto groupItemPtr = NodePtr();
+    std::vector<NodePtr> groupItems;
+
+    if(!parse<tags::CharacterGroupItemTag>(groupItemPtr))
+    {
+        return false;
+    }
+    else
+    {
+        groupItems.emplace_back(groupItemPtr.release());
+
+        while(parse<tags::CharacterGroupItemTag>(groupItemPtr))
+        {
+            groupItems.emplace_back(groupItemPtr.release());
+        }
+    }
+
+    if(!parse<tags::CharacterGroupCloseTag>())
+    {
+        return false;
+    }
+
+    node = std::make_unique<ast::CharacterClass>(std::move(groupItems));
+
+    return true;
+}
+
+bool Parser::parse(tags::CharacterGroupItemTag, NodePtr& node)
+{
+    if(parse<tags::CharacterClassTag>(node))
+    {
+        return true;
+    }
+
+    if(parse<tags::CharacterRangeTag>(node))
+    {
+        return true;
+    }
+
+    CodePoint cp;
+    if(parse<tags::MatchCharacterEscapeTag>(cp))
+    {
+        node = std::make_unique<ast::CharacterFromEscape>(cp);
+        return true;
+    }
+
+    if(parse<tags::MatchCharacterTag>(cp))
+    {
+        node = std::make_unique<ast::CharacterLiteral>(cp);
+        return true;
+    }
+
+    return false;
+}
+
+bool Parser::parse(tags::CharacterRangeTag, NodePtr& node)
+{
+    CodePoint start;
+    CodePoint end;
+
+    if(!parse<tags::MatchCharacterTag>(start))
+    {
+        return false;
+    }
+
+    if(!parse<tags::CharacterRangeHyphenTag>())
+    {
+        return false;
+    }
+
+    if(!parse<tags::MatchCharacterTag>(end))
+    {
+        return false;
+    }
+
+    //TODO add check that rnage is in order.
+
+    node = std::make_unique<ast::CodePointRange>(CodePointInterval(start,end));
+
+    return false;
+}
+
+bool Parser::parse(tags::CharacterRangeHyphenTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '-');
+}
+
+bool Parser::parse(tags::CharacterClassTag, NodePtr& node)
+{
+    if(parse<tags::CharacterClassAnyWordTag>())
+    {
+        node = std::make_unique<ast::CharacterClassAnyWord>();
+        return true;
+    }
+
+    if(parse<tags::CharacterClassAnyWordInvertedTag>())
+    {
+        node = std::make_unique<ast::CharacterClassAnyWordInverted>();
+        return true;
+    }
+
+    if(parse<tags::CharacterClassAnyDecimalDigitTag>())
+    {
+        node = std::make_unique<ast::CharacterClassAnyDecimalDigit>();
+        return true;
+    }
+
+    if(parse<tags::CharacterClassAnyDecimalDigitInvertedTag>())
+    {
+        node = std::make_unique<ast::CharacterClassAnyDecimalDigitInverted>();
+        return true;
+    }
+
+    //TODO add other shorthand like space
+
+    return false;
+}   
 
 bool Parser::parse(tags::MatchCharacterEscapeTag, CodePoint& cp)
 {
@@ -275,7 +481,6 @@ bool Parser::parse(tags::MatchCharacterTag, CodePoint& cp)
 
     return true;
 }
-
 
 bool Parser::parse(tags::QuantifierTag, NodePtr& astNode, NodePtr& inner)
 {
@@ -434,6 +639,11 @@ bool Parser::parse(tags::DigitTag, uint8_t& digit)
     return false;
 }
 
+bool Parser::parse(tags::CharacterGroupNegativeModifierTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '^');
+}
 
 bool Parser::parse(tags::LazyModifierTag)
 {
@@ -459,14 +669,11 @@ bool Parser::parse(tags::ZeroOrOneQuantifierTag)
     return (get(cp) == true && cp == '?');
 }
 
-
 bool Parser::parse(tags::GroupTag, NodePtr& astNode)
 {
     //TODO Work on this after character class
     return false;
 }
-
-
 
 bool Parser::parse(tags::BackreferenceTag, NodePtr& astNode)
 {
@@ -611,6 +818,17 @@ bool Parser::parse(tags::RangeCommaDelimiterTag)
     return (get(cp) == true && cp == ',');
 }
 
+bool Parser::parse(tags::CharacterGroupOpenTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '[');
+}
+
+bool Parser::parse(tags::CharacterGroupCloseTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == ']');
+}
 
 }
 

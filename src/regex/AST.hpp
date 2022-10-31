@@ -1,6 +1,6 @@
 #include <string>
 #include <memory>
-
+#include <vector>
 #include "CodePoint.hpp"
 
 namespace regex::ast
@@ -233,19 +233,46 @@ private:
 
 class CharacterClass : public Node
 {
+public:
+    CharacterClass(std::vector<NodePtr>&& codePointIntervals)
+    : CodePointIntervals{std::move(codePointIntervals)}
+    {}
+
 private:
     void eval() final
     {}
 
     void print(std::string& str) final
     {
-        str+= "[...]";
+        for (const auto& item : CodePointIntervals )
+        {
+            item->print(str);
+        }
     }
 
-    CodePoint Character;
+    std::vector<NodePtr> CodePointIntervals;
 };
 
-class ShorthandCharacterClass : public Node
+class CodePointRange : public Node
+{
+public:
+    CodePointRange(CodePointInterval interval)
+    : Interval{interval}
+    {}
+
+private:
+    void eval() final
+    {}
+
+    void print(std::string& str) final
+    {
+        str+= Interval.first + "-" + Interval.second;
+    }
+
+    CodePointInterval Interval;
+};
+
+class CharacterClassAnyWord : public Node
 {
 private:
     void eval() final
@@ -253,11 +280,48 @@ private:
 
     void print(std::string& str) final
     {
-        str+= "\\" + Character;
+        str+= "\\w";
     }
-
-    CodePoint Character;
 };
+
+class CharacterClassAnyWordInverted : public Node
+{
+private:
+    void eval() final
+    {}
+
+    void print(std::string& str) final
+    {
+        str+= "\\W";
+    }
+};
+
+class CharacterClassAnyDecimalDigit : public Node
+{
+private:
+    void eval() final
+    {}
+
+    void print(std::string& str) final
+    {
+        str+= "\\d";
+    }
+};
+
+
+
+class CharacterClassAnyDecimalDigitInverted : public Node
+{
+private:
+    void eval() final
+    {}
+
+    void print(std::string& str) final
+    {
+        str+= "\\D";
+    }
+};
+
 
 class AST
 {
