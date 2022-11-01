@@ -24,10 +24,10 @@ bool Parser::get(CodePoint & value)
     return (mCurser++ == mEnd ? false : true);
 }
 
-Parser::Parser(AST& ast, Utf8Iterator begin, Utf8Iterator end)
-: mCurser{begin}
-, mBegin {begin}
-, mEnd {end}
+Parser::Parser(AST& ast, const std::string& regex)
+: mCurser{regex.begin()}
+, mBegin {regex.begin()}
+, mEnd {regex.end()}
 {
     parse<tags::RegexTag>(ast.root);
 }
@@ -94,6 +94,16 @@ bool Parser::parse(tags::SubexpressionTag, NodePtr& astNode)
 
 bool Parser::parse(tags::SubexpressionItemTag, NodePtr& astNode)
 {
+    if(parse<tags::BackreferenceTag>(astNode))
+    {
+        error("Backreferences are not supported"); //TODO what to do with this?
+    }
+
+    if(parse<tags::AnchorTag>(astNode))
+    {
+        error("Anchors are not supported "); //TODO what to do with this?
+    }
+
     if(parse<tags::MatchTag>(astNode))
     {
         return true;
@@ -104,15 +114,9 @@ bool Parser::parse(tags::SubexpressionItemTag, NodePtr& astNode)
         return true;
     }
 
-    if(parse<tags::AnchorTag>(astNode))
-    {
-        error("Anchors are not supported "); //TODO what to do with this?
-    }
 
-    if(parse<tags::BackreferenceTag>(astNode))
-    {
-        error("Backreferences are not supported "); //TODO what to do with this?
-    }
+
+
 
     return false;
 }
@@ -238,6 +242,38 @@ bool Parser::parse(tags::CharacterClassAnyDecimalDigitInvertedTag)
     return (get(cp) == true && cp == 'D');
 }
 
+bool Parser::parse(tags::CharacterClassWhitespaceTag)
+{
+    CodePoint cp;
+    if(!get(cp))
+    {
+        return false;
+    }
+
+    if(cp != '\\')
+    {
+        return false;
+    }
+
+    return (get(cp) == true && cp == 's');
+}
+
+bool Parser::parse(tags::CharacterClassWhitespaceInvertedTag)
+{
+    CodePoint cp;
+    if(!get(cp))
+    {
+        return false;
+    }
+
+    if(cp != '\\')
+    {
+        return false;
+    }
+
+    return (get(cp) == true && cp == 'S');
+}
+
 bool Parser::parse(tags::BackreferenceStartTag)
 {
     CodePoint cp; 
@@ -276,26 +312,17 @@ bool Parser::parse(tags::CharacterGroupTag, NodePtr& node)
     auto groupItemPtr = NodePtr();
     std::vector<NodePtr> groupItems;
 
-    if(!parse<tags::CharacterGroupItemTag>(groupItemPtr))
-    {
-        return false;
-    }
-    else
+    while(parse<tags::CharacterGroupItemTag>(groupItemPtr))
     {
         groupItems.emplace_back(groupItemPtr.release());
-
-        while(parse<tags::CharacterGroupItemTag>(groupItemPtr))
-        {
-            groupItems.emplace_back(groupItemPtr.release());
-        }
     }
 
     if(!parse<tags::CharacterGroupCloseTag>())
     {
-        return false;
+        error("Character class missing closing bracket");
     }
 
-    node = std::make_unique<ast::CharacterClass>(std::move(groupItems));
+    node = std::make_unique<ast::CharacterClass>(std::move(groupItems), negated);
 
     return true;
 }
@@ -348,7 +375,10 @@ bool Parser::parse(tags::CharacterRangeTag, NodePtr& node)
         return false;
     }
 
-    //TODO add check that rnage is in order.
+    if(start > end)
+    {
+        error("Character range is out of order");
+    }
 
     node = std::make_unique<ast::CodePointRange>(CodePointInterval(start,end));
 
@@ -387,7 +417,18 @@ bool Parser::parse(tags::CharacterClassTag, NodePtr& node)
         return true;
     }
 
-    //TODO add other shorthand like space
+    if(parse<tags::CharacterClassWhitespaceTag>())
+    {
+        node = std::make_unique<ast::CharacterClassAnyWhitespace>();
+        return true;
+    }
+
+    if(parse<tags::CharacterClassWhitespaceInvertedTag>())
+    {
+        node = std::make_unique<ast::CharacterClassAnyWhitespaceInverted>();
+        return true;
+    }
+    
 
     return false;
 }   
@@ -416,11 +457,11 @@ bool Parser::parse(tags::MatchCharacterEscapeTag, CodePoint& cp)
        cp == '+' || 
        cp == '?' || 
        cp == '.' || 
+       cp == '|' || 
        cp == '(' || 
        cp == ')' || 
        cp == '[' || 
-       cp == ']' ||
-       cp == '$'
+       cp == ']'
     )
     {
         return true;
@@ -433,7 +474,6 @@ bool Parser::parse(tags::MatchCharacterEscapeTag, CodePoint& cp)
        cp == 't' ||    // horizontal tab
        cp == 'v' ||    // vertical tab
        cp == 'a' ||    // bell
-       cp == 'b' ||    // backspace
        cp == '\\'      // black slash
     )
     {
@@ -469,7 +509,7 @@ bool Parser::parse(tags::MatchCharacterTag, CodePoint& cp)
        cp == '*' || 
        cp == '+' || 
        cp == '?' || 
-       cp == '.' || 
+       cp == '.' ||
        cp == '(' || 
        cp == ')' || 
        cp == '[' || 
@@ -567,17 +607,17 @@ bool Parser::parse(tags::RangeQuantifierTag, uint64_t& min, uint64_t& max, bool&
 
     if(minOverflow)
     {
-        error("min value on range is too large"); // TODO specify limit
+        error("Lower bound on ranged quantifier too large");
     }
 
-    if(minOverflow)
+    if(maxOverflow)
     {
-        error("max value on range is too large"); // TODO specify limit
+        error("Upper bound on ranged quantifier too large");
     }
 
     if(min > max && isMaxBounded)
     {
-        error("min value is greater than max value on range"); // TODO reword this
+        error("The quantifier range is out of order"); // TODO reword this
     }
 
     return true;

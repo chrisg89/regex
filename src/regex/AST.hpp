@@ -234,8 +234,9 @@ private:
 class CharacterClass : public Node
 {
 public:
-    CharacterClass(std::vector<NodePtr>&& codePointIntervals)
+    CharacterClass(std::vector<NodePtr>&& codePointIntervals, bool isNegated)
     : CodePointIntervals{std::move(codePointIntervals)}
+    , Negated{isNegated}
     {}
 
 private:
@@ -244,13 +245,22 @@ private:
 
     void print(std::string& str) final
     {
+        str+= "[";
+
+        if(Negated)
+        {
+            str+= "^";
+        }
+
         for (const auto& item : CodePointIntervals )
         {
             item->print(str);
         }
+        str+= "]";
     }
 
     std::vector<NodePtr> CodePointIntervals;
+    bool Negated;
 };
 
 class CodePointRange : public Node
@@ -308,8 +318,6 @@ private:
     }
 };
 
-
-
 class CharacterClassAnyDecimalDigitInverted : public Node
 {
 private:
@@ -322,6 +330,29 @@ private:
     }
 };
 
+class CharacterClassAnyWhitespace : public Node
+{
+private:
+    void eval() final
+    {}
+
+    void print(std::string& str) final
+    {
+        str+= "\\s";
+    }
+};
+
+class CharacterClassAnyWhitespaceInverted : public Node
+{
+private:
+    void eval() final
+    {}
+
+    void print(std::string& str) final
+    {
+        str+= "\\S";
+    }
+};
 
 class AST
 {

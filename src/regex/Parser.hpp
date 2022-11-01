@@ -65,7 +65,8 @@ namespace tags
     struct LettersTag{};
     struct DigitTag{};
 
-
+    struct CharacterClassWhitespaceInvertedTag{};
+    struct CharacterClassWhitespaceTag{};
 
     struct AlternativeTag{};
 }
@@ -76,7 +77,7 @@ using ast::NodePtr;
 class Parser
 {
 public:
-    Parser(AST&, Utf8Iterator, Utf8Iterator);
+    Parser(AST&, const std::string& );
 
 private:
 
@@ -155,6 +156,10 @@ private:
     bool parse(tags::ZeroOrMoreQuantifierTag);
     bool parse(tags::OneOrMoreQuantifierTag);
     bool parse(tags::ZeroOrOneQuantifierTag);
+
+
+    bool parse(tags::CharacterClassWhitespaceInvertedTag);
+    bool parse(tags::CharacterClassWhitespaceTag);
     
     Utf8Iterator mCurser; //TODO why can this not be const?
     const Utf8Iterator mBegin;
