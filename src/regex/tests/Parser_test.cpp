@@ -757,7 +757,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "123|abc";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == "((1(23))|(a(bc)))");
+        CHECK(ast.print() == "(((12)3)|((ab)c))");
     }
 
     SECTION("Alternation, concatenation and character class")
@@ -765,7 +765,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "123|[abc]|z";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == "((1(23))|([abc]|z))");
+        CHECK(ast.print() == "(((12)3)|([abc]|z))");
     }
 
     SECTION("Alternation, concatenation and group")
@@ -773,7 +773,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "123|(abc|xy)|z";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == "((1(23))|(((a(bc))|(xy))|z))");
+        CHECK(ast.print() == "(((12)3)|((((ab)c)|(xy))|z))");
     }
 
     SECTION("TODO what to name this???")

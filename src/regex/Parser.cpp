@@ -108,25 +108,20 @@ bool Parser::parse(tags::ExpressionTag, NodePtr& astNode)
 
 bool Parser::parse(tags::SubexpressionTag, NodePtr& astNode)
 {
-    auto subexpressionItem = NodePtr();
-    auto subexpression = NodePtr();
+    auto lhs = NodePtr();
+    auto rhs = NodePtr();
 
-    if(!parse<tags::SubexpressionItemTag>(subexpressionItem))
+    if(!parse<tags::SubexpressionItemTag>(lhs))
     {
         return false;
     }
 
-    //TODO: is this recursion needed here? I think this would
-    // only effect abc -> (ab)c vs a(bc)
-    if(parse<tags::SubexpressionTag>(subexpression))
+    while(parse<tags::SubexpressionItemTag>(rhs))
     {
-        astNode = std::make_unique<ast::Concatenation>(subexpressionItem, subexpression);
-    }
-    else
-    {
-        std::swap(astNode, subexpressionItem);
+        lhs = std::make_unique<ast::Concatenation>(lhs, rhs);
     }
 
+    std::swap(astNode, lhs);
     return true;
 
 }
