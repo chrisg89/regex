@@ -16,11 +16,15 @@ namespace tags
     struct SubexpressionItemTag{};
     struct MatchTag{};
     struct GroupTag{};
+    struct GroupOpenTag{};
+    struct GroupCloseTag{};
+    struct GroupNonCapturingModifierTag{};
+
     struct AnchorTag{};
     struct BackreferenceTag{};
     struct BackreferenceStartTag{};
 
-    struct GroupNonCapturingModifierTag{};
+
     struct QuantifierTag{};
     struct MatchItemTag{};
     struct MatchAnyCharacterTag{};
@@ -156,6 +160,11 @@ private:
     bool parse(tags::ZeroOrMoreQuantifierTag);
     bool parse(tags::OneOrMoreQuantifierTag);
     bool parse(tags::ZeroOrOneQuantifierTag);
+
+    bool parse(tags::GroupOpenTag);
+    bool parse(tags::GroupCloseTag);
+    bool parse(tags::GroupNonCapturingModifierTag);
+
 
 
     bool parse(tags::CharacterClassWhitespaceInvertedTag);

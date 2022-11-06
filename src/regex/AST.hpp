@@ -37,9 +37,11 @@ private:
 
     void print(std::string& str) final
     {
+        str+= "(";
         left->print(str);
         str+= "|";
         right->print(str);
+        str+= ")";
     }
      
     NodePtr left;
@@ -60,8 +62,10 @@ private:
 
     void print(std::string& str) final
     {
+        str+= "(";
         left->print(str);
         right->print(str);
+        str+= ")";
     }
      
     NodePtr left;
@@ -365,7 +369,7 @@ public:
         return str;
     }
 
-    NodePtr root;  // should this be private? maybe make parser friend
+    NodePtr root;  // todo should this be private? maybe make parser friend
 };
 
 }

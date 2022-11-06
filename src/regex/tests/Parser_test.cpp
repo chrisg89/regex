@@ -171,8 +171,6 @@ SCENARIO("Parse characters")
         Parser(ast, regex);
         CHECK(ast.print() == regex);
     }
-
-    //chris
 }
 
 SCENARIO("Parse shorthand character classes") 
@@ -317,6 +315,78 @@ SCENARIO("Parse character classes")
     }
 }
 
+SCENARIO("Parse backreference") 
+{
+    SECTION("Backreference is not supported")
+    {
+        const std::string regex = R"(a\4)";
+        auto ast = ast::AST();
+        REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("Backreferences are not supported"));
+    }
+}
+
+SCENARIO("Parse group") 
+{
+    SECTION("Simple group")
+    {
+        const std::string regex = "(a)";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "a");
+    }
+
+    SECTION("Nested group")
+    {
+        const std::string regex = "((a))";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "a");
+    }
+
+    SECTION("Twice nested group")
+    {
+        const std::string regex = "(((a)))";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "a");
+    }
+
+    SECTION("Empty group is not supported")
+    {
+        const std::string regex = "()";
+        auto ast = ast::AST();
+        REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("Empty group is not supported"));
+    }
+
+    SECTION("Non-capturing group is not supported")
+    {
+        const std::string regex = "(?a)";
+        auto ast = ast::AST();
+        REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("Non-capturing groups are the default. Capturing groups not supported"));
+    }
+
+    SECTION("Throw when group is not complete due to missing closing parenthesis")
+    {
+        const std::string regex = "(a";
+        auto ast = ast::AST();
+        REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("Incomplete group structure"));
+    }
+
+    SECTION("Throw when nested group is not complete due to missing closing parenthesis")
+    {
+        const std::string regex = "((a)";
+        auto ast = ast::AST();
+        REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("Incomplete group structure"));
+    }
+
+    SECTION("Throw when there exists an unmatch left parenthesis")
+    {
+        const std::string regex = "abc)";
+        auto ast = ast::AST();
+        REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("Unmatched parenthesis"));
+    }
+}
+
 SCENARIO("Parse quantifiers") 
 {
     SECTION("Lazy Modifier (kleene star *) is not supported")
@@ -355,12 +425,76 @@ SCENARIO("Parse quantifiers")
         CHECK(ast.print() == regex);
     }
 
+    SECTION("Kleene star (*) operating on a group")
+    {
+        const std::string regex = "(a)*";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "a*");
+    }
+
+    SECTION("Kleene star (*) operating on a character class")
+    {
+        const std::string regex = "[abc]*";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
+    SECTION("Throw when token preceding Kleene star is not quantifiable ")
+    {
+        auto regex = GENERATE
+        (
+            "*",
+            "a?*",
+            "a+*",
+            "a**",
+            "a{1}*",
+            "a{1,}*",
+            "a{1,2}*"
+        );
+        auto ast = ast::AST();
+        REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("The preceding token is not quantifiable"));
+    }
+
     SECTION("Kleene plus (+)")
     {
         const std::string regex = "a+";
         auto ast = ast::AST();
         Parser(ast, regex);
         CHECK(ast.print() == regex);
+    }
+
+    SECTION("Kleene plus (+) operating on a group")
+    {
+        const std::string regex = "(a)+";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "a+");
+    }
+
+    SECTION("Kleene plus (+) operating on a character class")
+    {
+        const std::string regex = "[abc]+";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
+    SECTION("Throw when token preceding Kleene plus is not quantifiable ")
+    {
+        auto regex = GENERATE
+        (
+            "+",
+            "a?+",
+            "a++",
+            "a*+",
+            "a{1}+",
+            "a{1,}+",
+            "a{1,2}+"
+        );
+        auto ast = ast::AST();
+        REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("The preceding token is not quantifiable"));
     }
 
     SECTION("Optional (?)")
@@ -371,9 +505,51 @@ SCENARIO("Parse quantifiers")
         CHECK(ast.print() == regex);
     }
 
+    SECTION("Optional (?) operating on a group")
+    {
+        const std::string regex = "(a)?";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "a?");
+    }
+
+    SECTION("Optional (?) operating on a character class")
+    {
+        const std::string regex = "[abc]?";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
+    SECTION("Throw when token preceding optional is not quantifiable ")
+    {
+        auto regex = GENERATE
+        (
+            "?"
+        );
+        auto ast = ast::AST();
+        REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("The preceding token is not quantifiable"));
+    }
+
     SECTION("Ranged quantifier: lower bound only ")
     {
         const std::string regex = "a{100}";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
+    SECTION("Ranged quantifier: lower bound only operating on a group")
+    {
+        const std::string regex = "(a){100}";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "a{100}");
+    }
+
+    SECTION("Ranged quantifier: lower bound only operating on a character class")
+    {
+        const std::string regex = "[abc]{100}";
         auto ast = ast::AST();
         Parser(ast, regex);
         CHECK(ast.print() == regex);
@@ -387,12 +563,74 @@ SCENARIO("Parse quantifiers")
         CHECK(ast.print() == regex);
     }
 
+    SECTION("Ranged quantifier: upper bound is omitted operating on a group")
+    {
+        const std::string regex = "(a){100,}";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "a{100,}");
+    }
+
+    SECTION("Ranged quantifier: upper bound is omitted operating on a character class")
+    {
+        const std::string regex = "[abc]{100,}";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
     SECTION("Ranged quantifier: lower and upper bound ")
     {
         const std::string regex = "a{100,200}";
         auto ast = ast::AST();
         Parser(ast, regex);
         CHECK(ast.print() == regex);
+    }
+
+    SECTION("Ranged quantifier: lower and upper bound operating on a group")
+    {
+        const std::string regex = "(a){100,200}";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "a{100,200}");
+    }
+
+    SECTION("Ranged quantifier: lower and upper bound operating on a character class")
+    {
+        const std::string regex = "[abc]{100,200}";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "[abc]{100,200}");
+    }
+
+    SECTION("Throw when token preceding ranged quantifier is not quantifiable ")
+    {
+        auto regex = GENERATE
+        (
+            "{100}",
+            "a?{100}",
+            "a+{100}",
+            "a*{100}",
+            "a{1}{100}",
+            "a{1,}{100}",
+            "a{1,2}{100}",
+            "{100,}",
+            "a?{100,}",
+            "a+{100,}",
+            "a*{100,}",
+            "a{1}{100,}",
+            "a{1,}{100,}",
+            "a{1,2}{100,}",
+            "{100,200}",
+            "a?{100,200}",
+            "a+{100,200}",
+            "a*{100,200}",
+            "a{1}{100,200}",
+            "a{1,}{100,200}",
+            "a{1,2}{100,200}"
+        );
+        auto ast = ast::AST();
+        REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("The preceding token is not quantifiable"));
     }
 
     SECTION("Ranged quantifier throws when lower bound is too large")
@@ -417,16 +655,6 @@ SCENARIO("Parse quantifiers")
     }
 }
 
-SCENARIO("Parse backreference") 
-{
-    SECTION("Backreference is not supported")
-    {
-        const std::string regex = R"(a\4)";
-        auto ast = ast::AST();
-        REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("Backreferences are not supported"));
-    }
-}
-
 SCENARIO("Parse concatenation")
 {
     SECTION("Concatenation of two characters")
@@ -434,7 +662,7 @@ SCENARIO("Parse concatenation")
         const std::string regex = "ab";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "(ab)");
     }
 
     SECTION("Concatenation of two escaped meta characters")
@@ -442,7 +670,7 @@ SCENARIO("Parse concatenation")
         const std::string regex = R"(\*\*)";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == R"((\*\*))");
     }
 
     SECTION("Concatenation of two escaped characters with special meaning")
@@ -450,7 +678,7 @@ SCENARIO("Parse concatenation")
         const std::string regex = R"(\n\r)";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == R"((\n\r))");
     }
 
     SECTION("Concatenation of two characters from unicode")
@@ -464,24 +692,26 @@ SCENARIO("Parse concatenation")
         const std::string regex = "[abc][123]";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "([abc][123])");
     }
 
-    SECTION("Concatenation of two character groups")
+    SECTION("Concatenation of two groups")
     {
-        const std::string regex = R"(\n\r)";
-        //TODO
+        const std::string regex = "(a)(b)";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "(ab)");
     }
 }
 
-SCENARIO("Parse Alternation")
+SCENARIO("Parse alternation")
 {
     SECTION("Alternation of two characters")
     {
         const std::string regex = "a|b";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "(a|b)");
     }
 
     SECTION("Alternation of two escaped meta characters")
@@ -489,7 +719,7 @@ SCENARIO("Parse Alternation")
         const std::string regex = R"(\*|\*)";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == R"((\*|\*))");
     }
 
     SECTION("Alternation of two escaped characters with special meaning")
@@ -497,7 +727,7 @@ SCENARIO("Parse Alternation")
         const std::string regex = R"(\n|\r)";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == R"((\n|\r))");
     }
 
     SECTION("Alternation of two characters from unicode")
@@ -511,21 +741,39 @@ SCENARIO("Parse Alternation")
         const std::string regex = "[abc]|[123]";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "([abc]|[123])");
     }
 
-    SECTION("Alternation of two character groups")
+    SECTION("Alternation of two groups")
     {
-        const std::string regex = R"(\n|\r)";
-        //TODO
+        const std::string regex = "(a)|(b)";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "(a|b)");
     }
 
     SECTION("Alternation and concatenation")
     {
-        const std::string regex = "123|abc|xy|z";
+        const std::string regex = "123|abc";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "((1(23))|(a(bc)))");
+    }
+
+    SECTION("Alternation, concatenation and character class")
+    {
+        const std::string regex = "123|[abc]|z";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "((1(23))|([abc]|z))");
+    }
+
+    SECTION("Alternation, concatenation and group")
+    {
+        const std::string regex = "123|(abc|xy)|z";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "((1(23))|(((a(bc))|(xy))|z))");
     }
 
     SECTION("TODO what to name this???")

@@ -30,6 +30,42 @@ Parser::Parser(AST& ast, const std::string& regex)
 , mEnd {regex.end()}
 {
     parse<tags::RegexTag>(ast.root);
+
+    if(mCurser != mEnd)
+    {
+        if(parse<tags::GroupCloseTag>())
+        {
+            error("Unmatched parenthesis");
+        }
+        
+        if(parse<tags::ZeroOrMoreQuantifierTag>())
+        {
+            error("The preceding token is not quantifiable");
+        }
+        
+        if(parse<tags::OneOrMoreQuantifierTag>())
+        {
+            error("The preceding token is not quantifiable");
+        }
+        
+        if(parse<tags::ZeroOrOneQuantifierTag>())
+        {
+            error("The preceding token is not quantifiable");
+        }
+        
+        uint64_t min = 0;
+        uint64_t max = 0;
+        bool isMaxBounded = false;
+        if(parse<tags::RangeQuantifierTag>(min, max, isMaxBounded))
+        {
+            error("The preceding token is not quantifiable");
+        }
+
+
+
+        error("Unknown parse error");
+
+    }
 }
 
 bool Parser::parse(tags::RegexTag, NodePtr& astNode)
@@ -50,6 +86,7 @@ bool Parser::parse(tags::ExpressionTag, NodePtr& astNode)
 
     if(!parse<tags::SubexpressionTag>(subexpression))
     {
+        //TODO: this is valid. can be epsilon
         return false;
     }
 
@@ -79,6 +116,8 @@ bool Parser::parse(tags::SubexpressionTag, NodePtr& astNode)
         return false;
     }
 
+    //TODO: is this recursion needed here? I think this would
+    // only effect abc -> (ab)c vs a(bc)
     if(parse<tags::SubexpressionTag>(subexpression))
     {
         astNode = std::make_unique<ast::Concatenation>(subexpressionItem, subexpression);
@@ -498,6 +537,18 @@ bool Parser::parse(tags::MatchCharacterEscapeTag, CodePoint& cp)
 
 bool Parser::parse(tags::MatchCharacterTag, CodePoint& cp)
 {
+
+    // This is a bit messy. Not sure how to account for this in
+    // the grammar. A '{' can be either treated as a literal or
+    // the start of a ranged quantifier.
+    uint64_t min = 0;
+    uint64_t max = 0;
+    bool isMaxBounded = false;
+    if(parse<tags::RangeQuantifierTag>(min, max, isMaxBounded))
+    {
+        return false;
+    }
+
     if(!get(cp) || cp == '\\')
     {
         return false;
@@ -513,7 +564,8 @@ bool Parser::parse(tags::MatchCharacterTag, CodePoint& cp)
        cp == '(' || 
        cp == ')' || 
        cp == '[' || 
-       cp == ']'
+       cp == ']' || 
+       cp == '|'
     )
     {
         return false;
@@ -559,7 +611,7 @@ bool Parser::parse(tags::QuantifierTypeTag, NodePtr& astNode, NodePtr& inner)
 
     uint64_t min = 0;
     uint64_t max = 0;
-    bool isMaxBounded = false;;
+    bool isMaxBounded = false;
 
     if(parse<tags::RangeQuantifierTag>(min, max, isMaxBounded))
     {
@@ -617,7 +669,7 @@ bool Parser::parse(tags::RangeQuantifierTag, uint64_t& min, uint64_t& max, bool&
 
     if(min > max && isMaxBounded)
     {
-        error("The quantifier range is out of order"); // TODO reword this
+        error("The quantifier range is out of order");
     }
 
     return true;
@@ -711,8 +763,42 @@ bool Parser::parse(tags::ZeroOrOneQuantifierTag)
 
 bool Parser::parse(tags::GroupTag, NodePtr& astNode)
 {
-    //TODO Work on this after character class
-    return false;
+    auto expression = NodePtr();
+    auto quantifier = NodePtr();
+
+
+
+    if(!parse<tags::GroupOpenTag>())
+    {
+        return false;
+    }
+
+    if(parse<tags::GroupNonCapturingModifierTag>())
+    {
+        error("Non-capturing groups are the default. Capturing groups not supported");
+    }
+
+    if(!parse<tags::ExpressionTag>(expression))
+    {
+        // TODO: support empty group?
+        error("Empty group is not supported");
+    }
+
+    if(!parse<tags::GroupCloseTag>())
+    {
+        error("Incomplete group structure");
+    }
+
+    if(parse<tags::QuantifierTag>(quantifier, expression))
+    {
+        std::swap(astNode, quantifier);   
+    }
+    else
+    {
+        std::swap(astNode, expression);
+    }
+
+    return true;
 }
 
 bool Parser::parse(tags::BackreferenceTag, NodePtr& astNode)
@@ -869,6 +955,26 @@ bool Parser::parse(tags::CharacterGroupCloseTag)
     CodePoint cp; 
     return (get(cp) == true && cp == ']');
 }
+
+
+bool Parser::parse(tags::GroupOpenTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '(');
+}
+
+bool Parser::parse(tags::GroupCloseTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == ')');
+}
+
+bool Parser::parse(tags::GroupNonCapturingModifierTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '?');
+}
+
 
 }
 
