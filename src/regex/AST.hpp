@@ -6,6 +6,8 @@
 namespace regex::ast
 {
 
+//TODO prefix private members with m
+
 class Node;
 
 using NodePtr = std::unique_ptr<Node>;
@@ -182,11 +184,12 @@ private:
     }
 };
 
-class CharacterLiteral : public Node
+class Character : public Node
 {
 public:
-    CharacterLiteral(CodePoint character)
-    : Character{character}
+    Character(CodePoint character, bool escaped)
+    : mCodePoint{character}
+    , mEscaped{escaped}
     {}
 
 private:
@@ -195,10 +198,15 @@ private:
 
     void print(std::string& str) final
     {
-        str+= Character;
+        if(mEscaped)
+        {
+            str+= "\\";
+        }
+        str+= mCodePoint;
     }
 
-    CodePoint Character;
+    bool mEscaped;
+    CodePoint mCodePoint;
 };
 
 class CharacterFromUnicodeEscape : public Node
@@ -210,26 +218,6 @@ private:
     void print(std::string& str) final
     {
         str+= "TODO";
-    }
-
-    CodePoint Character;
-};
-
-class CharacterFromEscape : public Node
-{
-public:
-    CharacterFromEscape(CodePoint character)
-    : Character{character}
-    {}
-
-private:
-    void eval() final
-    {}
-
-    void print(std::string& str) final
-    {
-        str+= "\\";
-        str+= Character;
     }
 
     CodePoint Character;
@@ -270,8 +258,9 @@ private:
 class CodePointRange : public Node
 {
 public:
-    CodePointRange(CodePointInterval interval)
-    : Interval{interval}
+    CodePointRange(NodePtr&& start, NodePtr&& end)
+    : Start{std::move(start)}
+    , End{std::move(end)}
     {}
 
 private:
@@ -280,10 +269,13 @@ private:
 
     void print(std::string& str) final
     {
-        str+= Interval.first + "-" + Interval.second;
+        Start->print(str);
+        str+= "-";
+        End->print(str);
     }
 
-    CodePointInterval Interval;
+    NodePtr Start;
+    NodePtr End;
 };
 
 class CharacterClassAnyWord : public Node

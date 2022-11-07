@@ -269,14 +269,12 @@ SCENARIO("Parse character classes")
 
     SECTION("Character class with escaped meta characters")
     {
-        const std::string regex = R"([\^\$\*\+\?\.\(\)\[\]])";
+        const std::string regex = R"([\^\]\[\-])";
         auto ast = ast::AST();
         Parser(ast, regex);
         CHECK(ast.print() == regex);
     }
 
-    /*
-    TODO: this is wrong. Character class needs its own special character parser
     SECTION("Character class with characters that are considered meta characters outside the character class")
     {
         const std::string regex = "[$*+?.()]";
@@ -284,11 +282,50 @@ SCENARIO("Parse character classes")
         Parser(ast, regex);
         CHECK(ast.print() == regex);
     }
-    */
 
-    SECTION("Character class with ranges")
+    SECTION("Character class with range (literal characters)")
+    {
+        const std::string regex = "[a-z]";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
+    SECTION("Character class with range (escaped characters)")
+    {
+        const std::string regex = "[\\^-\\^]";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
+    SECTION("Character class with range (mixed literal and escaped)")
+    {
+        const std::string regex = "[\\^-z]";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
+    SECTION("Character class with multiple ranges")
     {
         const std::string regex = "[a-zA-Z0-9]";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
+    SECTION("Character class with range containing a single character")
+    {
+        const std::string regex = "[a-a]";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
+    SECTION("Character class with range, literal character and escaped character")
+    {
+        const std::string regex = "[a-zXYZ\\a]";
         auto ast = ast::AST();
         Parser(ast, regex);
         CHECK(ast.print() == regex);
@@ -304,6 +341,12 @@ SCENARIO("Parse character classes")
     SECTION("Throw exception when character range is out of order")
     {
         const std::string regex = "[a-]";
+        //TODO test this
+    }
+
+    SECTION("Throw exception when character range contains shorthand character class")
+    {
+        const std::string regex = "[\\w-a]";
         //TODO test this
     }
 

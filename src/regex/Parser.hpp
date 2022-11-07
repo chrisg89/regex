@@ -62,12 +62,12 @@ namespace tags
     struct CharacterClassCloseTag{};
     struct CharacterClassNegativeModifierTag{};
     struct CharacterClassItemTag{};
-    struct CharacterClassLiteralCharacterTag{};
     struct CharacterClassEscapedCharacterTag{};
+    struct CharacterClassCharacterTag{};
 
     // Character range
-    struct CharacterRangeTag{};
-    struct CharacterRangeSeparatorTag{};
+    struct CharacterRangeTag{};          // TODO prefix with characterclass
+    struct CharacterRangeSeparatorTag{}; // TODO prefix with characterclass
 
     // Any character
     struct AnyCharacterTag{};
@@ -75,8 +75,8 @@ namespace tags
     // Escaped characters
     struct EscapedCharacterTag{};
 
-    // Literal character
-    struct LiteralCharacterTag{};
+    // Character
+    struct CharacterTag{};
 
     // Quantifier
     struct QuantifierTag{};
@@ -104,7 +104,7 @@ public:
 
 private:
 
-    Utf8Iterator mCurser; //TODO why can this not be const?
+    Utf8Iterator mCurser;
     const Utf8Iterator mBegin;
     const Utf8Iterator mEnd;
 
@@ -167,8 +167,8 @@ private:
     bool parse(tags::CharacterClassCloseTag);
     bool parse(tags::CharacterClassNegativeModifierTag);
     bool parse(tags::CharacterClassItemTag, NodePtr&);
-    //bool parse(tags::CharacterClassLiteralCharacterTag, NodePtr&);  // TODO
-    //bool parse(tags::CharacterClassEscapedCharacterTag, NodePtr&);  // TODO
+    bool parse(tags::CharacterClassEscapedCharacterTag, CodePoint&);
+    bool parse(tags::CharacterClassCharacterTag, CodePoint&, bool& escaped);
 
     // Character range
     bool parse(tags::CharacterRangeTag, NodePtr&);
@@ -180,8 +180,8 @@ private:
     // Escaped characters
     bool parse(tags::EscapedCharacterTag, CodePoint&);
 
-    // Literal character
-    bool parse(tags::LiteralCharacterTag, CodePoint&);
+    // Character
+    bool parse(tags::CharacterTag, CodePoint&, bool&);
 
     // Quantifier
     bool parse(tags::QuantifierTag, NodePtr&, NodePtr&);
