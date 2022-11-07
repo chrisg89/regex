@@ -16,6 +16,4 @@ bool Parser::parse(Args&... args)
     return success;
 }
 
-
-
 } 

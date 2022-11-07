@@ -8,44 +8,78 @@
 namespace regex::parser
 {
 
+using ast::AST;
+using ast::NodePtr;
+
 namespace tags
 {
+    // Regex & expressions
     struct RegexTag{};
     struct ExpressionTag{};
     struct SubexpressionTag{};
     struct SubexpressionItemTag{};
-    struct MatchTag{};
+
+    // Anchor TODO: some of these need to be renamed...
+    struct AnchorTag{};
+    struct AnchorStartOfStringTag{};
+    struct AnchorEndOfStringTag{};
+    struct AnchorWordBoundaryTag{};
+    struct AnchorNonWordBoundaryTag{};
+    struct AnchorStartOfStringOnlyTag{};
+    struct AnchorEndOfStringOnlyNotNewlineTag{};
+    struct AnchorEndOfStringOnlyTag{};
+    struct AnchorPreviousMatchEndTag{};
+
+    // Backreference
+    struct BackreferenceTag{};
+    struct BackreferenceStartTag{};
+
+    // Alternation
+    struct AlternativeTag{};
+
+    // Group
     struct GroupTag{};
     struct GroupOpenTag{};
     struct GroupCloseTag{};
     struct GroupNonCapturingModifierTag{};
 
-    struct AnchorTag{};
-    struct BackreferenceTag{};
-    struct BackreferenceStartTag{};
-
-
-    struct QuantifierTag{};
+    // Match
+    struct MatchTag{};
     struct MatchItemTag{};
-    struct MatchAnyCharacterTag{};
-    struct MatchCharacterClassTag{};
-    struct MatchCharacterTag{};
-    struct MatchCharacterEscapeTag{};
-    struct CharacterGroupTag{};
-    struct CharacterClassTag{};
-    struct CharacterGroupNegativeModifierTag{};
-    struct CharacterGroupItemTag{};
-    struct CharacterRangeTag{};
 
-    struct CharacterRangeHyphenTag{};
-    struct CharTag{};
-    struct CharacterClassAnyWordTag{};
-    struct CharacterClassAnyWordInvertedTag{};
-    struct CharacterClassAnyDecimalDigitTag{};
-    struct CharacterClassAnyDecimalDigitInvertedTag{};
-    struct CharacterGroupOpenTag{};
-    struct CharacterGroupCloseTag{};
-    struct UnicodeCategoryNameTag{};
+    // Short hand character classes
+    struct ShorthandCharacterClassTag{};       
+    struct ShorthandCharacterClassWordTag{};        
+    struct ShorthandCharacterClassWordNegatedTag{};  
+    struct ShorthandCharacterClassDigitTag{};        
+    struct ShorthandCharacterClassDigitNegatedTag{}; 
+    struct ShorthandCharacterClassWhitespaceNegatedTag{};    
+    struct ShorthandCharacterClassWhitespaceTag{};
+
+    // Character class
+    struct CharacterClassTag{};
+    struct CharacterClassOpenTag{};
+    struct CharacterClassCloseTag{};
+    struct CharacterClassNegativeModifierTag{};
+    struct CharacterClassItemTag{};
+    struct CharacterClassLiteralCharacterTag{};
+    struct CharacterClassEscapedCharacterTag{};
+
+    // Character range
+    struct CharacterRangeTag{};
+    struct CharacterRangeSeparatorTag{};
+
+    // Any character
+    struct AnyCharacterTag{};
+
+    // Escaped characters
+    struct EscapedCharacterTag{};
+
+    // Literal character
+    struct LiteralCharacterTag{};
+
+    // Quantifier
+    struct QuantifierTag{};
     struct QuantifierTypeTag{};
     struct LazyModifierTag{};
     struct ZeroOrMoreQuantifierTag{};
@@ -56,27 +90,12 @@ namespace tags
     struct RangeQuantifierUpperBoundTag{};
     struct RangeOpenTag{};
     struct RangeCloseTag{};
-    struct RangeCommaDelimiterTag{};
-    struct StartOfStringAnchorTag{};
-    struct AnchorWordBoundaryTag{};
-    struct AnchorNonWordBoundaryTag{};
-    struct AnchorStartOfStringOnlyTag{};
-    struct AnchorEndOfStringOnlyNotNewlineTag{};
-    struct AnchorEndOfStringOnlyTag{};
-    struct AnchorPreviousMatchEndTag{};
-    struct AnchorEndOfStringTag{};
-    struct IntegerTag{};
-    struct LettersTag{};
+    struct RangeSeparatorTag{};
+
+    // Numeric
     struct DigitTag{};
-
-    struct CharacterClassWhitespaceInvertedTag{};
-    struct CharacterClassWhitespaceTag{};
-
-    struct AlternativeTag{};
+    struct IntegerTag{};
 }
-
-using ast::AST;
-using ast::NodePtr;
 
 class Parser
 {
@@ -84,101 +103,106 @@ public:
     Parser(AST&, const std::string& );
 
 private:
+    
+    friend class Backtracker;
 
+    Utf8Iterator mCurser; //TODO why can this not be const?
+    const Utf8Iterator mBegin;
+    const Utf8Iterator mEnd;
+
+    int pos() const;
+    bool get(CodePoint & value);
+    void error(const std::string& msg) const;
+
+    void HandleUnexpected();
+
+    // Wraps the specialized parsing routines with backtracking capability
     template <typename Tag, typename... Args>
     bool parse(Args&... args);
 
+    // Regex & expressions
     bool parse(tags::RegexTag, NodePtr&);
     bool parse(tags::ExpressionTag, NodePtr&);
     bool parse(tags::SubexpressionTag, NodePtr&);
     bool parse(tags::SubexpressionItemTag, NodePtr&);
-    bool parse(tags::MatchTag, NodePtr&);
-    bool parse(tags::GroupTag, NodePtr&);
+
+    // Anchor TODO: some of these need to be renamed...
     bool parse(tags::AnchorTag, NodePtr&);
-    bool parse(tags::BackreferenceTag, NodePtr&);
-    bool parse(tags::MatchItemTag, NodePtr&);
-    bool parse(tags::QuantifierTag, NodePtr&, NodePtr&);
-
-
-    bool parse(tags::CharacterGroupItemTag, NodePtr&);
-
-    bool parse(tags::QuantifierTypeTag, NodePtr&, NodePtr&);
-    
-
-    bool parse(tags::MatchCharacterClassTag, NodePtr&);
-    bool parse(tags::RangeQuantifierLowerBoundTag, uint64_t&, bool& );
-    bool parse(tags::RangeQuantifierUpperBoundTag, uint64_t&, bool& );
-
-
-    bool parse(tags::IntegerTag, uint64_t&, bool& );
-
-
-    bool parse(tags::RangeQuantifierTag, uint64_t&, uint64_t&, bool&);
-
-    bool parse(tags::MatchCharacterTag, CodePoint&);
-    bool parse(tags::MatchCharacterEscapeTag, CodePoint&);
-
-    bool parse(tags::DigitTag, uint8_t&);
-    bool parse(tags::StartOfStringAnchorTag);
-    bool parse(tags::AlternativeTag);
-
-    bool parse(tags::RangeOpenTag);
-    bool parse(tags::RangeCloseTag);
-    bool parse(tags::RangeCommaDelimiterTag);
-
-    bool parse(tags::CharacterGroupOpenTag);
-    bool parse(tags::CharacterGroupCloseTag);
-
-    bool parse(tags::CharacterGroupNegativeModifierTag);
-
-    bool parse(tags::LazyModifierTag);
+    bool parse(tags::AnchorStartOfStringTag);
+    bool parse(tags::AnchorEndOfStringTag);
     bool parse(tags::AnchorWordBoundaryTag);
     bool parse(tags::AnchorNonWordBoundaryTag);
     bool parse(tags::AnchorStartOfStringOnlyTag);
     bool parse(tags::AnchorEndOfStringOnlyNotNewlineTag);
     bool parse(tags::AnchorEndOfStringOnlyTag);
     bool parse(tags::AnchorPreviousMatchEndTag);
-    bool parse(tags::AnchorEndOfStringTag);
-    bool parse(tags::MatchAnyCharacterTag);
+
+    // Backreference
+    bool parse(tags::BackreferenceTag, NodePtr&);
     bool parse(tags::BackreferenceStartTag);
-    bool parse(tags::CharacterRangeHyphenTag);
 
-    
+    // Alternation
+    bool parse(tags::AlternativeTag);
 
-    bool parse(tags::CharacterClassAnyWordTag);
-    bool parse(tags::CharacterClassAnyWordInvertedTag);
-    bool parse(tags::CharacterClassAnyDecimalDigitTag);
-    bool parse(tags::CharacterClassAnyDecimalDigitInvertedTag);
-
-    
-    bool parse(tags::CharacterGroupTag, NodePtr&);    
-    bool parse(tags::CharacterClassTag, NodePtr&);
-    bool parse(tags::CharacterRangeTag, NodePtr&);
-
-
-
-    bool parse(tags::ZeroOrMoreQuantifierTag);
-    bool parse(tags::OneOrMoreQuantifierTag);
-    bool parse(tags::ZeroOrOneQuantifierTag);
-
+    // Group 
+    bool parse(tags::GroupTag, NodePtr&);
     bool parse(tags::GroupOpenTag);
     bool parse(tags::GroupCloseTag);
     bool parse(tags::GroupNonCapturingModifierTag);
 
+    // Match
+    bool parse(tags::MatchTag, NodePtr&);
+    bool parse(tags::MatchItemTag, NodePtr&);
 
+    // Short hand character classes
+    bool parse(tags::ShorthandCharacterClassTag, NodePtr&);
+    bool parse(tags::ShorthandCharacterClassWordTag);
+    bool parse(tags::ShorthandCharacterClassWordNegatedTag);
+    bool parse(tags::ShorthandCharacterClassDigitTag);
+    bool parse(tags::ShorthandCharacterClassDigitNegatedTag);
+    bool parse(tags::ShorthandCharacterClassWhitespaceTag);
+    bool parse(tags::ShorthandCharacterClassWhitespaceNegatedTag);
 
-    bool parse(tags::CharacterClassWhitespaceInvertedTag);
-    bool parse(tags::CharacterClassWhitespaceTag);
-    
-    Utf8Iterator mCurser; //TODO why can this not be const?
-    const Utf8Iterator mBegin;
-    const Utf8Iterator mEnd;
+    // Character class
+    bool parse(tags::CharacterClassTag, NodePtr&);  
+    bool parse(tags::CharacterClassOpenTag);
+    bool parse(tags::CharacterClassCloseTag);
+    bool parse(tags::CharacterClassNegativeModifierTag);
+    bool parse(tags::CharacterClassItemTag, NodePtr&);
+    //bool parse(tags::CharacterClassLiteralCharacterTag, NodePtr&);  // TODO
+    //bool parse(tags::CharacterClassEscapedCharacterTag, NodePtr&);  // TODO
 
-    bool get(CodePoint & value);
-    int pos() const;
-    void error(const std::string& msg) const;
+    // Character range
+    bool parse(tags::CharacterRangeTag, NodePtr&);
+    bool parse(tags::CharacterRangeSeparatorTag);
 
-    friend class Backtracker;
+    // Any character
+    bool parse(tags::AnyCharacterTag);
+
+    // Escaped characters
+    bool parse(tags::EscapedCharacterTag, CodePoint&);
+
+    // Literal character
+    bool parse(tags::LiteralCharacterTag, CodePoint&);
+
+    // Quantifier
+    bool parse(tags::QuantifierTag, NodePtr&, NodePtr&);
+    bool parse(tags::QuantifierTypeTag, NodePtr&, NodePtr&);
+    bool parse(tags::LazyModifierTag);
+    bool parse(tags::ZeroOrMoreQuantifierTag);
+    bool parse(tags::OneOrMoreQuantifierTag);
+    bool parse(tags::ZeroOrOneQuantifierTag);
+    bool parse(tags::RangeQuantifierTag, uint64_t&, uint64_t&, bool&);
+    bool parse(tags::RangeQuantifierLowerBoundTag, uint64_t&, bool&);
+    bool parse(tags::RangeQuantifierUpperBoundTag, uint64_t&, bool&);
+    bool parse(tags::RangeOpenTag);
+    bool parse(tags::RangeCloseTag);
+    bool parse(tags::RangeSeparatorTag);
+
+    // Numeric
+    bool parse(tags::DigitTag, uint8_t&);
+    bool parse(tags::IntegerTag, uint64_t&, bool&);
+
 };
 
 
