@@ -103,8 +103,6 @@ public:
     Parser(AST&, const std::string& );
 
 private:
-    
-    friend class Backtracker;
 
     Utf8Iterator mCurser; //TODO why can this not be const?
     const Utf8Iterator mBegin;
@@ -203,25 +201,6 @@ private:
     bool parse(tags::DigitTag, uint8_t&);
     bool parse(tags::IntegerTag, uint64_t&, bool&);
 
-};
-
-
-class Backtracker
-{
-public:
-    explicit Backtracker(Utf8Iterator& curser)
-    : mCurser {curser}
-    , mBegin {curser}
-    {}
-
-    void backtrack()
-    {
-        mCurser = mBegin;
-    }
-
-private:
-    Utf8Iterator& mCurser;
-    Utf8Iterator mBegin;
 };
 
 } //namespace regex
