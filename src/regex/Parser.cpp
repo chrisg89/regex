@@ -539,6 +539,12 @@ bool Parser::parse(tags::CharacterClassTag, NodePtr& node)
         groupItems.emplace_back(groupItemPtr.release());
     }
 
+    if(parse<tags::CharacterRangeSeparatorTag>())
+    {
+        groupItemPtr = std::make_unique<ast::Character>('-', false);
+        groupItems.emplace_back(groupItemPtr.release());
+    }
+
     if(!parse<tags::CharacterClassCloseTag>())
     {
         error("Character class missing closing bracket");

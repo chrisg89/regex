@@ -341,7 +341,9 @@ SCENARIO("Parse character classes")
     SECTION("Throw exception when character range is out of order")
     {
         const std::string regex = "[a-]";
-        //TODO test this
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
     }
 
     SECTION("Throw exception when character range contains shorthand character class")
