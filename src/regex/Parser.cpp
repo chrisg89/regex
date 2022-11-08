@@ -542,12 +542,6 @@ bool Parser::parse(tags::CharacterClassTag, NodePtr& node)
         groupItems.emplace_back(groupItemPtr.release());
     }
 
-    if(parse<tags::CharacterRangeSeparatorTag>())
-    {
-        groupItemPtr = std::make_unique<ast::Character>('-', false);
-        groupItems.emplace_back(groupItemPtr.release());
-    }
-
     if(!parse<tags::CharacterClassCloseTag>())
     {
         error("Character class missing closing bracket");
@@ -669,9 +663,10 @@ bool Parser::parse(tags::CharacterClassCharacterTag, CodePoint& cp, bool& escape
     }
 
     // ignore meta-characters
-    if(cp == '-' || 
-       cp == ']'
-    )
+    // While '-' and '[' and '^' are meta-characters, they may be 
+    // interpreted literally depending on their position in the
+    // character class. Hence, they're excluded here.
+    if(cp == ']')
     {
         return false;
     }

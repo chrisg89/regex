@@ -275,6 +275,22 @@ SCENARIO("Parse character classes")
         CHECK(ast.print() == regex);
     }
 
+    SECTION("Character class where hyphen is only character")
+    {
+        const std::string regex = "[-]";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
+    SECTION("Character class where hyphen is first character")
+    {
+        const std::string regex = "[-a]";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
     SECTION("Character class where hyphen is final character")
     {
         const std::string regex = "[a-]";
@@ -283,17 +299,17 @@ SCENARIO("Parse character classes")
         CHECK(ast.print() == regex);
     }
 
-    SECTION("Character class where closing bracket is first character")
+    SECTION("Character class where hyphen is treated literally in presence of shorthand character class")
     {
-        const std::string regex = "[[]";
+        const std::string regex = "[\\w-\\W]";
         auto ast = ast::AST();
         Parser(ast, regex);
         CHECK(ast.print() == regex);
     }
 
-    SECTION("Negated Character class where closing bracket is first character")
+    SECTION("Character class where closing bracket is first character")
     {
-        const std::string regex = "[^[]";
+        const std::string regex = "[[]";
         auto ast = ast::AST();
         Parser(ast, regex);
         CHECK(ast.print() == regex);
@@ -353,16 +369,6 @@ SCENARIO("Parse character classes")
         auto ast = ast::AST();
         REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("Character range is out of order"));
     }
-
-/* TODO this should throw "You cannot create a range with shorthand escape sequences"
-    SECTION("Throw exception when character range contains shorthand character class")
-    {
-        const std::string regex = "[\\w-a]";
-        auto ast = ast::AST();
-        Parser(ast, regex);
-        CHECK(ast.print() == regex);
-    }
-*/
 
     SECTION("Throw exception when the character class is empty")
     {
