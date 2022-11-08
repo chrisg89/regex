@@ -227,14 +227,6 @@ SCENARIO("Parse shorthand character classes")
 SCENARIO("Parse character classes") 
 {
 
-    SECTION("Empty Character class is allowed")
-    {
-        const std::string regex = "[]";
-        auto ast = ast::AST();
-        Parser(ast, regex);
-        CHECK(ast.print() == regex);
-    }
-
     SECTION("Simple character class")
     {
         const std::string regex = "[hello]";
@@ -278,6 +270,30 @@ SCENARIO("Parse character classes")
     SECTION("Character class with characters that are considered meta characters outside the character class")
     {
         const std::string regex = "[$*+?.()]";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
+    SECTION("Character class where hyphen is final character")
+    {
+        const std::string regex = "[a-]";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
+    SECTION("Character class where closing bracket is first character")
+    {
+        const std::string regex = "[[]";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == regex);
+    }
+
+    SECTION("Negated Character class where closing bracket is first character")
+    {
+        const std::string regex = "[^[]";
         auto ast = ast::AST();
         Parser(ast, regex);
         CHECK(ast.print() == regex);
@@ -338,18 +354,21 @@ SCENARIO("Parse character classes")
         REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("Character range is out of order"));
     }
 
-    SECTION("Throw exception when character range is out of order")
+/* TODO this should throw "You cannot create a range with shorthand escape sequences"
+    SECTION("Throw exception when character range contains shorthand character class")
     {
-        const std::string regex = "[a-]";
+        const std::string regex = "[\\w-a]";
         auto ast = ast::AST();
         Parser(ast, regex);
         CHECK(ast.print() == regex);
     }
+*/
 
-    SECTION("Throw exception when character range contains shorthand character class")
+    SECTION("Throw exception when the character class is empty")
     {
-        const std::string regex = "[\\w-a]";
-        //TODO test this
+        const std::string regex = "[]";
+        auto ast = ast::AST();
+        REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("Character class missing closing bracket"));
     }
 
     SECTION("Throw exception when the closing bracket is missing")

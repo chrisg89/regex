@@ -528,11 +528,14 @@ bool Parser::parse(tags::CharacterClassTag, NodePtr& node)
         negated = true;
     }
 
-    //TODO first ']' can be considered literal
-    //TODO last - can be considered literal
-
     auto groupItemPtr = NodePtr();
     std::vector<NodePtr> groupItems;
+
+    if(parse<tags::CharacterClassCloseTag>())
+    {
+        groupItemPtr = std::make_unique<ast::Character>(']', false);
+        groupItems.emplace_back(groupItemPtr.release());
+    }
 
     while(parse<tags::CharacterClassItemTag>(groupItemPtr))
     {
