@@ -79,7 +79,7 @@ bool Parser::parse(tags::ExpressionTag, NodePtr& astNode)
     {
         if(!parse<tags::ExpressionTag>(expression))
         {
-            error("missing 2nd Alternative "); //TODO this is actually valid...
+            error("missing 2nd Alternative "); //TODO: this is valid. can be epsilon
         }
         astNode = std::make_unique<ast::Alternative>(subexpression, expression);
     }
@@ -108,7 +108,6 @@ bool Parser::parse(tags::SubexpressionTag, NodePtr& astNode)
 
     std::swap(astNode, subexpr);
     return true;
-
 }
 
 bool Parser::parse(tags::SubexpressionItemTag, NodePtr& astNode)
@@ -175,7 +174,6 @@ bool Parser::parse(tags::AnchorTag, NodePtr& astNode)
     }
 
     return false;
-
 }
 
 bool Parser::parse(tags::AnchorStartOfStringTag)
@@ -249,7 +247,7 @@ bool Parser::parse(tags::BackreferenceTag, NodePtr& astNode)
     
     if(overflow)
     {
-        error("back reference is too large"); // TODO test this
+        error("back reference is too large");
     }
 
     return true;
@@ -271,8 +269,6 @@ bool Parser::parse(tags::GroupTag, NodePtr& astNode)
 {
     auto expression = NodePtr();
     auto quantifier = NodePtr();
-
-
 
     if(!parse<tags::GroupOpenTag>())
     {
@@ -421,12 +417,7 @@ bool Parser::parse(tags::ShorthandCharacterClassTag, NodePtr& node)
 bool Parser::parse(tags::ShorthandCharacterClassWordTag)
 {
     CodePoint cp;
-    if(!get(cp))
-    {
-        return false;
-    }
-
-    if(cp != '\\')
+    if(!get(cp) || cp != '\\')
     {
         return false;
     }
@@ -437,12 +428,7 @@ bool Parser::parse(tags::ShorthandCharacterClassWordTag)
 bool Parser::parse(tags::ShorthandCharacterClassWordNegatedTag)
 {
     CodePoint cp;
-    if(!get(cp))
-    {
-        return false;
-    }
-
-    if(cp != '\\')
+    if(!get(cp) || cp != '\\')
     {
         return false;
     }
@@ -453,12 +439,7 @@ bool Parser::parse(tags::ShorthandCharacterClassWordNegatedTag)
 bool Parser::parse(tags::ShorthandCharacterClassDigitTag)
 {
     CodePoint cp;
-    if(!get(cp))
-    {
-        return false;
-    }
-
-    if(cp != '\\')
+    if(!get(cp) || cp != '\\')
     {
         return false;
     }
@@ -469,12 +450,7 @@ bool Parser::parse(tags::ShorthandCharacterClassDigitTag)
 bool Parser::parse(tags::ShorthandCharacterClassDigitNegatedTag)
 {
     CodePoint cp;
-    if(!get(cp))
-    {
-        return false;
-    }
-
-    if(cp != '\\')
+    if(!get(cp) || cp != '\\')
     {
         return false;
     }
@@ -485,12 +461,7 @@ bool Parser::parse(tags::ShorthandCharacterClassDigitNegatedTag)
 bool Parser::parse(tags::ShorthandCharacterClassWhitespaceTag)
 {
     CodePoint cp;
-    if(!get(cp))
-    {
-        return false;
-    }
-
-    if(cp != '\\')
+    if(!get(cp) || cp != '\\')
     {
         return false;
     }
@@ -501,12 +472,7 @@ bool Parser::parse(tags::ShorthandCharacterClassWhitespaceTag)
 bool Parser::parse(tags::ShorthandCharacterClassWhitespaceNegatedTag)
 {
     CodePoint cp;
-    if(!get(cp))
-    {
-        return false;
-    }
-
-    if(cp != '\\')
+    if(!get(cp) || cp != '\\')
     {
         return false;
     }
@@ -595,12 +561,7 @@ bool Parser::parse(tags::CharacterClassItemTag, NodePtr& node)
 
 bool Parser::parse(tags::CharacterClassEscapedCharacterTag, CodePoint& cp)
 {
-    if(!get(cp))
-    {
-        return false;
-    }
-
-    if(cp != '\\')
+    if(!get(cp) || cp != '\\')
     {
         return false;
     }
@@ -962,20 +923,12 @@ bool Parser::parse(tags::RangeQuantifierTag, uint64_t& min, uint64_t& max, bool&
 
 bool Parser::parse(tags::RangeQuantifierLowerBoundTag, uint64_t& min, bool& overflow)
 {
-    if(parse<tags::IntegerTag>(min, overflow))
-    {
-        return true;
-    }
-    return false;
+    return parse<tags::IntegerTag>(min, overflow);
 }
 
 bool Parser::parse(tags::RangeQuantifierUpperBoundTag, uint64_t& max, bool& overflow)
 {
-    if(parse<tags::IntegerTag>(max, overflow))
-    {
-        return true;
-    }
-    return false;
+    return parse<tags::IntegerTag>(max, overflow);
 }
 
 bool Parser::parse(tags::RangeOpenTag)

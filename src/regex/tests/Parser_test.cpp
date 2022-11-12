@@ -22,7 +22,7 @@ SCENARIO("Parse characters")
         CHECK(ast.print() == regex);
     }
 
-    SECTION("Character from unicode")
+    SECTION("Character from unicode code point")
     {
         const std::string regex = "a";
         //TODO not yet implemented
