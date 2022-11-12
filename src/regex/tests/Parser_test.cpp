@@ -421,11 +421,12 @@ SCENARIO("Parse group")
         CHECK(ast.print() == "a");
     }
 
-    SECTION("Empty group is not supported")
+    SECTION("Empty group")
     {
         const std::string regex = "()";
         auto ast = ast::AST();
-        REQUIRE_THROWS_WITH(Parser(ast, regex), Contains("Empty group is not supported"));
+        Parser(ast, regex);
+        CHECK(ast.print() == "");
     }
 
     SECTION("Non-capturing group is not supported")
@@ -784,6 +785,30 @@ SCENARIO("Parse alternation")
         CHECK(ast.print() == "(a|b)");
     }
 
+    SECTION("Alternation with empty (epsilon) right hand side")
+    {
+        const std::string regex = "a|";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "(a|)");
+    }
+
+    SECTION("Alternation with empty (epsilon) left hand side")
+    {
+        const std::string regex = "|b";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "(|b)");
+    }
+
+    SECTION("Alternation with empty (epsilon) left and right hand side")
+    {
+        const std::string regex = "|";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "(|)");
+    }
+
     SECTION("Alternation of two escaped meta characters")
     {
         const std::string regex = R"(\*|\*)";
@@ -846,11 +871,6 @@ SCENARIO("Parse alternation")
         CHECK(ast.print() == "(((12)3)|((((ab)c)|(xy))|z))");
     }
 
-    SECTION("TODO what to name this???")
-    {
-        const std::string regex = "1|";
-        //TODO
-    }
 }
 
 

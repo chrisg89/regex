@@ -71,15 +71,14 @@ bool Parser::parse(tags::ExpressionTag, NodePtr& astNode)
 
     if(!parse<tags::SubexpressionTag>(subexpression))
     {
-        //TODO: this is valid. can be epsilon
-        return false;
+        subexpression = std::make_unique<ast::Epsilon>();
     }
 
     if(parse<tags::AlternativeTag>())
     {
         if(!parse<tags::ExpressionTag>(expression))
         {
-            error("missing 2nd Alternative "); //TODO: this is valid. can be epsilon
+            expression = std::make_unique<ast::Epsilon>();
         }
         astNode = std::make_unique<ast::Alternative>(subexpression, expression);
     }
@@ -282,8 +281,7 @@ bool Parser::parse(tags::GroupTag, NodePtr& astNode)
 
     if(!parse<tags::ExpressionTag>(expression))
     {
-        // TODO: support empty group?
-        error("Empty group is not supported");
+        expression = std::make_unique<ast::Epsilon>();
     }
 
     if(!parse<tags::GroupCloseTag>())

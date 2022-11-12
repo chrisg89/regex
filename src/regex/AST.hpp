@@ -184,6 +184,20 @@ private:
     }
 };
 
+
+
+class Epsilon : public Node
+{
+private:
+    void eval() final
+    {}
+
+    void print(std::string& str) final
+    {
+        str+= "";
+    }
+};
+
 class Character : public Node
 {
 public:
