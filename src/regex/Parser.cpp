@@ -7,17 +7,23 @@
 namespace regex::parser
 {
 
-Parser::Parser(AST& ast, const std::string& regex)
+Parser::Parser(const std::string& regex)
 : mCurser{regex.begin()}
 , mBegin {regex.begin()}
 , mEnd {regex.end()}
+{}
+
+AST Parser::parse()
 {
-    parse<tags::RegexTag>(ast.root);
+    NodePtr root;
+    parse<tags::RegexTag>(root);
 
     if(mCurser != mEnd)
     {
         HandleUnexpected();
     }
+
+    return AST(root);
 }
 
 void Parser::HandleUnexpected()

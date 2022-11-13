@@ -360,6 +360,9 @@ class AST
 {
 public:
 
+    AST(NodePtr& node ) : root{std::move(node)}
+    {}
+
     std::string print()
     {
         std::string str;
@@ -367,7 +370,8 @@ public:
         return str;
     }
 
-    NodePtr root;  // todo should this be private? maybe make parser friend
+private:
+    NodePtr root;
 };
 
 }
