@@ -11,30 +11,22 @@
 namespace regex::ast
 {
 
-//TODO prefix private members with m
-
 class Node;
-
 using NodePtr = std::unique_ptr<Node>;
-
 
 class Node
 {
 public:
     virtual void eval() = 0;
     virtual void print(std::string&) = 0;
-
-private:
-
-
 };
 
 class Alternative : public Node
 {
 public:
     Alternative(NodePtr& lhs, NodePtr& rhs)
-    : left {lhs.release()}
-    , right {rhs.release()}
+    : mLeft {lhs.release()}
+    , mRight {rhs.release()}
     {}
 
 private:
@@ -45,22 +37,22 @@ private:
     void print(std::string& str) final
     {
         str+= "(";
-        left->print(str);
+        mLeft->print(str);
         str+= "|";
-        right->print(str);
+        mRight->print(str);
         str+= ")";
     }
      
-    NodePtr left;
-    NodePtr right;
+    NodePtr mLeft;
+    NodePtr mRight;
 };
 
 class Concatenation : public Node
 {
 public:
     Concatenation(NodePtr& lhs, NodePtr& rhs)
-    : left {lhs.release()}
-    , right {rhs.release()}
+    : mLeft {lhs.release()}
+    , mRight {rhs.release()}
     {}
 
 private:
@@ -70,20 +62,20 @@ private:
     void print(std::string& str) final
     {
         str+= "(";
-        left->print(str);
-        right->print(str);
+        mLeft->print(str);
+        mRight->print(str);
         str+= ")";
     }
      
-    NodePtr left;
-    NodePtr right;
+    NodePtr mLeft;
+    NodePtr mRight;
 };
 
 class KleeneStar : public Node
 {
 public:
-    KleeneStar(NodePtr& inner)
-    : inner {inner.release()}
+    KleeneStar(NodePtr& mInner)
+    : mInner {mInner.release()}
     {}
 
 private:
@@ -92,18 +84,18 @@ private:
 
     void print(std::string& str) final
     {
-        inner->print(str);
+        mInner->print(str);
         str+= "*";
     }
      
-    NodePtr inner;
+    NodePtr mInner;
 };
 
 class KleenePlus : public Node
 {
 public:
-    KleenePlus(NodePtr& inner)
-    : inner {inner.release()}
+    KleenePlus(NodePtr& mInner)
+    : mInner {mInner.release()}
     {}
 
 private:
@@ -112,18 +104,18 @@ private:
 
     void print(std::string& str) final
     {
-        inner->print(str);
+        mInner->print(str);
         str+= "+";
     }
      
-    NodePtr inner;
+    NodePtr mInner;
 };
 
 class Optional : public Node
 {
 public:
-    Optional(NodePtr& inner)
-    : inner {inner.release()}
+    Optional(NodePtr& mInner)
+    : mInner {mInner.release()}
     {}
 
 private:
@@ -132,21 +124,21 @@ private:
 
     void print(std::string& str) final
     {
-        inner->print(str);
+        mInner->print(str);
         str+= "?";
     }
      
-    NodePtr inner;
+    NodePtr mInner;
 };
 
 class RangeQuantifier : public Node
 {
 public:
-    RangeQuantifier(NodePtr& inner, uint64_t min, uint64_t max, bool isMaxBounded)
-    : inner {inner.release()}
-    , min {min}
-    , max {max}
-    , isMaxBounded {isMaxBounded}
+    RangeQuantifier(NodePtr& mInner, uint64_t min, uint64_t max, bool isMaxBounded)
+    : mInner {mInner.release()}
+    , mMin {min}
+    , mMax {max}
+    , mIsMaxBounded {isMaxBounded}
     {}
 
 private:
@@ -155,26 +147,25 @@ private:
 
     void print(std::string& str) final
     {
-        inner->print(str);
-        if(min==max)
+        mInner->print(str);
+        if(mMin==mMax)
         {
-            str += "{" + std::to_string(min) + "}";
+            str += "{" + std::to_string(mMin) + "}";
         }
-        else if(isMaxBounded)
+        else if(mIsMaxBounded)
         {
-            str += "{" + std::to_string(min) + "," + std::to_string(max) + "}";
+            str += "{" + std::to_string(mMin) + "," + std::to_string(mMax) + "}";
         }
         else
         {
-            str += "{" + std::to_string(min) + "," + "}";
+            str += "{" + std::to_string(mMin) + "," + "}";
         }
     }
 
-    uint64_t min;
-    uint64_t max;
-    bool isMaxBounded;
-     
-    NodePtr inner;
+    uint64_t mMin;
+    uint64_t mMax;
+    bool mIsMaxBounded;     
+    NodePtr mInner;
 };
 
 class Any : public Node
@@ -206,7 +197,7 @@ class Character : public Node
 public:
     Character(CodePoint character, bool escaped)
     : mCodePoint{character}
-    , mEscaped{escaped}
+    , mIsEscaped{escaped}
     {}
 
 private:
@@ -215,7 +206,7 @@ private:
 
     void print(std::string& str) final
     {
-        if(mEscaped)
+        if(mIsEscaped)
         {
             std::stringstream ss;
             ss << std::hex << std::setfill ('0') << std::setw(6) << mCodePoint;
@@ -228,7 +219,7 @@ private:
         }
     }
 
-    bool mEscaped;
+    bool mIsEscaped;
     CodePoint mCodePoint;
 };
 
@@ -236,8 +227,8 @@ class CharacterClass : public Node
 {
 public:
     CharacterClass(std::vector<NodePtr>& codePointIntervals, bool isNegated)
-    : CodePointIntervals{std::move(codePointIntervals)}
-    , Negated{isNegated}
+    : mCodePointIntervals{std::move(codePointIntervals)}
+    , mIsNegated{isNegated}
     {}
 
 private:
@@ -248,28 +239,28 @@ private:
     {
         str+= "[";
 
-        if(Negated)
+        if(mIsNegated)
         {
             str+= "^";
         }
 
-        for (const auto& item : CodePointIntervals )
+        for (const auto& item : mCodePointIntervals )
         {
             item->print(str);
         }
         str+= "]";
     }
 
-    std::vector<NodePtr> CodePointIntervals;
-    bool Negated;
+    std::vector<NodePtr> mCodePointIntervals;
+    bool mIsNegated;
 };
 
 class CodePointRange : public Node
 {
 public:
     CodePointRange(NodePtr& start, NodePtr& end)
-    : Start{std::move(start)}
-    , End{std::move(end)}
+    : mStart{std::move(start)}
+    , mEnd{std::move(end)}
     {}
 
 private:
@@ -278,13 +269,13 @@ private:
 
     void print(std::string& str) final
     {
-        Start->print(str);
+        mStart->print(str);
         str+= "-";
-        End->print(str);
+        mEnd->print(str);
     }
 
-    NodePtr Start;
-    NodePtr End;
+    NodePtr mStart;
+    NodePtr mEnd;
 };
 
 class CharacterClassAnyWord : public Node
@@ -363,18 +354,18 @@ class AST
 {
 public:
 
-    AST(NodePtr& node ) : root{std::move(node)}
+    AST(NodePtr& node ) : mRoot{std::move(node)}
     {}
 
     std::string print()
     {
         std::string str;
-        root->print(str);
+        mRoot->print(str);
         return str;
     }
 
 private:
-    NodePtr root;
+    NodePtr mRoot;
 };
 
 } // namespace regex::ast
