@@ -1,9 +1,12 @@
-#include <string>
-#include <memory>
-#include <vector>
-#include <sstream>
-#include <iomanip>
+#pragma once
+
 #include "CodePoint.hpp"
+
+#include <iomanip>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace regex::ast
 {
@@ -374,4 +377,4 @@ private:
     NodePtr root;
 };
 
-}
+} // namespace regex::ast

@@ -1,3 +1,5 @@
+#pragma once
+
 namespace regex::parser
 {
 
@@ -16,4 +18,4 @@ bool Parser::parse(Args&... args)
     return success;
 }
 
-} 
+} // namespace regex::parser

@@ -1,7 +1,7 @@
-
 #include "Parser.hpp"
-#include <stdexcept>
+
 #include <limits>
+#include <stdexcept>
 #include <vector>
 
 namespace regex::parser
@@ -993,7 +993,7 @@ bool Parser::parse(tags::IntegerTag, uint64_t& integer, bool& overflow)
     return true;
 }
 
-}
+} // namespace regex::parser
 
 
 

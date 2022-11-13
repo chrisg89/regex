@@ -1,9 +1,8 @@
-
 #pragma once
 
 #include "AST.hpp"
-#include "Utf8Iterator.hpp"
 #include "CodePoint.hpp"
+#include "Utf8Iterator.hpp"
 
 namespace regex::parser
 {
@@ -126,6 +125,7 @@ private:
     bool parse(tags::SubexpressionItemTag, NodePtr&);
 
     // Anchor TODO: some of these need to be renamed...
+    //TODO : test anchors. Rename /B to word boundary?
     bool parse(tags::AnchorTag, NodePtr&);
     bool parse(tags::AnchorStartOfStringTag);
     bool parse(tags::AnchorEndOfStringTag);
@@ -204,6 +204,6 @@ private:
 
 };
 
-} //namespace regex
+} // namespace regex::parser
 
 #include "Parser-inl.hpp"

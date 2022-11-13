@@ -1,16 +1,10 @@
 #include "catch.hpp"
 #include "Parser.hpp"
 
-#include <stdexcept>
-#include <iostream>
-
 namespace regex::parser {
-
 namespace {
 
 using Catch::Contains;
-
-//TODO : test anchors. Rename /B to word boundary?
 
 SCENARIO("Parse characters")
 {
@@ -895,6 +889,5 @@ SCENARIO("Parse alternation")
 
 }
 
-
-}
-}
+} // namespace 
+} // namespace regex::parser
