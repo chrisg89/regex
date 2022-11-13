@@ -22,12 +22,6 @@ SCENARIO("Parse characters")
         CHECK(ast.print() == regex);
     }
 
-    SECTION("Character from unicode code point")
-    {
-        const std::string regex = "a";
-        //TODO not yet implemented
-    }
-
     SECTION("Any character .")
     {
         const std::string regex = ".";
@@ -36,12 +30,20 @@ SCENARIO("Parse characters")
         CHECK(ast.print() == regex);
     }
 
+    SECTION("Unicode code point")
+    {
+        const std::string regex = "\\u000058";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "\\u000058");
+    }
+
     SECTION("Escaped character \\n")
     {
         const std::string regex = "\\n";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u00000a");
     }
 
     SECTION("Escaped character \\f")
@@ -49,7 +51,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\f";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u00000c");
     }
 
     SECTION("Escaped character \\r")
@@ -57,7 +59,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\r";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u00000d");
     }
 
     SECTION("Escaped character \\t")
@@ -65,7 +67,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\t";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u000009");
     }
 
     SECTION("Escaped character \\v")
@@ -73,7 +75,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\v";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u00000b");
     }
 
     SECTION("Escaped character \\a")
@@ -81,7 +83,15 @@ SCENARIO("Parse characters")
         const std::string regex = "\\a";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u000007");
+    }
+
+    SECTION("Escaped character \\")
+    {
+        const std::string regex = "\\\\";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "\\u00005c");
     }
 
     SECTION("Escaped meta character ^")
@@ -89,7 +99,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\^";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u00005e");
     }
 
     SECTION("Escaped meta character $")
@@ -97,7 +107,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\$";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u000024");
     }
 
     SECTION("Escaped meta character *")
@@ -105,7 +115,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\*";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u00002a");
     }
 
     SECTION("Escaped meta character +")
@@ -113,7 +123,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\+";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u00002b");
     }
 
     SECTION("Escaped meta character ?")
@@ -121,7 +131,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\?";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u00003f");
     }
 
     SECTION("Escaped meta character .")
@@ -129,7 +139,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\.";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u00002e");
     }
 
     SECTION("Escaped meta character |")
@@ -137,7 +147,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\|";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u00007c");
     }
 
     SECTION("Escaped meta character (")
@@ -145,7 +155,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\(";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u000028");
     }
 
     SECTION("Escaped meta character )")
@@ -153,7 +163,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\)";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u000029");
     }
 
     SECTION("Escaped meta character [")
@@ -161,7 +171,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\[";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u00005b");
     }
 
     SECTION("Escaped meta character ]")
@@ -169,7 +179,7 @@ SCENARIO("Parse characters")
         const std::string regex = "\\]";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u00005d");
     }
 }
 
@@ -256,7 +266,7 @@ SCENARIO("Parse character classes")
         const std::string regex = R"([\n\f\r\t\v\a\\])";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\u00000a\\u00000c\\u00000d\\u000009\\u00000b\\u000007\\u00005c]");
     }
 
     SECTION("Character class with escaped meta characters")
@@ -264,7 +274,7 @@ SCENARIO("Parse character classes")
         const std::string regex = R"([\^\]\[\-])";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\u00005e\\u00005d\\u00005b\\u00002d]");
     }
 
     SECTION("Character class with characters that are considered meta characters outside the character class")
@@ -273,6 +283,14 @@ SCENARIO("Parse character classes")
         auto ast = ast::AST();
         Parser(ast, regex);
         CHECK(ast.print() == regex);
+    }
+
+    SECTION("Character class with unicode code point")
+    {
+        const std::string regex = "[\\u000058]";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "[\\u000058]");
     }
 
     SECTION("Character class where hyphen is only character")
@@ -328,7 +346,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[\\^-\\^]";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\u00005e-\\u00005e]");
     }
 
     SECTION("Character class with range (mixed literal and escaped)")
@@ -336,7 +354,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[\\^-z]";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\u00005e-z]");
     }
 
     SECTION("Character class with multiple ranges")
@@ -360,7 +378,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[a-zXYZ\\a]";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[a-zXYZ\\u000007]");
     }
 
     SECTION("Throw exception when character range is out of order")
@@ -741,7 +759,7 @@ SCENARIO("Parse concatenation")
         const std::string regex = R"(\*\*)";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == R"((\*\*))");
+        CHECK(ast.print() == "(\\u00002a\\u00002a)");
     }
 
     SECTION("Concatenation of two escaped characters with special meaning")
@@ -749,13 +767,15 @@ SCENARIO("Parse concatenation")
         const std::string regex = R"(\n\r)";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == R"((\n\r))");
+        CHECK(ast.print() == "(\\u00000a\\u00000d)");
     }
 
     SECTION("Concatenation of two characters from unicode")
     {
-        const std::string regex = R"(\n\r)";
-        //TODO
+        const std::string regex = "\\u000058\\u000059";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "(\\u000058\\u000059)");
     }
 
     SECTION("Concatenation of two character classes")
@@ -814,7 +834,7 @@ SCENARIO("Parse alternation")
         const std::string regex = R"(\*|\*)";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == R"((\*|\*))");
+        CHECK(ast.print() == "(\\u00002a|\\u00002a)");
     }
 
     SECTION("Alternation of two escaped characters with special meaning")
@@ -822,13 +842,15 @@ SCENARIO("Parse alternation")
         const std::string regex = R"(\n|\r)";
         auto ast = ast::AST();
         Parser(ast, regex);
-        CHECK(ast.print() == R"((\n|\r))");
+        CHECK(ast.print() == "(\\u00000a|\\u00000d)");
     }
 
     SECTION("Alternation of two characters from unicode")
     {
-        const std::string regex = R"(\n|\r)";
-        //TODO
+        const std::string regex = "\\u000058|\\u000059";
+        auto ast = ast::AST();
+        Parser(ast, regex);
+        CHECK(ast.print() == "(\\u000058|\\u000059)");
     }
 
     SECTION("Alternation of two character classes")

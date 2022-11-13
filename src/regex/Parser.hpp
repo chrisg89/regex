@@ -62,7 +62,6 @@ namespace tags
     struct CharacterClassCloseTag{};
     struct CharacterClassNegativeModifierTag{};
     struct CharacterClassItemTag{};
-    struct CharacterClassEscapedCharacterTag{};
     struct CharacterClassCharacterTag{};
 
     // Character range
@@ -93,6 +92,7 @@ namespace tags
     struct RangeSeparatorTag{};
 
     // Numeric
+    struct UnicodeTag{};
     struct DigitTag{};
     struct IntegerTag{};
 }
@@ -167,8 +167,7 @@ private:
     bool parse(tags::CharacterClassCloseTag);
     bool parse(tags::CharacterClassNegativeModifierTag);
     bool parse(tags::CharacterClassItemTag, NodePtr&);
-    bool parse(tags::CharacterClassEscapedCharacterTag, CodePoint&);
-    bool parse(tags::CharacterClassCharacterTag, CodePoint&, bool& escaped);
+    bool parse(tags::CharacterClassCharacterTag, NodePtr&, CodePoint&);
 
     // Character range
     bool parse(tags::CharacterRangeTag, NodePtr&);
@@ -178,10 +177,10 @@ private:
     bool parse(tags::AnyCharacterTag);
 
     // Escaped characters
-    bool parse(tags::EscapedCharacterTag, CodePoint&);
+    bool parse(tags::EscapedCharacterTag, NodePtr&, CodePoint&);
 
     // Character
-    bool parse(tags::CharacterTag, CodePoint&, bool&);
+    bool parse(tags::CharacterTag, NodePtr&, CodePoint&);
 
     // Quantifier
     bool parse(tags::QuantifierTag, NodePtr&, NodePtr&);
@@ -198,6 +197,7 @@ private:
     bool parse(tags::RangeSeparatorTag);
 
     // Numeric
+    bool parse(tags::UnicodeTag, NodePtr&, CodePoint&);
     bool parse(tags::DigitTag, uint8_t&);
     bool parse(tags::IntegerTag, uint64_t&, bool&);
 

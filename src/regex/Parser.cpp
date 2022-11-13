@@ -361,9 +361,8 @@ bool Parser::parse(tags::MatchItemTag, NodePtr& astNode)
 
     CodePoint cp;
     bool escaped = false;
-    if(parse<tags::CharacterTag>(cp, escaped))
+    if(parse<tags::CharacterTag>(astNode, cp))
     {
-        astNode = std::make_unique<ast::Character>(cp, escaped);
         return true;
     }
 
@@ -511,7 +510,7 @@ bool Parser::parse(tags::CharacterClassTag, NodePtr& node)
         error("Character class missing closing bracket");
     }
 
-    node = std::make_unique<ast::CharacterClass>(std::move(groupItems), negated);
+    node = std::make_unique<ast::CharacterClass>(groupItems, negated);
 
     return true;
 }
@@ -547,72 +546,18 @@ bool Parser::parse(tags::CharacterClassItemTag, NodePtr& node)
     }
 
     CodePoint cp;
-    bool escaped = false;
-    if(parse<tags::CharacterClassCharacterTag>(cp, escaped))
+    if(parse<tags::CharacterClassCharacterTag>(node, cp))
     {
-        node = std::make_unique<ast::Character>(cp, escaped);
         return true;
     }
 
     return false;
 }
 
-bool Parser::parse(tags::CharacterClassEscapedCharacterTag, CodePoint& cp)
+bool Parser::parse(tags::CharacterClassCharacterTag, NodePtr& node, CodePoint& cp)
 {
-    if(!get(cp) || cp != '\\')
+    if(parse<tags::EscapedCharacterTag>(node, cp))
     {
-        return false;
-    }
-
-    if(!get(cp))
-    {
-        error("Pattern may not end with a trailing backslash");
-    }
-
-    // escaped meta-characters
-    if(cp == '-' ||    
-       cp == ']' ||
-       cp == '[' ||
-       cp == '^'
-    )
-    {
-        return true;
-    }
-
-    // escaped characters with special meaning
-    if(cp == 'n' ||    // newline
-       cp == 'f' ||    // form feed
-       cp == 'r' ||    // carriage return
-       cp == 't' ||    // horizontal tab
-       cp == 'v' ||    // vertical tab
-       cp == 'a' ||    // bell
-       cp == '\\'      // black slash
-    )
-    {
-        return true;
-    }
-
-    // Ignore short-hand character classes
-    if(cp == 'w' ||    
-       cp == 'W' || 
-       cp == 'd' || 
-       cp == 'D' || 
-       cp == 's' || 
-       cp == 'S'
-    )
-    {
-        return false;
-    }
-
-    error("This token has no special meaning and has thus been rendered erroneous");
-    return false; // to supress compiler warning
-}
-
-bool Parser::parse(tags::CharacterClassCharacterTag, CodePoint& cp, bool& escaped)
-{
-    if(parse<tags::CharacterClassEscapedCharacterTag>(cp))
-    {
-        escaped = true;
         return true;
     }
 
@@ -630,18 +575,18 @@ bool Parser::parse(tags::CharacterClassCharacterTag, CodePoint& cp, bool& escape
         return false;
     }
 
+    node = std::make_unique<ast::Character>(cp, false);
     return true;
 }
 
 bool Parser::parse(tags::CharacterRangeTag, NodePtr& node)
 {
-    CodePoint start;
-    bool startIsEscaped = false;
-
-    CodePoint end;
-    bool endIsEscaped = false;
-
-    if(!parse<tags::CharacterClassCharacterTag>(start, startIsEscaped))
+    NodePtr start;
+    NodePtr end;
+    CodePoint startCP; 
+    CodePoint endCP; 
+    
+    if(!parse<tags::CharacterClassCharacterTag>(start, startCP))
     {
         return false;
     }
@@ -651,26 +596,17 @@ bool Parser::parse(tags::CharacterRangeTag, NodePtr& node)
         return false;
     }
 
-    if(!parse<tags::CharacterClassCharacterTag>(end, endIsEscaped))
+    if(!parse<tags::CharacterClassCharacterTag>(end, endCP))
     {
         return false;
     }
 
-    if(start > end)
+    if(startCP > endCP)
     {
         error("Character range is out of order");
     }
 
-    NodePtr nodeStart = 
-        std::make_unique<ast::Character>(start, startIsEscaped);
-
-    NodePtr nodeEnd = 
-        std::make_unique<ast::Character>(end, endIsEscaped);
-
-    node = std::make_unique<ast::CodePointRange>(
-        std::move(nodeStart),
-        std::move(nodeEnd));
-
+    node = std::make_unique<ast::CodePointRange>(start, end);
     return true;
 }
 
@@ -686,14 +622,9 @@ bool Parser::parse(tags::AnyCharacterTag)
     return (get(cp) == true && cp == '.');
 }
 
-bool Parser::parse(tags::EscapedCharacterTag, CodePoint& cp)
+bool Parser::parse(tags::EscapedCharacterTag, NodePtr& node, CodePoint& cp)
 {
-    if(!get(cp))
-    {
-        return false;
-    }
-
-    if(cp != '\\')
+    if(!get(cp) || cp != '\\')
     {
         return false;
     }
@@ -703,53 +634,85 @@ bool Parser::parse(tags::EscapedCharacterTag, CodePoint& cp)
         error("Pattern may not end with a trailing backslash");
     }
 
-    // escaped meta-characters
-    if(cp == '^' ||    
-       cp == '$' || 
-       cp == '*' || 
-       cp == '+' || 
-       cp == '?' || 
-       cp == '.' || 
-       cp == '|' || 
-       cp == '(' || 
-       cp == ')' || 
-       cp == '[' || 
-       cp == ']'
-    )
+    switch (cp)
     {
-        return true;
-    }
+        case '^':
+        case '$':
+        case '*':
+        case '+':
+        case '?':
+        case '.':
+        case '|':
+        case '(':
+        case ')':
+        case '[':
+        case ']':
+        case '-':
+        {
+            node = std::make_unique<ast::Character>(cp, true);
+            return true;
+        }
 
-    // escaped characters with special meaning
-    if(cp == 'n' ||    // newline
-       cp == 'f' ||    // form feed
-       cp == 'r' ||    // carriage return
-       cp == 't' ||    // horizontal tab
-       cp == 'v' ||    // vertical tab
-       cp == 'a' ||    // bell
-       cp == '\\'      // black slash
-    )
-    {
-        return true;
-    }
+        case 'w':
+        case 'W':
+        case 'd':
+        case 'D':
+        case 's':
+        case 'S':
+        {
+            return false;
+        }
 
-    // Ignore short-hand character classes
-    if(cp == 'w' ||    
-       cp == 'W' || 
-       cp == 'd' || 
-       cp == 'D' || 
-       cp == 's' || 
-       cp == 'S'
-    )
-    {
-        return false;
-    }
+        case 'n':
+        {
+            node = std::make_unique<ast::Character>('\n', true);
+            return true;
+        } 
+        case 'f':
+        {
+            node = std::make_unique<ast::Character>('\f', true);
+            return true;
+        }
+        case 'r':
+        {
+            node = std::make_unique<ast::Character>('\r', true);
+            return true;
+        }
+        case 't':
+        {
+            node = std::make_unique<ast::Character>('\t', true);
+            return true;
+        }
+        case 'v':
+        {
+            node = std::make_unique<ast::Character>('\v', true);
+            return true;
+        }
+        case 'a':
+        {
+            node = std::make_unique<ast::Character>('\a', true);
+            return true;
+        }
+        case '\\':
+        {
+            node = std::make_unique<ast::Character>('\\', true);
+            return true;
+        }
+        
+        case 'u':
+        {
+            return parse<tags::UnicodeTag>(node, cp);
+        }
 
-    error("This token has no special meaning and has thus been rendered erroneous");
-    return false; // to supress compiler warning
+        default:
+        {
+            error("This token has no special meaning and has thus been rendered erroneous");
+            return false;
+        }
+    }
 }
 
-bool Parser::parse(tags::CharacterTag, CodePoint& cp, bool& escaped)
+bool Parser::parse(tags::CharacterTag, NodePtr& node, CodePoint& cp)
 {
 
     // This is a bit messy. Not sure how to account for this in
@@ -763,9 +726,8 @@ bool Parser::parse(tags::CharacterTag, CodePoint& cp, bool& escaped)
         return false;
     }
 
-    if(parse<tags::EscapedCharacterTag>(cp))
+    if(parse<tags::EscapedCharacterTag>(node, cp))
     {
-        escaped = true;
         return true;
     }
 
@@ -791,6 +753,7 @@ bool Parser::parse(tags::CharacterTag, CodePoint& cp, bool& escaped)
         return false;
     }
 
+    node = std::make_unique<ast::Character>(cp, false);
     return true;
 }
 
@@ -945,6 +908,45 @@ bool Parser::parse(tags::RangeSeparatorTag)
 {
     CodePoint cp; 
     return (get(cp) == true && cp == ',');
+}
+
+inline int hex2int(char ch)
+{
+    int val;
+    if (ch >= '0' && ch <= '9')
+        val = ch - '0';
+    if (ch >= 'A' && ch <= 'F')
+        val = ch - 'A' + 10;
+    if (ch >= 'a' && ch <= 'f')
+        val = ch - 'a' + 10;
+    return val;
+}
+
+bool Parser::parse(tags::UnicodeTag, NodePtr& node, CodePoint& cp)
+{
+    constexpr auto kNumDigits = 6u;
+    CodePoint digit;
+    
+    
+    cp = 0;
+    for(int i=0; i < kNumDigits; i++)
+    {
+        if(!get(digit) || !isxdigit(digit))
+        {
+            error("The Unicode codepoint is incomplete");
+        }
+        
+        cp = cp << 4;
+        cp |= hex2int(digit);
+    }
+
+    if(cp > 0x0010FFFF)
+    {
+        error("The Unicode codepoint invalid");
+    }
+
+    node = std::make_unique<ast::Character>(cp, true);
+    return true;
 }
 
 bool Parser::parse(tags::DigitTag, uint8_t& digit)

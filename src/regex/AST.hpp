@@ -1,6 +1,8 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <sstream>
+#include <iomanip>
 #include "CodePoint.hpp"
 
 namespace regex::ast
@@ -169,7 +171,7 @@ private:
     uint64_t max;
     bool isMaxBounded;
      
-    NodePtr inner; // use NodePtr
+    NodePtr inner;
 };
 
 class Any : public Node
@@ -183,8 +185,6 @@ private:
         str+= ".";
     }
 };
-
-
 
 class Epsilon : public Node
 {
@@ -214,9 +214,15 @@ private:
     {
         if(mEscaped)
         {
-            str+= "\\";
+            std::stringstream ss;
+            ss << std::hex << std::setfill ('0') << std::setw(6) << mCodePoint;
+            str+= "\\u";
+            str+= ss.str();
         }
-        str+= mCodePoint;
+        else
+        {
+            str+= mCodePoint;
+        }
     }
 
     bool mEscaped;
@@ -240,7 +246,7 @@ private:
 class CharacterClass : public Node
 {
 public:
-    CharacterClass(std::vector<NodePtr>&& codePointIntervals, bool isNegated)
+    CharacterClass(std::vector<NodePtr>& codePointIntervals, bool isNegated)
     : CodePointIntervals{std::move(codePointIntervals)}
     , Negated{isNegated}
     {}
@@ -272,7 +278,7 @@ private:
 class CodePointRange : public Node
 {
 public:
-    CodePointRange(NodePtr&& start, NodePtr&& end)
+    CodePointRange(NodePtr& start, NodePtr& end)
     : Start{std::move(start)}
     , End{std::move(end)}
     {}
@@ -328,7 +334,7 @@ private:
     }
 };
 
-class CharacterClassAnyDecimalDigitInverted : public Node
+class CharacterClassAnyDecimalDigitInverted : public Node  //todo rename to shorthand?
 {
 private:
     void eval() final
