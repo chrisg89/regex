@@ -65,8 +65,8 @@ namespace tags
     struct CharacterClassCharacterTag{};
 
     // Character range
-    struct CharacterRangeTag{};          // TODO prefix with characterclass
-    struct CharacterRangeSeparatorTag{}; // TODO prefix with characterclass
+    struct CharacterRangeTag{};
+    struct CharacterRangeSeparatorTag{};
 
     // Any character
     struct AnyCharacterTag{};

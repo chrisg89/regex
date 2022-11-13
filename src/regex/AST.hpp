@@ -229,20 +229,6 @@ private:
     CodePoint mCodePoint;
 };
 
-class CharacterFromUnicodeEscape : public Node
-{
-private:
-    void eval() final
-    {}
-
-    void print(std::string& str) final
-    {
-        str+= "TODO";
-    }
-
-    CodePoint Character;
-};
-
 class CharacterClass : public Node
 {
 public:
@@ -310,7 +296,7 @@ private:
     }
 };
 
-class CharacterClassAnyWordInverted : public Node
+class CharacterClassAnyWordNegated : public Node
 {
 private:
     void eval() final
@@ -322,7 +308,7 @@ private:
     }
 };
 
-class CharacterClassAnyDecimalDigit : public Node
+class CharacterClassAnyDigit : public Node
 {
 private:
     void eval() final
@@ -334,7 +320,7 @@ private:
     }
 };
 
-class CharacterClassAnyDecimalDigitInverted : public Node  //todo rename to shorthand?
+class CharacterClassAnyDigitNegated : public Node
 {
 private:
     void eval() final
@@ -358,7 +344,7 @@ private:
     }
 };
 
-class CharacterClassAnyWhitespaceInverted : public Node
+class CharacterClassAnyWhitespaceNegated : public Node
 {
 private:
     void eval() final

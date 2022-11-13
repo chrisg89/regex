@@ -379,19 +379,19 @@ bool Parser::parse(tags::ShorthandCharacterClassTag, NodePtr& node)
 
     if(parse<tags::ShorthandCharacterClassWordNegatedTag>())
     {
-        node = std::make_unique<ast::CharacterClassAnyWordInverted>();
+        node = std::make_unique<ast::CharacterClassAnyWordNegated>();
         return true;
     }
 
     if(parse<tags::ShorthandCharacterClassDigitTag>())
     {
-        node = std::make_unique<ast::CharacterClassAnyDecimalDigit>();
+        node = std::make_unique<ast::CharacterClassAnyDigit>();
         return true;
     }
 
     if(parse<tags::ShorthandCharacterClassDigitNegatedTag>())
     {
-        node = std::make_unique<ast::CharacterClassAnyDecimalDigitInverted>();
+        node = std::make_unique<ast::CharacterClassAnyDigitNegated>();
         return true;
     }
 
@@ -403,7 +403,7 @@ bool Parser::parse(tags::ShorthandCharacterClassTag, NodePtr& node)
 
     if(parse<tags::ShorthandCharacterClassWhitespaceNegatedTag>())
     {
-        node = std::make_unique<ast::CharacterClassAnyWhitespaceInverted>();
+        node = std::make_unique<ast::CharacterClassAnyWhitespaceNegated>();
         return true;
     }
     
