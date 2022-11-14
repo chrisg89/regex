@@ -611,7 +611,7 @@ bool Parser::parse(tags::CharacterRangeTag, NodePtr& node)
         error("Character range is out of order");
     }
 
-    node = std::make_unique<ast::CodePointRange>(start, end);
+    node = std::make_unique<ast::CharacterRange>(start, end);
     return true;
 }
 

@@ -229,10 +229,10 @@ public:
     bool mIsNegated;
 };
 
-class CodePointRange : public Node // TODO rename to ChartacterRange
+class CharacterRange : public Node
 {
 public:
-    CodePointRange(NodePtr& start, NodePtr& end)
+    CharacterRange(NodePtr& start, NodePtr& end)
     : mStart{std::move(start)}
     , mEnd{std::move(end)}
     {}
