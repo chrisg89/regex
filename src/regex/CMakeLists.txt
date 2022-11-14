@@ -7,6 +7,7 @@ add_library(regex_lib
     TokenStream.cpp
     Utf8Iterator.cpp
     Parser.cpp
+    Alphabet.cpp
     )
 
 TARGET_LINK_LIBRARIES( regex_lib

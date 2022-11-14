@@ -8,46 +8,7 @@
 namespace regex
 {
 
-void DisjoinOverlap(Alphabet& alphabet, CodePoint min, CodePoint max)
-{
-    enum class EndpointType { eStart , eEnd};
-    using Point = std::pair<CodePoint, EndpointType>;
-    using Points = std::set<Point>;
 
-    auto points = Points{};
-
-    for (auto& codePointInterval : alphabet)
-    {
-        points.emplace(codePointInterval.first, EndpointType::eStart);
-        points.emplace(codePointInterval.second, EndpointType::eEnd);
-    }
-    alphabet.clear();
-
-    // this needs to be large enough to prevent overflow errors
-    unsigned long long int current = min;
-
-    for (auto& point : points)
-    {
-        if(point.second == EndpointType::eStart)
-        {
-            if(current < point.first )
-            {
-                alphabet.emplace_back(current, point.first-1);
-                current = point.first;
-            }
-        }
-        else
-        {
-            alphabet.emplace_back(current, point.first);
-            current = point.first+1;
-        }
-    }
-
-    if(current < max)
-    {
-        alphabet.emplace_back(current, max);
-    }
-}
 
 
 

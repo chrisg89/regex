@@ -17,8 +17,6 @@ namespace regex
 
 using DFA = fa::DFA;
 
-void DisjoinOverlap(Alphabet& alphabet, CodePoint min, CodePoint max);   //TODO do not expose this interface. How to test? Its complex enough...
-
 class Regex
 {
 
