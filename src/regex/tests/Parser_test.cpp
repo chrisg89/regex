@@ -15,7 +15,7 @@ SCENARIO("Parse characters")
         const std::string regex = "a";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\u000061");
     }
 
     SECTION("Any character .")
@@ -235,18 +235,18 @@ SCENARIO("Parse character classes")
 
     SECTION("Simple character class")
     {
-        const std::string regex = "[hello]";
+        const std::string regex = "[abc]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\u000061\\u000062\\u000063]");
     }
 
     SECTION("Negated character class")
     {
-        const std::string regex = "[^hello]";
+        const std::string regex = "[^abc]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[^\\u000061\\u000062\\u000063]");
     }
 
     SECTION("Character class with shorthand")
@@ -278,7 +278,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[$*+?.()]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\u000024\\u00002a\\u00002b\\u00003f\\u00002e\\u000028\\u000029]");
     }
 
     SECTION("Character class with unicode code point")
@@ -294,7 +294,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[-]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\u00002d]");
     }
 
     SECTION("Character class where hyphen is first character")
@@ -302,7 +302,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[-a]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\u00002d\\u000061]");
     }
 
     SECTION("Character class where hyphen is final character")
@@ -310,7 +310,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[a-]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\u000061\\u00002d]");
     }
 
     SECTION("Character class where hyphen is treated literally in presence of shorthand character class")
@@ -318,7 +318,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[\\w-\\W]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\w\\u00002d\\W]");
     }
 
     SECTION("Character class where closing bracket is first character")
@@ -326,7 +326,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[[]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\u00005b]");
     }
 
     SECTION("Character class with range (literal characters)")
@@ -334,7 +334,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[a-z]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\u000061-\\u00007a]");
     }
 
     SECTION("Character class with range (escaped characters)")
@@ -350,7 +350,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[\\^-z]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "[\\u00005e-z]");
+        CHECK(ast.print() == "[\\u00005e-\\u00007a]");
     }
 
     SECTION("Character class with multiple ranges")
@@ -358,7 +358,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[a-zA-Z0-9]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\u000061-\\u00007a\\u000041-\\u00005a\\u000030-\\u000039]");
     }
 
     SECTION("Character class with range containing a single character")
@@ -366,7 +366,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[a-a]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\u000061-\\u000061]");
     }
 
     SECTION("Character class with range, literal character and escaped character")
@@ -374,7 +374,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[a-zXYZ\\a]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "[a-zXYZ\\u000007]");
+        CHECK(ast.print() == "[\\u000061-\\u00007a\\u000058\\u000059\\u00005a\\u000007]");
     }
 
     SECTION("Throw exception when character range is out of order")
@@ -416,7 +416,7 @@ SCENARIO("Parse group")
         const std::string regex = "(a)";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a");
+        CHECK(ast.print() == "\\u000061");
     }
 
     SECTION("Nested group")
@@ -424,7 +424,7 @@ SCENARIO("Parse group")
         const std::string regex = "((a))";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a");
+        CHECK(ast.print() == "\\u000061");
     }
 
     SECTION("Twice nested group")
@@ -432,7 +432,7 @@ SCENARIO("Parse group")
         const std::string regex = "(((a)))";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a");
+        CHECK(ast.print() == "\\u000061");
     }
 
     SECTION("Empty group")
@@ -507,7 +507,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a*";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a{0,}");
+        CHECK(ast.print() == "\\u000061{0,}");
     }
 
     SECTION("Kleene star (*) operating on a group")
@@ -515,7 +515,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a)*";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a{0,}");
+        CHECK(ast.print() == "\\u000061{0,}");
     }
 
     SECTION("Kleene star (*) operating on a character class")
@@ -523,7 +523,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "[abc]*";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "[abc]{0,}");
+        CHECK(ast.print() == "[\\u000061\\u000062\\u000063]{0,}");
     }
 
     SECTION("Throw when token preceding Kleene star is not quantifiable ")
@@ -547,7 +547,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a+";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a{1,}");
+        CHECK(ast.print() == "\\u000061{1,}");
     }
 
     SECTION("Kleene plus (+) operating on a group")
@@ -555,7 +555,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a)+";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a{1,}");
+        CHECK(ast.print() == "\\u000061{1,}");
     }
 
     SECTION("Kleene plus (+) operating on a character class")
@@ -563,7 +563,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "[abc]+";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "[abc]{1,}");
+        CHECK(ast.print() == "[\\u000061\\u000062\\u000063]{1,}");
     }
 
     SECTION("Throw when token preceding Kleene plus is not quantifiable ")
@@ -587,7 +587,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a?";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a{0,1}");
+        CHECK(ast.print() == "\\u000061{0,1}");
     }
 
     SECTION("Optional (?) operating on a group")
@@ -595,7 +595,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a)?";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a{0,1}");
+        CHECK(ast.print() == "\\u000061{0,1}");
     }
 
     SECTION("Optional (?) operating on a character class")
@@ -603,7 +603,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "[abc]?";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "[abc]{0,1}");
+        CHECK(ast.print() == "[\\u000061\\u000062\\u000063]{0,1}");
     }
 
     SECTION("Throw when token preceding optional is not quantifiable ")
@@ -621,7 +621,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a{100}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a{100,100}");
+        CHECK(ast.print() == "\\u000061{100,100}");
     }
 
     SECTION("Ranged quantifier: lower bound only operating on a group")
@@ -629,7 +629,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a){100}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a{100,100}");
+        CHECK(ast.print() == "\\u000061{100,100}");
     }
 
     SECTION("Ranged quantifier: lower bound only operating on a character class")
@@ -637,7 +637,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "[abc]{100}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "[abc]{100,100}");
+        CHECK(ast.print() == "[\\u000061\\u000062\\u000063]{100,100}");
     }
 
     SECTION("Ranged quantifier: upper bound is omitted ")
@@ -645,7 +645,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a{100,}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a{100,}");
+        CHECK(ast.print() == "\\u000061{100,}");
     }
 
     SECTION("Ranged quantifier: upper bound is omitted operating on a group")
@@ -653,7 +653,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a){100,}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a{100,}");
+        CHECK(ast.print() == "\\u000061{100,}");
     }
 
     SECTION("Ranged quantifier: upper bound is omitted operating on a character class")
@@ -661,7 +661,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "[abc]{100,}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "[abc]{100,}");
+        CHECK(ast.print() == "[\\u000061\\u000062\\u000063]{100,}");
     }
 
     SECTION("Ranged quantifier: lower and upper bound ")
@@ -669,7 +669,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a{100,200}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a{100,200}");
+        CHECK(ast.print() == "\\u000061{100,200}");
     }
 
     SECTION("Ranged quantifier: lower and upper bound operating on a group")
@@ -677,7 +677,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a){100,200}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a{100,200}");
+        CHECK(ast.print() == "\\u000061{100,200}");
     }
 
     SECTION("Ranged quantifier: lower and upper bound operating on a character class")
@@ -685,7 +685,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "[abc]{100,200}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "[abc]{100,200}");
+        CHECK(ast.print() == "[\\u000061\\u000062\\u000063]{100,200}");
     }
 
     SECTION("Throw when token preceding ranged quantifier is not quantifiable ")
@@ -747,7 +747,7 @@ SCENARIO("Parse concatenation")
         const std::string regex = "ab";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(ab)");
+        CHECK(ast.print() == "(\\u000061\\u000062)");
     }
 
     SECTION("Concatenation of two escaped meta characters")
@@ -779,7 +779,7 @@ SCENARIO("Parse concatenation")
         const std::string regex = "[abc][123]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "([abc][123])");
+        CHECK(ast.print() == "([\\u000061\\u000062\\u000063][\\u000031\\u000032\\u000033])");
     }
 
     SECTION("Concatenation of two groups")
@@ -787,7 +787,7 @@ SCENARIO("Parse concatenation")
         const std::string regex = "(a)(b)";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(ab)");
+        CHECK(ast.print() == "(\\u000061\\u000062)");
     }
 }
 
@@ -798,7 +798,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "a|b";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(a|b)");
+        CHECK(ast.print() == "(\\u000061|\\u000062)");
     }
 
     SECTION("Alternation with empty (epsilon) right hand side")
@@ -806,7 +806,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "a|";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(a|)");
+        CHECK(ast.print() == "(\\u000061|)");
     }
 
     SECTION("Alternation with empty (epsilon) left hand side")
@@ -814,7 +814,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "|b";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(|b)");
+        CHECK(ast.print() == "(|\\u000062)");
     }
 
     SECTION("Alternation with empty (epsilon) left and right hand side")
@@ -854,7 +854,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "[abc]|[123]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "([abc]|[123])");
+        CHECK(ast.print() == "([\\u000061\\u000062\\u000063]|[\\u000031\\u000032\\u000033])");
     }
 
     SECTION("Alternation of two groups")
@@ -862,7 +862,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "(a)|(b)";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(a|b)");
+        CHECK(ast.print() == "(\\u000061|\\u000062)");
     }
 
     SECTION("Alternation and concatenation")
@@ -870,7 +870,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "123|abc";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(((12)3)|((ab)c))");
+        CHECK(ast.print() == "(((\\u000031\\u000032)\\u000033)|((\\u000061\\u000062)\\u000063))");
     }
 
     SECTION("Alternation, concatenation and character class")
@@ -878,7 +878,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "123|[abc]|z";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(((12)3)|([abc]|z))");
+        CHECK(ast.print() == "(((\\u000031\\u000032)\\u000033)|([\\u000061\\u000062\\u000063]|\\u00007a))");
     }
 
     SECTION("Alternation, concatenation and group")
@@ -886,12 +886,12 @@ SCENARIO("Parse alternation")
         const std::string regex = "123|(abc|xy)|z";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(((12)3)|((((ab)c)|(xy))|z))");
+        CHECK(ast.print() == "(((\\u000031\\u000032)\\u000033)|((((\\u000061\\u000062)\\u000063)|(\\u000078\\u000079))|\\u00007a))");
     }
 }
 
 
-SCENARIO("?????")
+SCENARIO("?????") //TODO delete
 {
     SECTION("Alternation of two characters")
     {

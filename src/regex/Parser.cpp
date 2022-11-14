@@ -501,7 +501,7 @@ bool Parser::parse(tags::CharacterClassTag, NodePtr& node)
 
     if(parse<tags::CharacterClassCloseTag>())
     {
-        groupItemPtr = std::make_unique<ast::Character>(']', false);
+        groupItemPtr = std::make_unique<ast::Character>(']');
         groupItems.emplace_back(groupItemPtr.release());
     }
 
@@ -580,7 +580,7 @@ bool Parser::parse(tags::CharacterClassCharacterTag, NodePtr& node, CodePoint& c
         return false;
     }
 
-    node = std::make_unique<ast::Character>(cp, false);
+    node = std::make_unique<ast::Character>(cp);
     return true;
 }
 
@@ -654,7 +654,7 @@ bool Parser::parse(tags::EscapedCharacterTag, NodePtr& node, CodePoint& cp)
         case ']':
         case '-':
         {
-            node = std::make_unique<ast::Character>(cp, true);
+            node = std::make_unique<ast::Character>(cp);
             return true;
         }
 
@@ -670,37 +670,37 @@ bool Parser::parse(tags::EscapedCharacterTag, NodePtr& node, CodePoint& cp)
 
         case 'n':
         {
-            node = std::make_unique<ast::Character>('\n', true);
+            node = std::make_unique<ast::Character>('\n');
             return true;
         } 
         case 'f':
         {
-            node = std::make_unique<ast::Character>('\f', true);
+            node = std::make_unique<ast::Character>('\f');
             return true;
         }
         case 'r':
         {
-            node = std::make_unique<ast::Character>('\r', true);
+            node = std::make_unique<ast::Character>('\r');
             return true;
         }
         case 't':
         {
-            node = std::make_unique<ast::Character>('\t', true);
+            node = std::make_unique<ast::Character>('\t');
             return true;
         }
         case 'v':
         {
-            node = std::make_unique<ast::Character>('\v', true);
+            node = std::make_unique<ast::Character>('\v');
             return true;
         }
         case 'a':
         {
-            node = std::make_unique<ast::Character>('\a', true);
+            node = std::make_unique<ast::Character>('\a');
             return true;
         }
         case '\\':
         {
-            node = std::make_unique<ast::Character>('\\', true);
+            node = std::make_unique<ast::Character>('\\');
             return true;
         }
         
@@ -757,7 +757,7 @@ bool Parser::parse(tags::CharacterTag, NodePtr& node, CodePoint& cp)
         return false;
     }
 
-    node = std::make_unique<ast::Character>(cp, false);
+    node = std::make_unique<ast::Character>(cp);
     return true;
 }
 
@@ -955,7 +955,7 @@ bool Parser::parse(tags::UnicodeTag, NodePtr& node, CodePoint& cp)
         error("The Unicode codepoint invalid");
     }
 
-    node = std::make_unique<ast::Character>(cp, true);
+    node = std::make_unique<ast::Character>(cp);
     return true;
 }
 

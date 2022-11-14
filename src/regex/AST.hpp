@@ -156,9 +156,8 @@ class Epsilon : public Node
 class Character : public Node
 {
 public:
-    Character(CodePoint character, bool escaped)
+    Character(CodePoint character)
     : mCodePoint{character}
-    , mIsEscaped{escaped}
     {}
 
     void eval() final
@@ -171,20 +170,12 @@ public:
 
     void print(std::string& str) final
     {
-        if(mIsEscaped)
-        {
-            std::stringstream ss;
-            ss << std::hex << std::setfill ('0') << std::setw(6) << mCodePoint;
-            str+= "\\u";
-            str+= ss.str();
-        }
-        else
-        {
-            str+= mCodePoint;
-        }
+        std::stringstream ss;
+        ss << std::hex << std::setfill ('0') << std::setw(6) << mCodePoint;
+        str+= "\\u";
+        str+= ss.str();
     }
 
-    bool mIsEscaped;
     CodePoint mCodePoint;
 };
 
