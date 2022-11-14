@@ -84,82 +84,10 @@ public:
     NodePtr mRight;
 };
 
-class KleeneStar : public Node
+class Quantifier : public Node
 {
 public:
-    KleeneStar(NodePtr& mInner)
-    : mInner {mInner.release()}
-    {}
-
-    void eval() final
-    {}
-
-    void makeAlphabet(Alphabet& alphabet) final
-    {
-        mInner->makeAlphabet(alphabet);
-    }
-
-    void print(std::string& str) final
-    {
-        mInner->print(str);
-        str+= "*";
-    }
-     
-    NodePtr mInner;
-};
-
-class KleenePlus : public Node
-{
-public:
-    KleenePlus(NodePtr& mInner)
-    : mInner {mInner.release()}
-    {}
-
-    void eval() final
-    {}
-
-    void makeAlphabet(Alphabet& alphabet) final
-    {
-        mInner->makeAlphabet(alphabet);
-    }
-
-    void print(std::string& str) final
-    {
-        mInner->print(str);
-        str+= "+";
-    }
-     
-    NodePtr mInner;
-};
-
-class Optional : public Node
-{
-public:
-    Optional(NodePtr& mInner)
-    : mInner {mInner.release()}
-    {}
-
-    void eval() final
-    {}
-
-    void makeAlphabet(Alphabet& alphabet) final
-    {
-        mInner->makeAlphabet(alphabet);
-    }
-
-    void print(std::string& str) final
-    {
-        mInner->print(str);
-        str+= "?";
-    }
-     
-    NodePtr mInner;
-};
-
-class RangeQuantifier : public Node
-{
-public:
-    RangeQuantifier(NodePtr& mInner, uint64_t min, uint64_t max, bool isMaxBounded)
+    Quantifier(NodePtr& mInner, uint64_t min, uint64_t max, bool isMaxBounded)
     : mInner {mInner.release()}
     , mMin {min}
     , mMax {max}
@@ -177,11 +105,7 @@ public:
     void print(std::string& str) final
     {
         mInner->print(str);
-        if(mMin==mMax)
-        {
-            str += "{" + std::to_string(mMin) + "}";
-        }
-        else if(mIsMaxBounded)
+        if(mIsMaxBounded)
         {
             str += "{" + std::to_string(mMin) + "," + std::to_string(mMax) + "}";
         }

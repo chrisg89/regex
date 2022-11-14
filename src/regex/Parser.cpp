@@ -366,7 +366,6 @@ bool Parser::parse(tags::MatchItemTag, NodePtr& astNode)
     }
 
     CodePoint cp;
-    bool escaped = false;
     if(parse<tags::CharacterTag>(astNode, cp))
     {
         return true;
@@ -724,10 +723,9 @@ bool Parser::parse(tags::CharacterTag, NodePtr& node, CodePoint& cp)
     // This is a bit messy. Not sure how to account for this in
     // the grammar. A '{' can be either treated as a literal or
     // the start of a ranged quantifier.
-    uint64_t min = 0;
-    uint64_t max = 0;
-    bool isMaxBounded = false;
-    if(parse<tags::RangeQuantifierTag>(min, max, isMaxBounded))
+    auto dummy1 = NodePtr();
+    auto dummy2 = NodePtr();
+    if(parse<tags::RangeQuantifierTag>(dummy1,dummy2))
     {
         return false;
     }
@@ -780,31 +778,23 @@ bool Parser::parse(tags::QuantifierTag, NodePtr& astNode, NodePtr& inner)
 
 bool Parser::parse(tags::QuantifierTypeTag, NodePtr& astNode, NodePtr& inner)
 {
-    if(parse<tags::ZeroOrMoreQuantifierTag>())
+    if(parse<tags::ZeroOrMoreQuantifierTag>(astNode, inner))
     {
-        astNode = std::make_unique<ast::KleeneStar>(inner);
         return true;
     }
 
-    if(parse<tags::OneOrMoreQuantifierTag>())
+    if(parse<tags::OneOrMoreQuantifierTag>(astNode, inner))
     {
-        astNode = std::make_unique<ast::KleenePlus>(inner);
         return true;
     }
 
-    if(parse<tags::ZeroOrOneQuantifierTag>())
+    if(parse<tags::ZeroOrOneQuantifierTag>(astNode, inner))
     {
-        astNode = std::make_unique<ast::Optional>(inner);
         return true;
     }
 
-    uint64_t min = 0;
-    uint64_t max = 0;
-    bool isMaxBounded = false;
-
-    if(parse<tags::RangeQuantifierTag>(min, max, isMaxBounded))
+    if(parse<tags::RangeQuantifierTag>(astNode, inner))
     {
-        astNode = std::make_unique<ast::RangeQuantifier>(inner, min, max, isMaxBounded);
         return true;
     }
 
@@ -817,27 +807,44 @@ bool Parser::parse(tags::LazyModifierTag)
     return (get(cp) == true && cp == '?');
 }
 
-bool Parser::parse(tags::ZeroOrMoreQuantifierTag)
+bool Parser::parse(tags::ZeroOrMoreQuantifierTag, NodePtr& astNode, NodePtr& inner)
 {
     CodePoint cp; 
-    return (get(cp) == true && cp == '*');
+    if (get(cp) == true && cp == '*')
+    {
+        astNode = std::make_unique<ast::Quantifier>(inner, 0, 0, false);
+        return true;
+    }
+    return false;
 }
 
-bool Parser::parse(tags::OneOrMoreQuantifierTag)
+bool Parser::parse(tags::OneOrMoreQuantifierTag, NodePtr& astNode, NodePtr& inner)
 {
     CodePoint cp; 
-    return (get(cp) == true && cp == '+');
+    if (get(cp) == true && cp == '+')
+    {
+        astNode = std::make_unique<ast::Quantifier>(inner, 1, 0, false);
+        return true;
+    }
+    return false;
 }
 
-bool Parser::parse(tags::ZeroOrOneQuantifierTag)
+bool Parser::parse(tags::ZeroOrOneQuantifierTag, NodePtr& astNode, NodePtr& inner)
 {
     CodePoint cp; 
-    return (get(cp) == true && cp == '?');
+    if (get(cp) == true && cp == '?')
+    {
+        astNode = std::make_unique<ast::Quantifier>(inner, 0, 1, true);
+        return true;
+    }
+    return false;
 }
 
-bool Parser::parse(tags::RangeQuantifierTag, uint64_t& min, uint64_t& max, bool& isMaxBounded)
+bool Parser::parse(tags::RangeQuantifierTag, NodePtr& astNode, NodePtr& inner)
 {
-
+    uint64_t min = 0;
+    uint64_t max = 0;
+    bool isMaxBounded = true;
     bool minOverflow = false;
     bool maxOverflow = false;
 
@@ -855,11 +862,7 @@ bool Parser::parse(tags::RangeQuantifierTag, uint64_t& min, uint64_t& max, bool&
 
     if(parse<tags::RangeSeparatorTag>())
     {
-        if(parse<tags::RangeQuantifierUpperBoundTag>(max, maxOverflow))
-        {
-            isMaxBounded = true;
-        }
-        else
+        if(!parse<tags::RangeQuantifierUpperBoundTag>(max, maxOverflow))
         {
             isMaxBounded = false;
         }
@@ -885,6 +888,7 @@ bool Parser::parse(tags::RangeQuantifierTag, uint64_t& min, uint64_t& max, bool&
         error("The quantifier range is out of order");
     }
 
+    astNode = std::make_unique<ast::Quantifier>(inner, min, max, isMaxBounded);
     return true;
 }
 
@@ -994,6 +998,3 @@ bool Parser::parse(tags::IntegerTag, uint64_t& integer, bool& overflow)
 }
 
 } // namespace regex::parser
-
-
-

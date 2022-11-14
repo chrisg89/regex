@@ -507,7 +507,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a*";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "a{0,}");
     }
 
     SECTION("Kleene star (*) operating on a group")
@@ -515,7 +515,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a)*";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a*");
+        CHECK(ast.print() == "a{0,}");
     }
 
     SECTION("Kleene star (*) operating on a character class")
@@ -523,7 +523,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "[abc]*";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[abc]{0,}");
     }
 
     SECTION("Throw when token preceding Kleene star is not quantifiable ")
@@ -547,7 +547,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a+";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "a{1,}");
     }
 
     SECTION("Kleene plus (+) operating on a group")
@@ -555,7 +555,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a)+";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a+");
+        CHECK(ast.print() == "a{1,}");
     }
 
     SECTION("Kleene plus (+) operating on a character class")
@@ -563,7 +563,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "[abc]+";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[abc]{1,}");
     }
 
     SECTION("Throw when token preceding Kleene plus is not quantifiable ")
@@ -587,7 +587,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a?";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "a{0,1}");
     }
 
     SECTION("Optional (?) operating on a group")
@@ -595,7 +595,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a)?";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a?");
+        CHECK(ast.print() == "a{0,1}");
     }
 
     SECTION("Optional (?) operating on a character class")
@@ -603,7 +603,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "[abc]?";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[abc]{0,1}");
     }
 
     SECTION("Throw when token preceding optional is not quantifiable ")
@@ -621,7 +621,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a{100}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "a{100,100}");
     }
 
     SECTION("Ranged quantifier: lower bound only operating on a group")
@@ -629,7 +629,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a){100}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "a{100}");
+        CHECK(ast.print() == "a{100,100}");
     }
 
     SECTION("Ranged quantifier: lower bound only operating on a character class")
@@ -637,7 +637,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "[abc]{100}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[abc]{100,100}");
     }
 
     SECTION("Ranged quantifier: upper bound is omitted ")
@@ -645,7 +645,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a{100,}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "a{100,}");
     }
 
     SECTION("Ranged quantifier: upper bound is omitted operating on a group")
@@ -661,7 +661,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "[abc]{100,}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[abc]{100,}");
     }
 
     SECTION("Ranged quantifier: lower and upper bound ")
@@ -669,7 +669,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a{100,200}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "a{100,200}");
     }
 
     SECTION("Ranged quantifier: lower and upper bound operating on a group")

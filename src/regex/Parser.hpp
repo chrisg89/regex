@@ -187,10 +187,10 @@ private:
     bool parse(tags::QuantifierTag, NodePtr&, NodePtr&);
     bool parse(tags::QuantifierTypeTag, NodePtr&, NodePtr&);
     bool parse(tags::LazyModifierTag);
-    bool parse(tags::ZeroOrMoreQuantifierTag);
-    bool parse(tags::OneOrMoreQuantifierTag);
-    bool parse(tags::ZeroOrOneQuantifierTag);
-    bool parse(tags::RangeQuantifierTag, uint64_t&, uint64_t&, bool&);
+    bool parse(tags::ZeroOrMoreQuantifierTag, NodePtr&, NodePtr&);
+    bool parse(tags::OneOrMoreQuantifierTag, NodePtr&, NodePtr&);
+    bool parse(tags::ZeroOrOneQuantifierTag, NodePtr&, NodePtr&);
+    bool parse(tags::RangeQuantifierTag, NodePtr&, NodePtr&);
     bool parse(tags::RangeQuantifierLowerBoundTag, uint64_t&, bool&);
     bool parse(tags::RangeQuantifierUpperBoundTag, uint64_t&, bool&);
     bool parse(tags::RangeOpenTag);
