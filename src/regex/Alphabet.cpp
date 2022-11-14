@@ -7,6 +7,16 @@
 namespace regex
 {
 
+bool isSubset(CodePointInterval& outer, CodePointInterval& inner)  //TODO move to codePoint?
+{
+    if(outer.first <= inner.first && outer.second >= inner.second)
+    {
+        return true;
+    }
+
+    return false;
+}
+
 void DisjoinOverlap(Alphabet& alphabet, CodePoint min, CodePoint max)
 {
     enum class EndpointType { eStart , eEnd};

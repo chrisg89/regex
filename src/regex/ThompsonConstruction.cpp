@@ -81,16 +81,6 @@ BlackBox::BlackBox(StateId entry, StateId exit)
 , exit {exit}
 {}
 
-bool isSubset(CodePointInterval& outer, CodePointInterval& inner)
-{
-    if(outer.first <= inner.first && outer.second >= inner.second)
-    {
-        return true;
-    }
-
-    return false;
-}
-
 BlackBox buildSymbol(NFA& nfa, Alphabet& alphabet, CodePointInterval& interval)
 {
     auto entry = nfa.addState(false, false);
