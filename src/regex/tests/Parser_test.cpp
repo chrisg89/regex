@@ -1,6 +1,8 @@
 #include "catch.hpp"
 #include "Parser.hpp"
 
+#include <iostream>
+
 namespace regex::parser {
 namespace {
 
@@ -886,7 +888,27 @@ SCENARIO("Parse alternation")
         auto ast = parser.parse();
         CHECK(ast.print() == "(((12)3)|((((ab)c)|(xy))|z))");
     }
+}
 
+
+SCENARIO("?????")
+{
+    SECTION("Alternation of two characters")
+    {
+        const std::string regex = "[^a-c]";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        //CHECK(ast.print() == "(a|b)");
+
+        auto alphabet = ast.makeAlphabet();
+
+        for (auto& x : alphabet)
+        {
+            std::cout << x.first << " - " << x.second << std::endl;
+        }
+    }
+
+   
 }
 
 } // namespace 

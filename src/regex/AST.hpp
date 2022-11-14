@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Alphabet.hpp"
 #include "CodePoint.hpp"
 
 #include <iomanip>
@@ -7,6 +8,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
+//TODO Replace reset()
 
 namespace regex::ast
 {
@@ -19,6 +22,7 @@ class Node
 public:
     virtual void eval() = 0;
     virtual void print(std::string&) = 0;
+    virtual void makeAlphabet(Alphabet&) = 0; 
 };
 
 class Alternative : public Node
@@ -29,10 +33,14 @@ public:
     , mRight {rhs.release()}
     {}
 
-private:
-
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        mLeft->makeAlphabet(alphabet);
+        mRight->makeAlphabet(alphabet);
+    }
 
     void print(std::string& str) final
     {
@@ -55,9 +63,14 @@ public:
     , mRight {rhs.release()}
     {}
 
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        mLeft->makeAlphabet(alphabet);
+        mRight->makeAlphabet(alphabet);
+    }
 
     void print(std::string& str) final
     {
@@ -78,9 +91,13 @@ public:
     : mInner {mInner.release()}
     {}
 
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        mInner->makeAlphabet(alphabet);
+    }
 
     void print(std::string& str) final
     {
@@ -98,9 +115,13 @@ public:
     : mInner {mInner.release()}
     {}
 
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        mInner->makeAlphabet(alphabet);
+    }
 
     void print(std::string& str) final
     {
@@ -118,9 +139,13 @@ public:
     : mInner {mInner.release()}
     {}
 
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        mInner->makeAlphabet(alphabet);
+    }
 
     void print(std::string& str) final
     {
@@ -141,9 +166,13 @@ public:
     , mIsMaxBounded {isMaxBounded}
     {}
 
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        mInner->makeAlphabet(alphabet);
+    }
 
     void print(std::string& str) final
     {
@@ -170,9 +199,13 @@ private:
 
 class Any : public Node
 {
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        alphabet.emplace_back(kCodePointMin, kCodePointMax);
+    }
 
     void print(std::string& str) final
     {
@@ -182,9 +215,13 @@ private:
 
 class Epsilon : public Node
 {
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        /* Do nothing */
+    }
 
     void print(std::string& str) final
     {
@@ -200,9 +237,13 @@ public:
     , mIsEscaped{escaped}
     {}
 
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        alphabet.emplace_back(mCodePoint,mCodePoint);
+    }
 
     void print(std::string& str) final
     {
@@ -227,13 +268,31 @@ class CharacterClass : public Node
 {
 public:
     CharacterClass(std::vector<NodePtr>& codePointIntervals, bool isNegated)
-    : mCodePointIntervals{std::move(codePointIntervals)}
+    : mCodePointIntervals{std::move(codePointIntervals)}  //TODO rename mCodePointIntervals to CharacterClassItem
     , mIsNegated{isNegated}
     {}
 
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        Alphabet temp;
+
+        for (const auto& item : mCodePointIntervals )
+        {
+            item->makeAlphabet(temp);
+        }
+
+        if(mIsNegated)
+        {
+            negate(temp);
+        }
+
+        alphabet.insert(std::end(alphabet), std::begin(temp), std::end(temp));
+    }
+
+
 
     void print(std::string& str) final
     {
@@ -255,7 +314,7 @@ private:
     bool mIsNegated;
 };
 
-class CodePointRange : public Node
+class CodePointRange : public Node // TODO rename to ChartacterRange
 {
 public:
     CodePointRange(NodePtr& start, NodePtr& end)
@@ -263,9 +322,16 @@ public:
     , mEnd{std::move(end)}
     {}
 
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        //TODO dynamic_cast is typically considered a code smell. Need to refactor?
+        auto start = dynamic_cast<Character&>(*mStart).mCodePoint;
+        auto end = dynamic_cast<Character&>(*mEnd).mCodePoint;
+        alphabet.emplace_back(start, end);
+    }
 
     void print(std::string& str) final
     {
@@ -280,9 +346,16 @@ private:
 
 class CharacterClassAnyWord : public Node
 {
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        alphabet.emplace_back(0x30, 0x39);
+        alphabet.emplace_back(0x41, 0x5A);
+        alphabet.emplace_back(0x5F, 0x5F);
+        alphabet.emplace_back(0x61, 0x7A);
+    }
 
     void print(std::string& str) final
     {
@@ -292,9 +365,17 @@ private:
 
 class CharacterClassAnyWordNegated : public Node
 {
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        alphabet.emplace_back(kCodePointMin, 0x2F);
+        alphabet.emplace_back(0x3A, 0x40);
+        alphabet.emplace_back(0x5B, 0x5E);
+        alphabet.emplace_back(0x60, 0x60);
+        alphabet.emplace_back(0x7B, kCodePointMax);
+    }
 
     void print(std::string& str) final
     {
@@ -304,9 +385,13 @@ private:
 
 class CharacterClassAnyDigit : public Node
 {
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        alphabet.emplace_back(0x30, 0x39);
+    }
 
     void print(std::string& str) final
     {
@@ -316,9 +401,14 @@ private:
 
 class CharacterClassAnyDigitNegated : public Node
 {
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        alphabet.emplace_back(kCodePointMin, 0x2F);
+        alphabet.emplace_back(0x3A, kCodePointMax);
+    }
 
     void print(std::string& str) final
     {
@@ -328,9 +418,14 @@ private:
 
 class CharacterClassAnyWhitespace : public Node
 {
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        alphabet.emplace_back(0x09, 0x0D);
+        alphabet.emplace_back(0x20, 0x20);
+    }
 
     void print(std::string& str) final
     {
@@ -340,9 +435,15 @@ private:
 
 class CharacterClassAnyWhitespaceNegated : public Node
 {
-private:
     void eval() final
     {}
+
+    void makeAlphabet(Alphabet& alphabet) final
+    {
+        alphabet.emplace_back(kCodePointMin, 0x08);
+        alphabet.emplace_back(0x0E, 0x1F);
+        alphabet.emplace_back(0x21, kCodePointMax);
+    }
 
     void print(std::string& str) final
     {
@@ -362,6 +463,14 @@ public:
         std::string str;
         mRoot->print(str);
         return str;
+    }
+
+    Alphabet makeAlphabet()
+    {
+        Alphabet alphabet;
+        mRoot->makeAlphabet(alphabet);
+        DisjoinOverlap(alphabet, kCodePointMin, kCodePointMax);
+        return alphabet;
     }
 
 private:
