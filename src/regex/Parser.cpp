@@ -7,6 +7,17 @@
 namespace regex::parser
 {
 
+NodePtr buildSubtree(CharacterGroup& Segments)
+{
+    NodePtr out = std::make_unique<ast::Epsilon>();
+
+    for(auto it = Segments.rbegin(); it != Segments.rend(); ++it) {
+        NodePtr segment = std::make_unique<ast::CharacterRange>(it->first, it->second);
+        out = std::make_unique<ast::Alternative>(segment, out);
+    }
+    return out;
+}
+
 Parser::Parser(const std::string& regex)
 : mCurser{regex.begin()}
 , mBegin {regex.begin()}
@@ -16,11 +27,11 @@ Parser::Parser(const std::string& regex)
 AST Parser::parse()
 {
     NodePtr root;
-    parse<tags::RegexTag>(root);
+    parse<tags::RegexTag>(root); //TODO handle false
 
     if(mCurser != mEnd)
     {
-        HandleUnexpected();
+        HandleUnexpected();  //TODO this if should look at return from parse.
     }
 
     return AST(root);
@@ -56,7 +67,7 @@ void Parser::error(const std::string& msg) const
 bool Parser::get(CodePoint & value)
 {
     value = *mCurser;
-    return (mCurser++ == mEnd ? false : true);
+    return (mCurser++ == mEnd ? false : true);  // TODO use a CP over 0x10FFFF to signal EOF
 }
 
 bool Parser::parse(tags::RegexTag, NodePtr& astNode)
@@ -67,6 +78,8 @@ bool Parser::parse(tags::RegexTag, NodePtr& astNode)
     }
 
     parse<tags::ExpressionTag>(astNode);
+
+    //TODO this should check for EOF as the last entry
     return true;
 }
 
@@ -376,110 +389,135 @@ bool Parser::parse(tags::MatchItemTag, NodePtr& astNode)
 
 bool Parser::parse(tags::ShorthandCharacterClassTag, NodePtr& node)
 {
-    if(parse<tags::ShorthandCharacterClassWordTag>())
+    CharacterGroup characterGroup;
+
+    if(parse<tags::ShorthandCharacterClassWordTag>(characterGroup))
     {
-        node = std::make_unique<ast::CharacterClassAnyWord>();
+        node = buildSubtree(characterGroup);
         return true;
     }
 
-    if(parse<tags::ShorthandCharacterClassWordNegatedTag>())
+    if(parse<tags::ShorthandCharacterClassWordNegatedTag>(characterGroup))
     {
-        node = std::make_unique<ast::CharacterClassAnyWordNegated>();
+        node = buildSubtree(characterGroup);
         return true;
     }
 
-    if(parse<tags::ShorthandCharacterClassDigitTag>())
+    if(parse<tags::ShorthandCharacterClassDigitTag>(characterGroup))
     {
-        node = std::make_unique<ast::CharacterClassAnyDigit>();
+        node = buildSubtree(characterGroup);
         return true;
     }
 
-    if(parse<tags::ShorthandCharacterClassDigitNegatedTag>())
+    if(parse<tags::ShorthandCharacterClassDigitNegatedTag>(characterGroup))
     {
-        node = std::make_unique<ast::CharacterClassAnyDigitNegated>();
+        node = buildSubtree(characterGroup);
         return true;
     }
 
-    if(parse<tags::ShorthandCharacterClassWhitespaceTag>())
+    if(parse<tags::ShorthandCharacterClassWhitespaceTag>(characterGroup))
     {
-        node = std::make_unique<ast::CharacterClassAnyWhitespace>();
+        node = buildSubtree(characterGroup);
         return true;
     }
 
-    if(parse<tags::ShorthandCharacterClassWhitespaceNegatedTag>())
+    if(parse<tags::ShorthandCharacterClassWhitespaceNegatedTag>(characterGroup))
     {
-        node = std::make_unique<ast::CharacterClassAnyWhitespaceNegated>();
+        node = buildSubtree(characterGroup);
         return true;
     }
     
-
     return false;
 }   
 
-bool Parser::parse(tags::ShorthandCharacterClassWordTag)
+bool Parser::parse(tags::ShorthandCharacterClassWordTag, CharacterGroup& group)
 {
     CodePoint cp;
     if(!get(cp) || cp != '\\')
     {
         return false;
     }
-
-    return (get(cp) == true && cp == 'w');
+    if(!get(cp) || cp != 'w')
+    {
+        return false;
+    }
+    group = {{0x30, 0x39}, {0x41, 0x5A}, {0x5F, 0x5F}, {0x61, 0x7A}};
+    return true;
 }
 
-bool Parser::parse(tags::ShorthandCharacterClassWordNegatedTag)
+bool Parser::parse(tags::ShorthandCharacterClassWordNegatedTag, CharacterGroup& group)
 {
     CodePoint cp;
     if(!get(cp) || cp != '\\')
     {
         return false;
     }
-
-    return (get(cp) == true && cp == 'W');
+    if(!get(cp) || cp != 'W')
+    {
+        return false;
+    }
+    group = {{kCodePointMin, 0x2F}, {0x3A, 0x40}, {0x5B, 0x5E}, {0x60, 0x60}, {0x7B, kCodePointMax}};
+    return true;
 }
 
-bool Parser::parse(tags::ShorthandCharacterClassDigitTag)
+bool Parser::parse(tags::ShorthandCharacterClassDigitTag, CharacterGroup& group)
 {
     CodePoint cp;
     if(!get(cp) || cp != '\\')
     {
         return false;
     }
-
-    return (get(cp) == true && cp == 'd');
+    if(!get(cp) || cp != 'd')
+    {
+        return false;
+    }
+    group = {{0x30, 0x39}};
+    return true;
 }
 
-bool Parser::parse(tags::ShorthandCharacterClassDigitNegatedTag)
+bool Parser::parse(tags::ShorthandCharacterClassDigitNegatedTag, CharacterGroup& group)
 {
     CodePoint cp;
     if(!get(cp) || cp != '\\')
     {
         return false;
     }
-
-    return (get(cp) == true && cp == 'D');
+    if(!get(cp) || cp != 'D')
+    {
+        return false;
+    }
+    group = {{kCodePointMin, 0x2F}, {0x3A, kCodePointMax}};
+    return true;
 }
 
-bool Parser::parse(tags::ShorthandCharacterClassWhitespaceTag)
+bool Parser::parse(tags::ShorthandCharacterClassWhitespaceTag, CharacterGroup& group)
 {
     CodePoint cp;
     if(!get(cp) || cp != '\\')
     {
         return false;
     }
-
-    return (get(cp) == true && cp == 's');
+    if(!get(cp) || cp != 's')
+    {
+        return false;
+    }
+    group = {{0x09, 0x0D}, {0x20, 0x20}};
+    return true;
 }
 
-bool Parser::parse(tags::ShorthandCharacterClassWhitespaceNegatedTag)
+bool Parser::parse(tags::ShorthandCharacterClassWhitespaceNegatedTag, CharacterGroup& group)
 {
     CodePoint cp;
     if(!get(cp) || cp != '\\')
     {
         return false;
     }
-
-    return (get(cp) == true && cp == 'S');
+    if(!get(cp) || cp != 'S')
+    {
+        return false;
+    }
+    group = {{kCodePointMin, 0x08}, {0x0E, 0x1F}, {0x21, kCodePointMax}};
+    return true;
 }
 
 bool Parser::parse(tags::CharacterClassTag, NodePtr& node)
@@ -496,27 +534,26 @@ bool Parser::parse(tags::CharacterClassTag, NodePtr& node)
         negated = true;
     }
 
-    auto groupItemPtr = NodePtr();
-    std::vector<NodePtr> groupItems;
+    CharacterGroup characterGroup;
 
     if(parse<tags::CharacterClassCloseTag>())
     {
-        groupItemPtr = std::make_unique<ast::Character>(']');
-        groupItems.emplace_back(groupItemPtr.release());
+        characterGroup.emplace_back(']', ']');
     }
 
-    while(parse<tags::CharacterClassItemTag>(groupItemPtr))
-    {
-        groupItems.emplace_back(groupItemPtr.release());
-    }
+    while(parse<tags::CharacterClassItemTag>(characterGroup))
+    {}
 
     if(!parse<tags::CharacterClassCloseTag>())
     {
         error("Character class missing closing bracket");
     }
 
-    node = std::make_unique<ast::CharacterClass>(groupItems, negated);
-
+    if(negated)
+    {
+        negate(characterGroup);
+    }
+    node = buildSubtree(characterGroup);
     return true;
 }
 
@@ -538,21 +575,48 @@ bool Parser::parse(tags::CharacterClassNegativeModifierTag)
     return (get(cp) == true && cp == '^');
 }
 
-bool Parser::parse(tags::CharacterClassItemTag, NodePtr& node)
+bool Parser::parse(tags::CharacterClassItemTag, CharacterGroup& group)
 {
-    if(parse<tags::ShorthandCharacterClassTag>(node))
+    if(parse<tags::ShorthandCharacterClassWordTag>(group))
     {
         return true;
     }
 
-    if(parse<tags::CharacterRangeTag>(node))
+    if(parse<tags::ShorthandCharacterClassWordNegatedTag>(group))
+    {
+        return true;
+    }
+
+    if(parse<tags::ShorthandCharacterClassDigitTag>(group))
+    {
+        return true;
+    }
+
+    if(parse<tags::ShorthandCharacterClassDigitNegatedTag>(group))
+    {
+        return true;
+    }
+
+    if(parse<tags::ShorthandCharacterClassWhitespaceTag>(group))
+    {
+        return true;
+    }
+
+    if(parse<tags::ShorthandCharacterClassWhitespaceNegatedTag>(group))
+    {
+        return true;
+    }
+
+    if(parse<tags::CharacterRangeTag>(group))
     {
         return true;
     }
 
     CodePoint cp;
+    NodePtr node;
     if(parse<tags::CharacterClassCharacterTag>(node, cp))
     {
+        group.emplace_back(cp, cp);
         return true;
     }
 
@@ -584,14 +648,14 @@ bool Parser::parse(tags::CharacterClassCharacterTag, NodePtr& node, CodePoint& c
     return true;
 }
 
-bool Parser::parse(tags::CharacterRangeTag, NodePtr& node)
+bool Parser::parse(tags::CharacterRangeTag, CharacterGroup& group)
 {
     NodePtr start;
     NodePtr end;
     CodePoint startCP; 
     CodePoint endCP; 
     
-    if(!parse<tags::CharacterClassCharacterTag>(start, startCP))
+    if(!parse<tags::CharacterClassCharacterTag>(start, startCP))  //TOOD this should not use node anymore.
     {
         return false;
     }
@@ -611,7 +675,7 @@ bool Parser::parse(tags::CharacterRangeTag, NodePtr& node)
         error("Character range is out of order");
     }
 
-    node = std::make_unique<ast::CharacterRange>(start, end);
+    group.emplace_back(startCP, endCP);
     return true;
 }
 
@@ -670,36 +734,43 @@ bool Parser::parse(tags::EscapedCharacterTag, NodePtr& node, CodePoint& cp)
 
         case 'n':
         {
+            cp = '\n';
             node = std::make_unique<ast::Character>('\n');
             return true;
         } 
         case 'f':
         {
+            cp = '\f';
             node = std::make_unique<ast::Character>('\f');
             return true;
         }
         case 'r':
         {
+            cp = '\r';
             node = std::make_unique<ast::Character>('\r');
             return true;
         }
         case 't':
         {
+            cp = '\t';
             node = std::make_unique<ast::Character>('\t');
             return true;
         }
         case 'v':
         {
+            cp = '\v';
             node = std::make_unique<ast::Character>('\v');
             return true;
         }
         case 'a':
         {
+            cp = '\a';
             node = std::make_unique<ast::Character>('\a');
             return true;
         }
         case '\\':
         {
+            cp = '\\';
             node = std::make_unique<ast::Character>('\\');
             return true;
         }

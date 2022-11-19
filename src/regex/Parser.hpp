@@ -9,6 +9,7 @@ namespace regex::parser
 
 using ast::AST;
 using ast::NodePtr;
+using CharacterGroup = std::vector<CodePointInterval>;
 
 namespace tags
 {
@@ -153,25 +154,27 @@ private:
     bool parse(tags::MatchTag, NodePtr&);
     bool parse(tags::MatchItemTag, NodePtr&);
 
+
     // Short hand character classes
     bool parse(tags::ShorthandCharacterClassTag, NodePtr&);
-    bool parse(tags::ShorthandCharacterClassWordTag);
-    bool parse(tags::ShorthandCharacterClassWordNegatedTag);
-    bool parse(tags::ShorthandCharacterClassDigitTag);
-    bool parse(tags::ShorthandCharacterClassDigitNegatedTag);
-    bool parse(tags::ShorthandCharacterClassWhitespaceTag);
-    bool parse(tags::ShorthandCharacterClassWhitespaceNegatedTag);
+    bool parse(tags::ShorthandCharacterClassWordTag, CharacterGroup&);
+    bool parse(tags::ShorthandCharacterClassWordNegatedTag, CharacterGroup&);
+    bool parse(tags::ShorthandCharacterClassDigitTag, CharacterGroup&);
+    bool parse(tags::ShorthandCharacterClassDigitNegatedTag, CharacterGroup&);
+    bool parse(tags::ShorthandCharacterClassWhitespaceTag, CharacterGroup&);
+    bool parse(tags::ShorthandCharacterClassWhitespaceNegatedTag, CharacterGroup&);
 
     // Character class
+    // TODO: should add a CharacterClassType for DRY
     bool parse(tags::CharacterClassTag, NodePtr&);  
     bool parse(tags::CharacterClassOpenTag);
     bool parse(tags::CharacterClassCloseTag);
     bool parse(tags::CharacterClassNegativeModifierTag);
-    bool parse(tags::CharacterClassItemTag, NodePtr&);
+    bool parse(tags::CharacterClassItemTag, CharacterGroup&);
     bool parse(tags::CharacterClassCharacterTag, NodePtr&, CodePoint&);
 
     // Character range
-    bool parse(tags::CharacterRangeTag, NodePtr&);
+    bool parse(tags::CharacterRangeTag, CharacterGroup&);
     bool parse(tags::CharacterRangeSeparatorTag);
 
     // Any character
@@ -198,6 +201,7 @@ private:
     bool parse(tags::RangeSeparatorTag);
 
     // Numeric
+    //TODO Add 4 digit and 8 digit unicode \\u \\U
     bool parse(tags::UnicodeTag, NodePtr&, CodePoint&);
     bool parse(tags::DigitTag, uint8_t&);
     bool parse(tags::IntegerTag, uint64_t&, bool&);

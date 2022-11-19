@@ -17,6 +17,7 @@ namespace regex::ast
 class Node;
 using NodePtr = std::unique_ptr<Node>;
 
+
 class Node
 {
 public:
@@ -171,7 +172,7 @@ public:
     void print(std::string& str) final
     {
         std::stringstream ss;
-        ss << std::hex << std::setfill ('0') << std::setw(6) << mCodePoint;
+        ss << std::hex << std::setfill ('0') << std::setw(6) << mCodePoint; // TODO print 8 digit unicode 
         str+= "\\u";
         str+= ss.str();
     }
@@ -179,62 +180,17 @@ public:
     CodePoint mCodePoint;
 };
 
-class CharacterClass : public Node
-{
-public:
-    CharacterClass(std::vector<NodePtr>& codePointIntervals, bool isNegated)
-    : mCodePointIntervals{std::move(codePointIntervals)}  //TODO rename mCodePointIntervals to CharacterClassItem
-    , mIsNegated{isNegated}
-    {}
-
-    void eval() final
-    {}
-
-    void makeAlphabet(Alphabet& alphabet) final
-    {
-        Alphabet temp;
-
-        for (const auto& item : mCodePointIntervals )
-        {
-            item->makeAlphabet(temp);
-        }
-
-        if(mIsNegated)
-        {
-            negate(temp);
-        }
-
-        alphabet.insert(std::end(alphabet), std::begin(temp), std::end(temp));
-    }
-
-
-
-    void print(std::string& str) final
-    {
-        str+= "[";
-
-        if(mIsNegated)
-        {
-            str+= "^";
-        }
-
-        for (const auto& item : mCodePointIntervals )
-        {
-            item->print(str);
-        }
-        str+= "]";
-    }
-
-    std::vector<NodePtr> mCodePointIntervals;
-    bool mIsNegated;
-};
-
 class CharacterRange : public Node
 {
 public:
-    CharacterRange(NodePtr& start, NodePtr& end)
-    : mStart{std::move(start)}
-    , mEnd{std::move(end)}
+    CharacterRange(CodePoint start, CodePoint end)
+    : mStart{start}
+    , mEnd{end}
+    {}
+
+    CharacterRange(CodePoint codepoint)  
+    : mStart{codepoint}
+    , mEnd{codepoint}
     {}
 
     void eval() final
@@ -242,128 +198,25 @@ public:
 
     void makeAlphabet(Alphabet& alphabet) final
     {
-        //TODO dynamic_cast is typically considered a code smell. Need to refactor?
-        auto start = dynamic_cast<Character&>(*mStart).mCodePoint;
-        auto end = dynamic_cast<Character&>(*mEnd).mCodePoint;
-        alphabet.emplace_back(start, end);
+        alphabet.emplace_back(mStart, mEnd);
     }
 
     void print(std::string& str) final
     {
-        mStart->print(str);
-        str+= "-";
-        mEnd->print(str);
+
+        std::stringstream ss;
+        ss << "[";
+        ss << "\\u" << std::hex << std::setfill ('0') << std::setw(6) << mStart; // TODO print 8 digit unicode 
+        ss << "-";
+        ss << "\\u" << std::hex << std::setfill ('0') << std::setw(6) << mEnd; // TODO print 8 digit unicode 
+        ss << "]";
+
+        str+= ss.str();
+
     }
 
-    NodePtr mStart;
-    NodePtr mEnd;
-};
-
-class CharacterClassAnyWord : public Node
-{
-    void eval() final
-    {}
-
-    void makeAlphabet(Alphabet& alphabet) final
-    {
-        alphabet.emplace_back(0x30, 0x39);
-        alphabet.emplace_back(0x41, 0x5A);
-        alphabet.emplace_back(0x5F, 0x5F);
-        alphabet.emplace_back(0x61, 0x7A);
-    }
-
-    void print(std::string& str) final
-    {
-        str+= "\\w";
-    }
-};
-
-class CharacterClassAnyWordNegated : public Node
-{
-    void eval() final
-    {}
-
-    void makeAlphabet(Alphabet& alphabet) final
-    {
-        alphabet.emplace_back(kCodePointMin, 0x2F);
-        alphabet.emplace_back(0x3A, 0x40);
-        alphabet.emplace_back(0x5B, 0x5E);
-        alphabet.emplace_back(0x60, 0x60);
-        alphabet.emplace_back(0x7B, kCodePointMax);
-    }
-
-    void print(std::string& str) final
-    {
-        str+= "\\W";
-    }
-};
-
-class CharacterClassAnyDigit : public Node
-{
-    void eval() final
-    {}
-
-    void makeAlphabet(Alphabet& alphabet) final
-    {
-        alphabet.emplace_back(0x30, 0x39);
-    }
-
-    void print(std::string& str) final
-    {
-        str+= "\\d";
-    }
-};
-
-class CharacterClassAnyDigitNegated : public Node
-{
-    void eval() final
-    {}
-
-    void makeAlphabet(Alphabet& alphabet) final
-    {
-        alphabet.emplace_back(kCodePointMin, 0x2F);
-        alphabet.emplace_back(0x3A, kCodePointMax);
-    }
-
-    void print(std::string& str) final
-    {
-        str+= "\\D";
-    }
-};
-
-class CharacterClassAnyWhitespace : public Node
-{
-    void eval() final
-    {}
-
-    void makeAlphabet(Alphabet& alphabet) final
-    {
-        alphabet.emplace_back(0x09, 0x0D);
-        alphabet.emplace_back(0x20, 0x20);
-    }
-
-    void print(std::string& str) final
-    {
-        str+= "\\s";
-    }
-};
-
-class CharacterClassAnyWhitespaceNegated : public Node
-{
-    void eval() final
-    {}
-
-    void makeAlphabet(Alphabet& alphabet) final
-    {
-        alphabet.emplace_back(kCodePointMin, 0x08);
-        alphabet.emplace_back(0x0E, 0x1F);
-        alphabet.emplace_back(0x21, kCodePointMax);
-    }
-
-    void print(std::string& str) final
-    {
-        str+= "\\S";
-    }
+    CodePoint mStart;
+    CodePoint mEnd;
 };
 
 class AST

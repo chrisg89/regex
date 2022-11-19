@@ -72,11 +72,11 @@ void negate(Alphabet& alphabet)
 
     for (const auto& interval : swapped )
     {
-        if(interval.first != kCodePointMin)
+        if(interval.first != current)
         {
             alphabet.emplace_back(current, interval.first-1);
-            current = interval.second + 1;
         }
+        current = interval.second + 1;
     }
 
     if(current< kCodePointMax)
