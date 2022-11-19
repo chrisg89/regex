@@ -368,12 +368,7 @@ bool Parser::parse(tags::MatchItemTag, NodePtr& astNode)
         return true;
     }
 
-    if(parse<tags::CharacterClassTag>(astNode))
-    {
-        return true;
-    }
-
-    if(parse<tags::ShorthandCharacterClassTag>(astNode))
+    if(parse<tags::CharacterClassTypeTag>(astNode))
     {
         return true;
     }
@@ -387,48 +382,196 @@ bool Parser::parse(tags::MatchItemTag, NodePtr& astNode)
     return false;
 }
 
-bool Parser::parse(tags::ShorthandCharacterClassTag, NodePtr& node)
+bool Parser::parse(tags::CharacterClassTypeTag, NodePtr& node)
 {
     CharacterGroup characterGroup;
 
-    if(parse<tags::ShorthandCharacterClassWordTag>(characterGroup))
+    if(parse<tags::CharacterClassTag>(characterGroup))
     {
         node = buildSubtree(characterGroup);
         return true;
     }
 
-    if(parse<tags::ShorthandCharacterClassWordNegatedTag>(characterGroup))
+    if(parse<tags::ShorthandCharacterClassTag>(characterGroup))
     {
         node = buildSubtree(characterGroup);
         return true;
     }
 
-    if(parse<tags::ShorthandCharacterClassDigitTag>(characterGroup))
-    {
-        node = buildSubtree(characterGroup);
-        return true;
-    }
-
-    if(parse<tags::ShorthandCharacterClassDigitNegatedTag>(characterGroup))
-    {
-        node = buildSubtree(characterGroup);
-        return true;
-    }
-
-    if(parse<tags::ShorthandCharacterClassWhitespaceTag>(characterGroup))
-    {
-        node = buildSubtree(characterGroup);
-        return true;
-    }
-
-    if(parse<tags::ShorthandCharacterClassWhitespaceNegatedTag>(characterGroup))
-    {
-        node = buildSubtree(characterGroup);
-        return true;
-    }
-    
     return false;
-}   
+}
+
+bool Parser::parse(tags::CharacterClassTag, CharacterGroup& group)
+{
+    bool negated = false;
+
+    if(!parse<tags::CharacterClassOpenTag>())
+    {
+        return false;
+    }
+
+    if(parse<tags::CharacterClassNegativeModifierTag>())
+    {
+        negated = true;
+    }
+
+    if(parse<tags::CharacterClassCloseTag>())
+    {
+        group.emplace_back(']', ']');
+    }
+
+    while(parse<tags::CharacterClassItemTag>(group))
+    {}
+
+    if(!parse<tags::CharacterClassCloseTag>())
+    {
+        error("Character class missing closing bracket");
+    }
+
+    if(negated)
+    {
+        negate(group);
+    }
+    return true;
+}
+
+bool Parser::parse(tags::CharacterClassOpenTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '[');
+}
+
+bool Parser::parse(tags::CharacterClassCloseTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == ']');
+}
+
+bool Parser::parse(tags::CharacterClassNegativeModifierTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '^');
+}
+
+bool Parser::parse(tags::CharacterClassItemTag, CharacterGroup& group)
+{
+    if(parse<tags::ShorthandCharacterClassTag>(group))
+    {
+        return true;
+    }
+
+    if(parse<tags::CharacterRangeTag>(group))
+    {
+        return true;
+    }
+
+    CodePoint cp;
+    NodePtr node;
+    if(parse<tags::CharacterClassCharacterTag>(node, cp))
+    {
+        group.emplace_back(cp, cp);
+        return true;
+    }
+
+    return false;
+}
+
+bool Parser::parse(tags::CharacterClassCharacterTag, NodePtr& node, CodePoint& cp)
+{
+    if(parse<tags::EscapedCharacterTag>(node, cp))
+    {
+        return true;
+    }
+
+    if(!get(cp))
+    {
+        return false;
+    }
+
+    // ignore meta-characters
+    // While '-' and '[' and '^' are meta-characters, they may be 
+    // interpreted literally depending on their position in the
+    // character class. Hence, they're excluded here.
+    if(cp == ']')
+    {
+        return false;
+    }
+
+    node = std::make_unique<ast::Character>(cp);
+    return true;
+}
+
+bool Parser::parse(tags::CharacterRangeTag, CharacterGroup& group)
+{
+    NodePtr start;
+    NodePtr end;
+    CodePoint startCP; 
+    CodePoint endCP; 
+    
+    if(!parse<tags::CharacterClassCharacterTag>(start, startCP))  //TOOD this should not use node anymore.
+    {
+        return false;
+    }
+
+    if(!parse<tags::CharacterRangeSeparatorTag>())
+    {
+        return false;
+    }
+
+    if(!parse<tags::CharacterClassCharacterTag>(end, endCP))
+    {
+        return false;
+    }
+
+    if(startCP > endCP)
+    {
+        error("Character range is out of order");
+    }
+
+    group.emplace_back(startCP, endCP);
+    return true;
+}
+
+bool Parser::parse(tags::CharacterRangeSeparatorTag)
+{
+    CodePoint cp; 
+    return (get(cp) == true && cp == '-');
+}
+
+bool Parser::parse(tags::ShorthandCharacterClassTag, CharacterGroup& group)
+{
+    if(parse<tags::ShorthandCharacterClassWordTag>(group))
+    {
+        return true;
+    }
+
+    if(parse<tags::ShorthandCharacterClassWordNegatedTag>(group))
+    {
+        return true;
+    }
+
+    if(parse<tags::ShorthandCharacterClassDigitTag>(group))
+    {
+        return true;
+    }
+
+    if(parse<tags::ShorthandCharacterClassDigitNegatedTag>(group))
+    {
+        return true;
+    }
+
+    if(parse<tags::ShorthandCharacterClassWhitespaceTag>(group))
+    {
+        return true;
+    }
+
+    if(parse<tags::ShorthandCharacterClassWhitespaceNegatedTag>(group))
+    {
+        return true;
+    }
+
+    return false;
+}
 
 bool Parser::parse(tags::ShorthandCharacterClassWordTag, CharacterGroup& group)
 {
@@ -518,171 +661,6 @@ bool Parser::parse(tags::ShorthandCharacterClassWhitespaceNegatedTag, CharacterG
     }
     group = {{kCodePointMin, 0x08}, {0x0E, 0x1F}, {0x21, kCodePointMax}};
     return true;
-}
-
-bool Parser::parse(tags::CharacterClassTag, NodePtr& node)
-{
-    bool negated = false;
-
-    if(!parse<tags::CharacterClassOpenTag>())
-    {
-        return false;
-    }
-
-    if(parse<tags::CharacterClassNegativeModifierTag>())
-    {
-        negated = true;
-    }
-
-    CharacterGroup characterGroup;
-
-    if(parse<tags::CharacterClassCloseTag>())
-    {
-        characterGroup.emplace_back(']', ']');
-    }
-
-    while(parse<tags::CharacterClassItemTag>(characterGroup))
-    {}
-
-    if(!parse<tags::CharacterClassCloseTag>())
-    {
-        error("Character class missing closing bracket");
-    }
-
-    if(negated)
-    {
-        negate(characterGroup);
-    }
-    node = buildSubtree(characterGroup);
-    return true;
-}
-
-bool Parser::parse(tags::CharacterClassOpenTag)
-{
-    CodePoint cp; 
-    return (get(cp) == true && cp == '[');
-}
-
-bool Parser::parse(tags::CharacterClassCloseTag)
-{
-    CodePoint cp; 
-    return (get(cp) == true && cp == ']');
-}
-
-bool Parser::parse(tags::CharacterClassNegativeModifierTag)
-{
-    CodePoint cp; 
-    return (get(cp) == true && cp == '^');
-}
-
-bool Parser::parse(tags::CharacterClassItemTag, CharacterGroup& group)
-{
-    if(parse<tags::ShorthandCharacterClassWordTag>(group))
-    {
-        return true;
-    }
-
-    if(parse<tags::ShorthandCharacterClassWordNegatedTag>(group))
-    {
-        return true;
-    }
-
-    if(parse<tags::ShorthandCharacterClassDigitTag>(group))
-    {
-        return true;
-    }
-
-    if(parse<tags::ShorthandCharacterClassDigitNegatedTag>(group))
-    {
-        return true;
-    }
-
-    if(parse<tags::ShorthandCharacterClassWhitespaceTag>(group))
-    {
-        return true;
-    }
-
-    if(parse<tags::ShorthandCharacterClassWhitespaceNegatedTag>(group))
-    {
-        return true;
-    }
-
-    if(parse<tags::CharacterRangeTag>(group))
-    {
-        return true;
-    }
-
-    CodePoint cp;
-    NodePtr node;
-    if(parse<tags::CharacterClassCharacterTag>(node, cp))
-    {
-        group.emplace_back(cp, cp);
-        return true;
-    }
-
-    return false;
-}
-
-bool Parser::parse(tags::CharacterClassCharacterTag, NodePtr& node, CodePoint& cp)
-{
-    if(parse<tags::EscapedCharacterTag>(node, cp))
-    {
-        return true;
-    }
-
-    if(!get(cp))
-    {
-        return false;
-    }
-
-    // ignore meta-characters
-    // While '-' and '[' and '^' are meta-characters, they may be 
-    // interpreted literally depending on their position in the
-    // character class. Hence, they're excluded here.
-    if(cp == ']')
-    {
-        return false;
-    }
-
-    node = std::make_unique<ast::Character>(cp);
-    return true;
-}
-
-bool Parser::parse(tags::CharacterRangeTag, CharacterGroup& group)
-{
-    NodePtr start;
-    NodePtr end;
-    CodePoint startCP; 
-    CodePoint endCP; 
-    
-    if(!parse<tags::CharacterClassCharacterTag>(start, startCP))  //TOOD this should not use node anymore.
-    {
-        return false;
-    }
-
-    if(!parse<tags::CharacterRangeSeparatorTag>())
-    {
-        return false;
-    }
-
-    if(!parse<tags::CharacterClassCharacterTag>(end, endCP))
-    {
-        return false;
-    }
-
-    if(startCP > endCP)
-    {
-        error("Character range is out of order");
-    }
-
-    group.emplace_back(startCP, endCP);
-    return true;
-}
-
-bool Parser::parse(tags::CharacterRangeSeparatorTag)
-{
-    CodePoint cp; 
-    return (get(cp) == true && cp == '-');
 }
 
 bool Parser::parse(tags::AnyCharacterTag)

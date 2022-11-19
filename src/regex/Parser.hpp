@@ -47,16 +47,10 @@ namespace tags
     struct MatchTag{};
     struct MatchItemTag{};
 
-    // Short hand character classes
-    struct ShorthandCharacterClassTag{};       
-    struct ShorthandCharacterClassWordTag{};        
-    struct ShorthandCharacterClassWordNegatedTag{};  
-    struct ShorthandCharacterClassDigitTag{};        
-    struct ShorthandCharacterClassDigitNegatedTag{}; 
-    struct ShorthandCharacterClassWhitespaceNegatedTag{};    
-    struct ShorthandCharacterClassWhitespaceTag{};
+
 
     // Character class
+    struct CharacterClassTypeTag{};
     struct CharacterClassTag{};
     struct CharacterClassOpenTag{};
     struct CharacterClassCloseTag{};
@@ -67,6 +61,15 @@ namespace tags
     // Character range
     struct CharacterRangeTag{};
     struct CharacterRangeSeparatorTag{};
+
+    // Short hand character classes    
+    struct ShorthandCharacterClassTag{};
+    struct ShorthandCharacterClassWordTag{};        
+    struct ShorthandCharacterClassWordNegatedTag{};  
+    struct ShorthandCharacterClassDigitTag{};        
+    struct ShorthandCharacterClassDigitNegatedTag{}; 
+    struct ShorthandCharacterClassWhitespaceNegatedTag{};    
+    struct ShorthandCharacterClassWhitespaceTag{};
 
     // Any character
     struct AnyCharacterTag{};
@@ -154,19 +157,9 @@ private:
     bool parse(tags::MatchTag, NodePtr&);
     bool parse(tags::MatchItemTag, NodePtr&);
 
-
-    // Short hand character classes
-    bool parse(tags::ShorthandCharacterClassTag, NodePtr&);
-    bool parse(tags::ShorthandCharacterClassWordTag, CharacterGroup&);
-    bool parse(tags::ShorthandCharacterClassWordNegatedTag, CharacterGroup&);
-    bool parse(tags::ShorthandCharacterClassDigitTag, CharacterGroup&);
-    bool parse(tags::ShorthandCharacterClassDigitNegatedTag, CharacterGroup&);
-    bool parse(tags::ShorthandCharacterClassWhitespaceTag, CharacterGroup&);
-    bool parse(tags::ShorthandCharacterClassWhitespaceNegatedTag, CharacterGroup&);
-
     // Character class
-    // TODO: should add a CharacterClassType for DRY
-    bool parse(tags::CharacterClassTag, NodePtr&);  
+    bool parse(tags::CharacterClassTypeTag, NodePtr&);  
+    bool parse(tags::CharacterClassTag, CharacterGroup&);  
     bool parse(tags::CharacterClassOpenTag);
     bool parse(tags::CharacterClassCloseTag);
     bool parse(tags::CharacterClassNegativeModifierTag);
@@ -176,6 +169,15 @@ private:
     // Character range
     bool parse(tags::CharacterRangeTag, CharacterGroup&);
     bool parse(tags::CharacterRangeSeparatorTag);
+
+    // Short hand character classes
+    bool parse(tags::ShorthandCharacterClassTag, CharacterGroup&);
+    bool parse(tags::ShorthandCharacterClassWordTag, CharacterGroup&);
+    bool parse(tags::ShorthandCharacterClassWordNegatedTag, CharacterGroup&);
+    bool parse(tags::ShorthandCharacterClassDigitTag, CharacterGroup&);
+    bool parse(tags::ShorthandCharacterClassDigitNegatedTag, CharacterGroup&);
+    bool parse(tags::ShorthandCharacterClassWhitespaceTag, CharacterGroup&);
+    bool parse(tags::ShorthandCharacterClassWhitespaceNegatedTag, CharacterGroup&);
 
     // Any character
     bool parse(tags::AnyCharacterTag);
