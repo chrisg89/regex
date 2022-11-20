@@ -352,8 +352,9 @@ bool Parser::parse(tags::MatchItemTag, NodePtr& astNode)
     }
 
     CodePoint cp;
-    if(parse<tags::CharacterTag>(astNode, cp))
+    if(parse<tags::CharacterTag>(cp))
     {
+        astNode = std::make_unique<ast::Character>(cp);
         return true;
     }
 
@@ -442,7 +443,7 @@ bool Parser::parse(tags::CharacterClassItemTag, CharacterGroup& group)
 
     CodePoint cp;
     NodePtr node;
-    if(parse<tags::CharacterClassCharacterTag>(node, cp))
+    if(parse<tags::CharacterClassCharacterTag>(cp))
     {
         group.emplace_back(cp, cp);
         return true;
@@ -451,14 +452,14 @@ bool Parser::parse(tags::CharacterClassItemTag, CharacterGroup& group)
     return false;
 }
 
-bool Parser::parse(tags::CharacterClassCharacterTag, NodePtr& node, CodePoint& cp)
+bool Parser::parse(tags::CharacterClassCharacterTag, CodePoint& cp)
 {
     if(parse<tags::EOFTag>())
     {
         return false;
     }
 
-    if(parse<tags::EscapedCharacterTag>(node, cp))
+    if(parse<tags::EscapedCharacterTag>(cp))
     {
         return true;
     }
@@ -474,7 +475,6 @@ bool Parser::parse(tags::CharacterClassCharacterTag, NodePtr& node, CodePoint& c
         return false;
     }
 
-    node = std::make_unique<ast::Character>(cp);
     return true;
 }
 
@@ -485,7 +485,7 @@ bool Parser::parse(tags::CharacterRangeTag, CharacterGroup& group)
     CodePoint startCP; 
     CodePoint endCP; 
     
-    if(!parse<tags::CharacterClassCharacterTag>(start, startCP))  //TOOD this should not use node anymore.
+    if(!parse<tags::CharacterClassCharacterTag>(startCP))
     {
         return false;
     }
@@ -495,7 +495,7 @@ bool Parser::parse(tags::CharacterRangeTag, CharacterGroup& group)
         return false;
     }
 
-    if(!parse<tags::CharacterClassCharacterTag>(end, endCP))
+    if(!parse<tags::CharacterClassCharacterTag>(endCP))
     {
         return false;
     }
@@ -632,7 +632,7 @@ bool Parser::parse(tags::AnyCharacterTag)
     return (get() == '.');
 }
 
-bool Parser::parse(tags::EscapedCharacterTag, NodePtr& node, CodePoint& cp)
+bool Parser::parse(tags::EscapedCharacterTag, CodePoint& cp)
 {
     if(get() != '\\')
     {
@@ -660,7 +660,6 @@ bool Parser::parse(tags::EscapedCharacterTag, NodePtr& node, CodePoint& cp)
         case ']':
         case '-':
         {
-            node = std::make_unique<ast::Character>(cp);
             return true;
         }
 
@@ -677,49 +676,42 @@ bool Parser::parse(tags::EscapedCharacterTag, NodePtr& node, CodePoint& cp)
         case 'n':
         {
             cp = '\n';
-            node = std::make_unique<ast::Character>('\n');
             return true;
         } 
         case 'f':
         {
             cp = '\f';
-            node = std::make_unique<ast::Character>('\f');
             return true;
         }
         case 'r':
         {
             cp = '\r';
-            node = std::make_unique<ast::Character>('\r');
             return true;
         }
         case 't':
         {
             cp = '\t';
-            node = std::make_unique<ast::Character>('\t');
             return true;
         }
         case 'v':
         {
             cp = '\v';
-            node = std::make_unique<ast::Character>('\v');
             return true;
         }
         case 'a':
         {
             cp = '\a';
-            node = std::make_unique<ast::Character>('\a');
             return true;
         }
         case '\\':
         {
             cp = '\\';
-            node = std::make_unique<ast::Character>('\\');
             return true;
         }
         
         case 'u':
         {
-            return parse<tags::UnicodeTag>(node, cp);
+            return parse<tags::UnicodeTag>(cp);
         }
 
         default:
@@ -730,7 +722,7 @@ bool Parser::parse(tags::EscapedCharacterTag, NodePtr& node, CodePoint& cp)
     }
 }
 
-bool Parser::parse(tags::CharacterTag, NodePtr& node, CodePoint& cp)
+bool Parser::parse(tags::CharacterTag, CodePoint& cp)
 {
 
     // This is a bit messy. Not sure how to account for this in
@@ -743,7 +735,7 @@ bool Parser::parse(tags::CharacterTag, NodePtr& node, CodePoint& cp)
         return false;
     }
 
-    if(parse<tags::EscapedCharacterTag>(node, cp))
+    if(parse<tags::EscapedCharacterTag>(cp))
     {
         return true;
     }
@@ -771,7 +763,6 @@ bool Parser::parse(tags::CharacterTag, NodePtr& node, CodePoint& cp)
         return false;
     }
 
-    node = std::make_unique<ast::Character>(cp);
     return true;
 }
 
@@ -939,10 +930,9 @@ inline int hex2int(char ch)
     return val;
 }
 
-bool Parser::parse(tags::UnicodeTag, NodePtr& node, CodePoint& cp)
+bool Parser::parse(tags::UnicodeTag, CodePoint& cp)
 {
     constexpr auto kNumDigits = 6u;
-    
     
     cp = 0;
     for(int i=0; i < kNumDigits; i++)
@@ -962,7 +952,6 @@ bool Parser::parse(tags::UnicodeTag, NodePtr& node, CodePoint& cp)
         error("The Unicode codepoint invalid");
     }
 
-    node = std::make_unique<ast::Character>(cp);
     return true;
 }
 

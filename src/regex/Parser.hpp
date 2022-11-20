@@ -165,7 +165,7 @@ private:
     bool parse(tags::CharacterClassCloseTag);
     bool parse(tags::CharacterClassNegativeModifierTag);
     bool parse(tags::CharacterClassItemTag, CharacterGroup&);
-    bool parse(tags::CharacterClassCharacterTag, NodePtr&, CodePoint&);
+    bool parse(tags::CharacterClassCharacterTag, CodePoint&);
 
     // Character range
     bool parse(tags::CharacterRangeTag, CharacterGroup&);
@@ -184,10 +184,10 @@ private:
     bool parse(tags::AnyCharacterTag);
 
     // Escaped characters
-    bool parse(tags::EscapedCharacterTag, NodePtr&, CodePoint&);
+    bool parse(tags::EscapedCharacterTag, CodePoint&);
 
     // Character
-    bool parse(tags::CharacterTag, NodePtr&, CodePoint&);
+    bool parse(tags::CharacterTag, CodePoint&);
 
     // Quantifier
     bool parse(tags::QuantifierTag, NodePtr&, NodePtr&);
@@ -205,7 +205,7 @@ private:
 
     // Numeric
     //TODO Add 4 digit and 8 digit unicode \\u \\U
-    bool parse(tags::UnicodeTag, NodePtr&, CodePoint&);
+    bool parse(tags::UnicodeTag, CodePoint&);
     bool parse(tags::DigitTag, uint8_t&);
     bool parse(tags::IntegerTag, uint64_t&, bool&);
 
