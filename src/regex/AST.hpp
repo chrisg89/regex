@@ -170,8 +170,8 @@ public:
     void print(std::string& str) final
     {
         std::stringstream ss;
-        ss << std::hex << std::setfill ('0') << std::setw(6) << mCodePoint; // TODO print 8 digit unicode 
-        str+= "\\u";
+        ss << std::hex << std::setfill ('0') << std::setw(8) << mCodePoint;
+        str+= "\\U";
         str+= ss.str();
     }
 
@@ -204,9 +204,9 @@ public:
 
         std::stringstream ss;
         ss << "[";
-        ss << "\\u" << std::hex << std::setfill ('0') << std::setw(6) << mStart; // TODO print 8 digit unicode 
+        ss << "\\U" << std::hex << std::setfill ('0') << std::setw(8) << mStart;
         ss << "-";
-        ss << "\\u" << std::hex << std::setfill ('0') << std::setw(6) << mEnd; // TODO print 8 digit unicode 
+        ss << "\\U" << std::hex << std::setfill ('0') << std::setw(8) << mEnd;
         ss << "]";
 
         str+= ss.str();

@@ -711,7 +711,12 @@ bool Parser::parse(tags::EscapedCharacterTag, CodePoint& cp)
         
         case 'u':
         {
-            return parse<tags::UnicodeTag>(cp);
+            return parse<tags::Unicode4DigitCodePointTag>(cp);
+        }
+        
+        case 'U':
+        {
+            return parse<tags::Unicode8DigitCodePointTag>(cp);
         }
 
         default:
@@ -930,9 +935,9 @@ inline int hex2int(char ch)
     return val;
 }
 
-bool Parser::parse(tags::UnicodeTag, CodePoint& cp)
+bool Parser::parse(tags::Unicode8DigitCodePointTag, CodePoint& cp)
 {
-    constexpr auto kNumDigits = 6u;
+    constexpr auto kNumDigits = 8u;
     
     cp = 0;
     for(int i=0; i < kNumDigits; i++)
@@ -950,6 +955,26 @@ bool Parser::parse(tags::UnicodeTag, CodePoint& cp)
     if(cp > 0x0010FFFF)
     {
         error("The Unicode codepoint invalid");
+    }
+
+    return true;
+}
+
+bool Parser::parse(tags::Unicode4DigitCodePointTag, CodePoint& cp)
+{
+    constexpr auto kNumDigits = 4u;
+    
+    cp = 0;
+    for(int i=0; i < kNumDigits; i++)
+    {
+        CodePoint digit = get();
+        if(!isxdigit(digit))
+        {
+            error("The Unicode codepoint is incomplete");
+        }
+        
+        cp = cp << 4;
+        cp |= hex2int(digit);
     }
 
     return true;

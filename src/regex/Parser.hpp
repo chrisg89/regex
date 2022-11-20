@@ -93,6 +93,9 @@ namespace tags
     struct RangeSeparatorTag{};
 
     // Numeric
+
+    struct Unicode4DigitCodePointTag{};
+    struct Unicode8DigitCodePointTag{};
     struct UnicodeTag{};
     struct DigitTag{};
     struct IntegerTag{};
@@ -204,8 +207,8 @@ private:
     bool parse(tags::RangeSeparatorTag);
 
     // Numeric
-    //TODO Add 4 digit and 8 digit unicode \\u \\U
-    bool parse(tags::UnicodeTag, CodePoint&);
+    bool parse(tags::Unicode4DigitCodePointTag, CodePoint&);
+    bool parse(tags::Unicode8DigitCodePointTag, CodePoint&);
     bool parse(tags::DigitTag, uint8_t&);
     bool parse(tags::IntegerTag, uint64_t&, bool&);
 
