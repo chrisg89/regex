@@ -964,26 +964,5 @@ SCENARIO("Parse alternation")
     }
 }
 
-
-SCENARIO("?????") //TODO delete
-{
-    SECTION("Alternation of two characters")
-    {
-        const std::string regex = "[^a-c]";
-        auto parser = Parser(regex);
-        auto ast = parser.parse();
-        //CHECK(ast.print() == "(a|b)");
-
-        auto alphabet = ast.makeAlphabet();
-
-        for (auto& x : alphabet)
-        {
-            std::cout << x.first << " - " << x.second << std::endl;
-        }
-    }
-
-   
-}
-
 } // namespace 
 } // namespace regex::parser

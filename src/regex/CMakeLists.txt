@@ -1,10 +1,7 @@
 
 add_library(regex_lib
-    CharacterClassStream.cpp
-    DFABuilder.cpp
     Regex.cpp
     ThompsonConstruction.cpp
-    TokenStream.cpp
     Utf8Iterator.cpp
     Parser.cpp
     Alphabet.cpp

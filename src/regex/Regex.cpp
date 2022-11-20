@@ -1,5 +1,5 @@
 #include "Regex.hpp" 
-
+#include "Parser.hpp"
 
 #include <cassert> //todo try to replace with excpetion everywhere
 
@@ -8,283 +8,17 @@
 namespace regex
 {
 
-
-
-
-
-
-
-
-
-bool isValidRegex(TokenStream regex)
-{
-
-    // TODO: there is prob a much more elegant way of writing this function. Refactor later?
-    bool valid = true;
-    int leftBracketCount = 0;
-    int rightBracketCount = 0;
-
-    Token current;
-    Token next;
-
-    while( true )
-    {
-        current = regex.get();
-        next = regex.peek();
-
-        if(current.first == TokenType::eEOF || !valid)
-        {
-            if (rightBracketCount != leftBracketCount)
-            {
-                valid = false;
-            }
-            break;
-        }
-
-        if (current.first == TokenType::eOpenBracket)
-        {
-            leftBracketCount++;
-            if(next.first == TokenType::eOpenBracket){
-                valid = true;
-            }
-            else if(next.first == TokenType::eCloseBracket){
-                valid = false;
-            }
-            else if(next.first == TokenType::eClosure){
-                valid = false;
-            }
-            else if(next.first == TokenType::eClosurePlus){
-                valid = false;
-            }
-            else if(next.first == TokenType::eOptional){
-                valid = false;
-            }
-            else if(next.first == TokenType::eUnion){
-                valid = false;
-            }
-            else if(next.first == TokenType::eEOF){
-                valid = false;
-            }
-            else{
-                valid = true;
-            }
-        }
-        else if (current.first == TokenType::eCloseBracket)
-        {
-            rightBracketCount++;
-            if(next.first == TokenType::eOpenBracket){
-                valid = true;
-            }
-            else if(next.first == TokenType::eCloseBracket){
-                valid = true;
-            }
-            else if(next.first == TokenType::eClosure){
-                valid = true;
-            }
-            else if(next.first == TokenType::eClosurePlus){
-                valid = true;
-            }
-            else if(next.first == TokenType::eOptional){
-                valid = true;
-            }
-            else if(next.first == TokenType::eUnion){
-                valid = true;
-            }
-            else if(next.first == TokenType::eEOF){
-                valid = true;
-            }
-            else{
-                valid = true;
-            }
-        }
-        else if (current.first == TokenType::eClosure)
-        {
-            if(next.first == TokenType::eOpenBracket){
-                valid = true;
-            }
-            else if(next.first == TokenType::eCloseBracket){
-                valid = true;
-            }
-            else if(next.first == TokenType::eClosure){
-                valid = true;
-            }
-            else if(next.first == TokenType::eClosurePlus){
-                valid = true;
-            }
-            else if(next.first == TokenType::eOptional){
-                valid = true;
-            }
-            else if(next.first == TokenType::eUnion){
-                valid = true;
-            }
-            else if(next.first == TokenType::eEOF){
-                valid = true;
-            }
-            else{
-                valid = true;
-            }
-        }
-        else if (current.first == TokenType::eClosurePlus)
-        {
-            if(next.first == TokenType::eOpenBracket){
-                valid = true;
-            }
-            else if(next.first == TokenType::eCloseBracket){
-                valid = true;
-            }
-            else if(next.first == TokenType::eClosure){
-                valid = true;
-            }
-            else if(next.first == TokenType::eClosurePlus){
-                valid = true;
-            }
-            else if(next.first == TokenType::eOptional){
-                valid = true;
-            }
-            else if(next.first == TokenType::eUnion){
-                valid = true;
-            }
-            else if(next.first == TokenType::eEOF){
-                valid = true;
-            }
-            else{
-                valid = true;
-            }
-        }
-        else if (current.first == TokenType::eOptional)
-        {
-            if(next.first == TokenType::eOpenBracket){
-                valid = true;
-            }
-            else if(next.first == TokenType::eCloseBracket){
-                valid = true;
-            }
-            else if(next.first == TokenType::eClosure){
-                valid = true;
-            }
-            else if(next.first == TokenType::eClosurePlus){
-                valid = true;
-            }
-            else if(next.first == TokenType::eOptional){
-                valid = true;
-            }
-            else if(next.first == TokenType::eUnion){
-                valid = true;
-            }
-            else if(next.first == TokenType::eEOF){
-                valid = true;
-            }
-            else{
-                valid = true;
-            }
-        }
-        else if (current.first == TokenType::eUnion)
-        {
-            if(next.first == TokenType::eOpenBracket){
-                valid = true;
-            }
-            else if(next.first == TokenType::eCloseBracket){
-                valid = false;
-            }
-            else if(next.first == TokenType::eClosure){
-                valid = false;
-            }
-            else if(next.first == TokenType::eClosurePlus){
-                valid = false;
-            }
-            else if(next.first == TokenType::eOptional){
-                valid = false;
-            }
-            else if(next.first == TokenType::eUnion){
-                valid = false;
-            }
-            else if(next.first == TokenType::eEOF){
-                valid = false;
-            }
-            else{
-                valid = true;
-            }
-        }
-        else
-        {
-            if(next.first == TokenType::eOpenBracket){
-                valid = true;
-            }
-            else if(next.first == TokenType::eCloseBracket){
-                valid = true;
-            }
-            else if(next.first == TokenType::eClosure){
-                valid = true;
-            }
-            else if(next.first == TokenType::eClosurePlus){
-                valid = true;
-            }
-            else if(next.first == TokenType::eOptional){
-                valid = true;
-            }
-            else if(next.first == TokenType::eUnion){
-                valid = true;
-            }
-            else if(next.first == TokenType::eEOF){
-                valid = true;
-            }
-            else{
-                valid = true;
-            }
-        }
-
-        if (rightBracketCount > leftBracketCount)
-        {
-            valid = false;
-        }
-    }
-
-    return valid;
-}
-
-
 Regex::Regex()
 : mDFA{{}} //TODO: create default constructor?
 {}
 
-void Regex::makeAlphabet(TokenStream regex)
-{
-    Alphabet alphabet;
-
-    Token current;
-    Token next;
-
-    while( true )
-    {
-        current = regex.get();
-        next = regex.peek();
-
-        if(current.first == TokenType::eEOF)
-        {
-            break;
-        }
-        if(current.first == TokenType::eSymbol)
-        {
-            alphabet.emplace_back(current.second);
-        }
-    }
-
-    DisjoinOverlap(alphabet, kCodePointMin, kCodePointMax);
-    
-    mAlphabet = alphabet;
-}
-
 void Regex::compile(std::string regex)
 {
-    
-    auto tokenStream = TokenStream(regex);
-
-    if (!isValidRegex(tokenStream)) // TODO rename to validateRegex and void. Throw exception inside
-        assert(false);
-
-    makeAlphabet(tokenStream);
-    
-    mDFA = build(tokenStream, mAlphabet);
+    auto parser = parser::Parser(regex);
+    auto ast = parser.parse();
+    mAlphabet = ast.makeAlphabet();
+    auto nfa = ast.makeNFA(mAlphabet); 
+    mDFA = nfa.toDFA();
 }
 
 fa::InputType Regex::findInAlphabet(CodePoint input)
@@ -299,7 +33,7 @@ fa::InputType Regex::findInAlphabet(CodePoint input)
         index++;
     }
 
-    assert(false); //TODO throw exception
+    assert(false); //TODO throw exception //TODO restructure this function
     return 0;
 }
 
@@ -327,7 +61,6 @@ bool Regex::match(const std::string string)
     return mDFA.isFinalState(current);
 }
 
-
 bool Regex::search(std::string string)
 {
     //TODO broken
@@ -340,7 +73,5 @@ bool Regex::search(std::string string)
 
     return true; //todo
 }
-
-
 
 } //namespace regex
