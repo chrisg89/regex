@@ -27,13 +27,7 @@ Parser::Parser(const std::string& regex)
 AST Parser::parse()
 {
     NodePtr root;
-    parse<tags::RegexTag>(root); //TODO handle false
-
-    if(mCurser != mEnd)
-    {
-        HandleUnexpected();  //TODO this if should look at return from parse.
-    }
-
+    parse<tags::RegexTag>(root);
     return AST(root);
 }
 
@@ -64,10 +58,9 @@ void Parser::error(const std::string& msg) const
     throw std::runtime_error("Error at position " + std::to_string(pos()) + ". Message: " + msg);
 }
 
-bool Parser::get(CodePoint & value)
+CodePoint Parser::get()
 {
-    value = *mCurser;
-    return (mCurser++ == mEnd ? false : true);  // TODO use a CP over 0x10FFFF to signal EOF
+    return (mCurser == mEnd ? kEOF : *mCurser++);
 }
 
 bool Parser::parse(tags::RegexTag, NodePtr& astNode)
@@ -79,7 +72,11 @@ bool Parser::parse(tags::RegexTag, NodePtr& astNode)
 
     parse<tags::ExpressionTag>(astNode);
 
-    //TODO this should check for EOF as the last entry
+    if(!parse<tags::EOFTag>())
+    {
+        HandleUnexpected();
+    }
+
     return true;
 }
 
@@ -196,56 +193,42 @@ bool Parser::parse(tags::AnchorTag, NodePtr& astNode)
 
 bool Parser::parse(tags::AnchorStartOfStringTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == '^');
+    return (get() == '^');
 }
 
 bool Parser::parse(tags::AnchorEndOfStringTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == '$');
+    return (get() == '$');
 }
 
 bool Parser::parse(tags::AnchorWordBoundaryTag)
 {
-    CodePoint cp1, cp2;
-    return ((get(cp1) == true && cp1 == '\\') &&
-            (get(cp2) == true && cp2 == 'b'));
+    return ((get() == '\\') && (get() == 'b'));
 }
 
 bool Parser::parse(tags::AnchorNonWordBoundaryTag)
 {
-    CodePoint cp1, cp2;
-    return ((get(cp1) == true && cp1 == '\\') &&
-            (get(cp2) == true && cp2 == 'B'));
+    return ((get() == '\\') && (get() == 'B'));
 }
 
 bool Parser::parse(tags::AnchorStartOfStringOnlyTag)
 {
-    CodePoint cp1, cp2;
-    return ((get(cp1) == true && cp1 == '\\') &&
-            (get(cp2) == true && cp2 == 'A'));
+    return ((get() == '\\') && (get() == 'A'));
 }
 
 bool Parser::parse(tags::AnchorEndOfStringOnlyNotNewlineTag)
 {
-    CodePoint cp1, cp2;
-    return ((get(cp1) == true && cp1 == '\\') &&
-            (get(cp2) == true && cp2 == 'z'));
+    return ((get() == '\\') && (get() == 'z'));
 }
 
 bool Parser::parse(tags::AnchorEndOfStringOnlyTag)
 {
-    CodePoint cp1, cp2;
-    return ((get(cp1) == true && cp1 == '\\') &&
-            (get(cp2) == true && cp2 == 'Z'));
+    return ((get() == '\\') && (get() == 'Z'));
 }
 
 bool Parser::parse(tags::AnchorPreviousMatchEndTag)
 {
-    CodePoint cp1, cp2;
-    return ((get(cp1) == true && cp1 == '\\') &&
-            (get(cp2) == true && cp2 == 'G'));
+    return ((get() == '\\') && (get() == 'G'));
 }
 
 bool Parser::parse(tags::BackreferenceTag, NodePtr& astNode)
@@ -273,14 +256,12 @@ bool Parser::parse(tags::BackreferenceTag, NodePtr& astNode)
 
 bool Parser::parse(tags::BackreferenceStartTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == '\\');
+    return (get() == '\\');
 }
 
 bool Parser::parse(tags::AlternativeTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == '|');
+    return (get() == '|');
 }
 
 bool Parser::parse(tags::GroupTag, NodePtr& astNode)
@@ -322,20 +303,17 @@ bool Parser::parse(tags::GroupTag, NodePtr& astNode)
 
 bool Parser::parse(tags::GroupOpenTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == '(');
+    return (get() == '(');
 }
 
 bool Parser::parse(tags::GroupCloseTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == ')');
+    return (get() == ')');
 }
 
 bool Parser::parse(tags::GroupNonCapturingModifierTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == '?');
+    return (get() == '?');
 }
 
 bool Parser::parse(tags::MatchTag, NodePtr& astNode)
@@ -437,20 +415,17 @@ bool Parser::parse(tags::CharacterClassTag, CharacterGroup& group)
 
 bool Parser::parse(tags::CharacterClassOpenTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == '[');
+    return (get() == '[');
 }
 
 bool Parser::parse(tags::CharacterClassCloseTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == ']');
+    return (get() == ']');
 }
 
 bool Parser::parse(tags::CharacterClassNegativeModifierTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == '^');
+    return (get() == '^');
 }
 
 bool Parser::parse(tags::CharacterClassItemTag, CharacterGroup& group)
@@ -478,20 +453,22 @@ bool Parser::parse(tags::CharacterClassItemTag, CharacterGroup& group)
 
 bool Parser::parse(tags::CharacterClassCharacterTag, NodePtr& node, CodePoint& cp)
 {
+    if(parse<tags::EOFTag>())
+    {
+        return false;
+    }
+
     if(parse<tags::EscapedCharacterTag>(node, cp))
     {
         return true;
     }
 
-    if(!get(cp))
-    {
-        return false;
-    }
 
     // ignore meta-characters
     // While '-' and '[' and '^' are meta-characters, they may be 
     // interpreted literally depending on their position in the
     // character class. Hence, they're excluded here.
+    cp = get();
     if(cp == ']')
     {
         return false;
@@ -534,8 +511,7 @@ bool Parser::parse(tags::CharacterRangeTag, CharacterGroup& group)
 
 bool Parser::parse(tags::CharacterRangeSeparatorTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == '-');
+    return (get() == '-');
 }
 
 bool Parser::parse(tags::ShorthandCharacterClassTag, CharacterGroup& group)
@@ -575,12 +551,11 @@ bool Parser::parse(tags::ShorthandCharacterClassTag, CharacterGroup& group)
 
 bool Parser::parse(tags::ShorthandCharacterClassWordTag, CharacterGroup& group)
 {
-    CodePoint cp;
-    if(!get(cp) || cp != '\\')
+    if(get() != '\\')
     {
         return false;
     }
-    if(!get(cp) || cp != 'w')
+    if(get() != 'w')
     {
         return false;
     }
@@ -590,12 +565,11 @@ bool Parser::parse(tags::ShorthandCharacterClassWordTag, CharacterGroup& group)
 
 bool Parser::parse(tags::ShorthandCharacterClassWordNegatedTag, CharacterGroup& group)
 {
-    CodePoint cp;
-    if(!get(cp) || cp != '\\')
+    if(get() != '\\')
     {
         return false;
     }
-    if(!get(cp) || cp != 'W')
+    if(get() != 'W')
     {
         return false;
     }
@@ -605,12 +579,11 @@ bool Parser::parse(tags::ShorthandCharacterClassWordNegatedTag, CharacterGroup& 
 
 bool Parser::parse(tags::ShorthandCharacterClassDigitTag, CharacterGroup& group)
 {
-    CodePoint cp;
-    if(!get(cp) || cp != '\\')
+    if(get() != '\\')
     {
         return false;
     }
-    if(!get(cp) || cp != 'd')
+    if(get() != 'd')
     {
         return false;
     }
@@ -620,12 +593,11 @@ bool Parser::parse(tags::ShorthandCharacterClassDigitTag, CharacterGroup& group)
 
 bool Parser::parse(tags::ShorthandCharacterClassDigitNegatedTag, CharacterGroup& group)
 {
-    CodePoint cp;
-    if(!get(cp) || cp != '\\')
+    if(get() != '\\')
     {
         return false;
     }
-    if(!get(cp) || cp != 'D')
+    if(get() != 'D')
     {
         return false;
     }
@@ -636,51 +608,43 @@ bool Parser::parse(tags::ShorthandCharacterClassDigitNegatedTag, CharacterGroup&
 bool Parser::parse(tags::ShorthandCharacterClassWhitespaceTag, CharacterGroup& group)
 {
     CodePoint cp;
-    if(!get(cp) || cp != '\\')
+    if(get() == '\\' && get() == 's')
     {
-        return false;
+        group = {{0x09, 0x0D}, {0x20, 0x20}};
+        return true;
     }
-    if(!get(cp) || cp != 's')
-    {
-        return false;
-    }
-    group = {{0x09, 0x0D}, {0x20, 0x20}};
-    return true;
+    return false;
 }
 
 bool Parser::parse(tags::ShorthandCharacterClassWhitespaceNegatedTag, CharacterGroup& group)
 {
     CodePoint cp;
-    if(!get(cp) || cp != '\\')
+    if(get() == '\\' && get() == 'S')
     {
-        return false;
+        group = {{kCodePointMin, 0x08}, {0x0E, 0x1F}, {0x21, kCodePointMax}};
+        return true;
     }
-    if(!get(cp) || cp != 'S')
-    {
-        return false;
-    }
-    group = {{kCodePointMin, 0x08}, {0x0E, 0x1F}, {0x21, kCodePointMax}};
-    return true;
+    return false;
 }
 
 bool Parser::parse(tags::AnyCharacterTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == '.');
+    return (get() == '.');
 }
 
 bool Parser::parse(tags::EscapedCharacterTag, NodePtr& node, CodePoint& cp)
 {
-    if(!get(cp) || cp != '\\')
+    if(get() != '\\')
     {
         return false;
     }
 
-    if(!get(cp))
+    if(parse<tags::EOFTag>())
     {
         error("Pattern may not end with a trailing backslash");
     }
 
+    cp = get();
     switch (cp)
     {
         case '^':
@@ -784,12 +748,13 @@ bool Parser::parse(tags::CharacterTag, NodePtr& node, CodePoint& cp)
         return true;
     }
 
-    if(!get(cp))
+    if(parse<tags::EOFTag>())
     {
         return false;
     }
 
     // ignore meta-characters
+    cp = get();
     if(cp == '^' ||    
        cp == '$' || 
        cp == '*' || 
@@ -852,14 +817,12 @@ bool Parser::parse(tags::QuantifierTypeTag, NodePtr& astNode, NodePtr& inner)
 
 bool Parser::parse(tags::LazyModifierTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == '?');
+    return (get() == '?');
 }
 
 bool Parser::parse(tags::ZeroOrMoreQuantifierTag, NodePtr& astNode, NodePtr& inner)
 {
-    CodePoint cp; 
-    if (get(cp) == true && cp == '*')
+    if (get() == '*')
     {
         astNode = std::make_unique<ast::Quantifier>(inner, 0, 0, false);
         return true;
@@ -869,8 +832,7 @@ bool Parser::parse(tags::ZeroOrMoreQuantifierTag, NodePtr& astNode, NodePtr& inn
 
 bool Parser::parse(tags::OneOrMoreQuantifierTag, NodePtr& astNode, NodePtr& inner)
 {
-    CodePoint cp; 
-    if (get(cp) == true && cp == '+')
+    if (get() == '+')
     {
         astNode = std::make_unique<ast::Quantifier>(inner, 1, 0, false);
         return true;
@@ -880,8 +842,7 @@ bool Parser::parse(tags::OneOrMoreQuantifierTag, NodePtr& astNode, NodePtr& inne
 
 bool Parser::parse(tags::ZeroOrOneQuantifierTag, NodePtr& astNode, NodePtr& inner)
 {
-    CodePoint cp; 
-    if (get(cp) == true && cp == '?')
+    if (get() == '?')
     {
         astNode = std::make_unique<ast::Quantifier>(inner, 0, 1, true);
         return true;
@@ -953,20 +914,17 @@ bool Parser::parse(tags::RangeQuantifierUpperBoundTag, uint64_t& max, bool& over
 
 bool Parser::parse(tags::RangeOpenTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == '{');
+    return (get() == '{');
 }
 
 bool Parser::parse(tags::RangeCloseTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == '}');
+    return (get() == '}');
 }
 
 bool Parser::parse(tags::RangeSeparatorTag)
 {
-    CodePoint cp; 
-    return (get(cp) == true && cp == ',');
+    return (get() == ',');
 }
 
 inline int hex2int(char ch)
@@ -984,13 +942,13 @@ inline int hex2int(char ch)
 bool Parser::parse(tags::UnicodeTag, NodePtr& node, CodePoint& cp)
 {
     constexpr auto kNumDigits = 6u;
-    CodePoint digit;
     
     
     cp = 0;
     for(int i=0; i < kNumDigits; i++)
     {
-        if(!get(digit) || !isxdigit(digit))
+        CodePoint digit = get();
+        if(!isxdigit(digit))
         {
             error("The Unicode codepoint is incomplete");
         }
@@ -1010,8 +968,8 @@ bool Parser::parse(tags::UnicodeTag, NodePtr& node, CodePoint& cp)
 
 bool Parser::parse(tags::DigitTag, uint8_t& digit)
 {
-    CodePoint cp; 
-    if(get(cp) == true && isdigit(cp))
+    CodePoint cp = get();
+    if(isdigit(cp))
     {
         digit = cp - '0';
         return true;
@@ -1044,6 +1002,11 @@ bool Parser::parse(tags::IntegerTag, uint64_t& integer, bool& overflow)
     }
 
     return true;
+}
+
+bool Parser::parse(tags::EOFTag)
+{
+    return (get() == kEOF);
 }
 
 } // namespace regex::parser

@@ -47,8 +47,6 @@ namespace tags
     struct MatchTag{};
     struct MatchItemTag{};
 
-
-
     // Character class
     struct CharacterClassTypeTag{};
     struct CharacterClassTag{};
@@ -98,6 +96,9 @@ namespace tags
     struct UnicodeTag{};
     struct DigitTag{};
     struct IntegerTag{};
+
+    // EOF
+    struct EOFTag{};
 }
 
 class Parser
@@ -113,7 +114,7 @@ private:
     const Utf8Iterator mEnd;
 
     int pos() const;
-    bool get(CodePoint & value);
+    CodePoint get();
     void error(const std::string& msg) const;
 
     void HandleUnexpected();
@@ -208,6 +209,8 @@ private:
     bool parse(tags::DigitTag, uint8_t&);
     bool parse(tags::IntegerTag, uint64_t&, bool&);
 
+    //EOF
+    bool parse(tags::EOFTag);
 };
 
 } // namespace regex::parser

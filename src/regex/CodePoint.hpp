@@ -12,6 +12,8 @@ using CodePointInterval = std::pair<CodePoint, CodePoint>;   //TODO make custom 
 constexpr CodePoint kCodePointMin = 0x0000'0000U;  //TODO
 constexpr CodePoint kCodePointMax = 0x0010'FFFFU; //TODO
 
+constexpr CodePoint kEOF = 0xFFFF'FFFFU; 
+
 //TODO Add calculation logic here for Codepoints?
 
 }
