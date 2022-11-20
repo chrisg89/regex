@@ -9,8 +9,6 @@
 #include <string>
 #include <vector>
 
-//TODO Replace reset()
-
 namespace regex::ast
 {
 
