@@ -8,6 +8,8 @@ namespace {
 
 using Catch::Contains;
 
+// TODO parse unicode test with failure modes
+
 SCENARIO("Parse characters")
 {
     SECTION("Simple character")
