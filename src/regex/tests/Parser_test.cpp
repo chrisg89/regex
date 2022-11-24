@@ -10,7 +10,7 @@ using Catch::Contains;
 
 SCENARIO("Parse characters")
 {
-    SECTION("Simple character")
+    SECTION("Ascii character")
     {
         const std::string regex = "a";
         auto parser = Parser(regex);
@@ -18,14 +18,57 @@ SCENARIO("Parse characters")
         CHECK(ast.print() == "\\U00000061");
     }
 
-    SECTION("Any character .")
+    SECTION("Cyrillic Capital Letter Nje")
     {
-        const std::string regex = ".";
+        const std::string regex = "Њ";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "\\U0000040a");
     }
 
+    SECTION("Cyrillic Capital Letter Nje")
+    {
+        const std::string regex = "Њ";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "\\U0000040a");
+    }
+
+    SECTION("Armenian capital latter Ayb")
+    {
+        const std::string regex = "Ա";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "\\U00000531");
+    }
+
+    SECTION("Arabic letter Beh")
+    {
+        const std::string regex = "ب";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "\\U00000628");
+    }
+  
+    SECTION("Telugu letter A")
+    {
+        const std::string regex = "అ";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "\\U00000c05");
+    }  
+
+    SECTION("Katakana letter Ga")
+    {
+        const std::string regex = "ガ";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "\\U000030ac");
+    }
+}
+
+SCENARIO("Parse escaped characters with special meaning")
+{
     SECTION("Escaped character \\n")
     {
         const std::string regex = "\\n";
@@ -81,7 +124,10 @@ SCENARIO("Parse characters")
         auto ast = parser.parse();
         CHECK(ast.print() == "\\U0000005c");
     }
+}
 
+SCENARIO("Parse escaped meta characters")
+{
     SECTION("Escaped meta character ^")
     {
         const std::string regex = "\\^";
@@ -277,6 +323,17 @@ SCENARIO("Parse character from 8 digit unicode code point")
         const std::string regex = "\\U00110000";
         auto parser = Parser(regex);
         REQUIRE_THROWS_WITH(parser.parse(), Contains("The Unicode codepoint invalid"));
+    }
+}
+
+SCENARIO("Parse any (.) character")
+{
+    SECTION("Any character .")
+    {
+        const std::string regex = ".";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == regex);
     }
 }
 
