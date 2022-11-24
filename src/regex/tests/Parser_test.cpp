@@ -8,8 +8,6 @@ namespace {
 
 using Catch::Contains;
 
-// TODO parse unicode test with failure modes
-
 SCENARIO("Parse characters")
 {
     SECTION("Simple character")
@@ -26,22 +24,6 @@ SCENARIO("Parse characters")
         auto parser = Parser(regex);
         auto ast = parser.parse();
         CHECK(ast.print() == regex);
-    }
-
-    SECTION("Unicode code point (4 digits)")
-    {
-        const std::string regex = "\\uFFFF";
-        auto parser = Parser(regex);
-        auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000ffff");
-    }
-    
-    SECTION("Unicode code point (8 digits)")
-    {
-        const std::string regex = "\\U0010FFFF";
-        auto parser = Parser(regex);
-        auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0010ffff");
     }
 
     SECTION("Escaped character \\n")
@@ -186,6 +168,115 @@ SCENARIO("Parse characters")
         auto parser = Parser(regex);
         auto ast = parser.parse();
         CHECK(ast.print() == "\\U0000005d");
+    }
+}
+
+SCENARIO("Parse character from 4 digit unicode code point")
+{
+    SECTION("Unicode code point decimal digits")
+    {
+        const std::string regex = "\\u1234";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "\\U00001234");
+    }
+
+    SECTION("Unicode code point lower case hex digits")
+    {
+        const std::string regex = "\\uabcd";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "\\U0000abcd");
+    }
+
+    SECTION("Unicode code point upper case hex digits")
+    {
+        const std::string regex = "\\uABCD";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "\\U0000abcd");
+    }
+
+    SECTION("Unicode code point mixed digits")
+    {
+        const std::string regex = "\\u1Ab3";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "\\U00001ab3");
+    }
+
+    SECTION("Throw on incomplete 4 digit unicode codepoint")
+    {
+        auto regex = GENERATE
+        (
+            "\\u",
+            "\\u1",
+            "\\u12",
+            "\\u123",
+            "\\u123x" // x is not a hexidecimal digit, hence, codepoint is incomplete
+        );
+        auto parser = Parser(regex);
+        REQUIRE_THROWS_WITH(parser.parse(), Contains("The Unicode codepoint is incomplete"));
+    }
+}
+
+SCENARIO("Parse character from 8 digit unicode code point")
+{
+    SECTION("Unicode code point decimal digits")
+    {
+        const std::string regex = "\\U00012345";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "\\U00012345");
+    }
+
+    SECTION("Unicode code point lower case hex digits")
+    {
+        const std::string regex = "\\U000abcde";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "\\U000abcde");
+    }
+
+    SECTION("Unicode code point upper case hex digits")
+    {
+        const std::string regex = "\\U000ABCDE";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "\\U000abcde");
+    }
+
+    SECTION("Unicode code point mixed digits")
+    {
+        const std::string regex = "\\U00012abC";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "\\U00012abc");
+    }
+
+    SECTION("Throw on incomplete 8 digit unicode codepoint")
+    {
+        auto regex = GENERATE
+        (
+            "\\U",        
+            "\\U1",
+            "\\U12",
+            "\\U123",
+            "\\U1234",
+            "\\U12345",
+            "\\U123456",
+            "\\U1234567",
+            "\\U1234567x" // x is not a hexidecimal digit, hence, codepoint is incomplete
+        );
+        auto parser = Parser(regex);
+        REQUIRE_THROWS_WITH(parser.parse(), Contains("The Unicode codepoint is incomplete"));
+    }
+
+    SECTION("Throw when unicode codepoint exceeds maximum value of 0x0010FFFF")
+    {
+        const std::string regex = "\\U00110000";
+        auto parser = Parser(regex);
+        REQUIRE_THROWS_WITH(parser.parse(), Contains("The Unicode codepoint invalid"));
     }
 }
 
@@ -518,7 +609,6 @@ SCENARIO("Parse Anchors")
         REQUIRE_THROWS_WITH(parser.parse(), Contains("This token has no special meaning and has thus been rendered erroneous"));
     }
 }
-
 
 SCENARIO("Parse group") 
 {
