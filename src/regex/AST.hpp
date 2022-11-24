@@ -119,32 +119,32 @@ public:
     {
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
-        //TODO can this routine be decomposed? its complex
         auto prev = entry;
+
         for(uint64_t min = 0; min < mMin; min++)
         {
-            auto BB = mInner->makeNFA(alphabet, nfa); //todo rename BB to next?
-            nfa.addTransition(fa::kEpsilon, prev, BB.entry);
-            prev = BB.exit;
+            auto next = mInner->makeNFA(alphabet, nfa);
+            nfa.addTransition(fa::kEpsilon, prev, next.entry);
+            prev = next.exit;
         }
 
         if(mIsMaxBounded)
         {
             for(uint64_t max = mMin; max < mMax; max++)
             {
-                auto BB = mInner->makeNFA(alphabet, nfa);
-                nfa.addTransition(fa::kEpsilon, prev, BB.entry);
+                auto next = mInner->makeNFA(alphabet, nfa);
+                nfa.addTransition(fa::kEpsilon, prev, next.entry);
                 nfa.addTransition(fa::kEpsilon, prev, exit);
-                prev = BB.exit;
+                prev = next.exit;
             }
         }
         else
         {
-            auto BB = mInner->makeNFA(alphabet, nfa);
-            nfa.addTransition(fa::kEpsilon, prev, BB.entry);
+            auto next = mInner->makeNFA(alphabet, nfa);
+            nfa.addTransition(fa::kEpsilon, prev, next.entry);
             nfa.addTransition(fa::kEpsilon, prev, exit);
-            nfa.addTransition(fa::kEpsilon, BB.exit, BB.entry);
-            prev = BB.exit;
+            nfa.addTransition(fa::kEpsilon, next.exit, next.entry);
+            prev = next.exit;
         }
 
         nfa.addTransition(fa::kEpsilon, prev, exit);
@@ -274,18 +274,20 @@ public:
 
     NFA makeNFA(Alphabet& alphabet)
     {
-        //TODO can this be cleaned up a bit?
-        using NfaAlphabet = fa::Alphabet;
-        auto nfaAlphabet = NfaAlphabet(alphabet.size());
-        std::iota(std::begin(nfaAlphabet), std::end(nfaAlphabet), 0); //todo explain this code
-        auto nfa = NFA(nfaAlphabet);
-        auto bb = mRoot->makeNFA(alphabet, nfa);
+        // Make the NFA's alphabet
+        auto nfaAlphabet = fa::Alphabet(alphabet.size());
+        std::iota(std::begin(nfaAlphabet), std::end(nfaAlphabet), 0);
 
+        // Make the empty NFA
+        auto nfa = NFA(nfaAlphabet);
+
+        // Populate the NFA using thompson construction
+        auto bb = mRoot->makeNFA(alphabet, nfa);
         auto start = nfa.addState(true, false);
         auto end = nfa.addState(false, true);
         nfa.addTransition(fa::kEpsilon, start, bb.entry);
         nfa.addTransition(fa::kEpsilon, bb.exit, end);
-
+        
         return nfa;
     }
 
