@@ -170,7 +170,7 @@ private:
     bool parse(tags::ShorthandCharacterClassWhitespaceNegatedTag, CharacterGroup&);
 
     // Any character
-    bool parse(tags::AnyCharacterTag);
+    bool parse(tags::AnyCharacterTag, NodePtr&);
 
     // Escaped characters
     bool parse(tags::EscapedCharacterTag, CodePoint&);

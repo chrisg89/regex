@@ -15,7 +15,7 @@ SCENARIO("Parse characters")
         const std::string regex = "a";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]");
     }
 
     SECTION("Cyrillic Capital Letter Nje")
@@ -23,7 +23,7 @@ SCENARIO("Parse characters")
         const std::string regex = "Њ";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000040a");
+        CHECK(ast.print() == "[\\U0000040a-\\U0000040a]");
     }
 
     SECTION("Cyrillic Capital Letter Nje")
@@ -31,7 +31,7 @@ SCENARIO("Parse characters")
         const std::string regex = "Њ";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000040a");
+        CHECK(ast.print() == "[\\U0000040a-\\U0000040a]");
     }
 
     SECTION("Armenian capital latter Ayb")
@@ -39,7 +39,7 @@ SCENARIO("Parse characters")
         const std::string regex = "Ա";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000531");
+        CHECK(ast.print() == "[\\U00000531-\\U00000531]");
     }
 
     SECTION("Arabic letter Beh")
@@ -47,7 +47,7 @@ SCENARIO("Parse characters")
         const std::string regex = "ب";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000628");
+        CHECK(ast.print() == "[\\U00000628-\\U00000628]");
     }
   
     SECTION("Telugu letter A")
@@ -55,7 +55,7 @@ SCENARIO("Parse characters")
         const std::string regex = "అ";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000c05");
+        CHECK(ast.print() == "[\\U00000c05-\\U00000c05]");
     }  
 
     SECTION("Katakana letter Ga")
@@ -63,7 +63,7 @@ SCENARIO("Parse characters")
         const std::string regex = "ガ";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U000030ac");
+        CHECK(ast.print() == "[\\U000030ac-\\U000030ac]");
     }
 }
 
@@ -74,7 +74,7 @@ SCENARIO("Parse escaped characters with special meaning")
         const std::string regex = "\\n";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000000a");
+        CHECK(ast.print() == "[\\U0000000a-\\U0000000a]");
     }
 
     SECTION("Escaped character \\f")
@@ -82,7 +82,7 @@ SCENARIO("Parse escaped characters with special meaning")
         const std::string regex = "\\f";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000000c");
+        CHECK(ast.print() == "[\\U0000000c-\\U0000000c]");
     }
 
     SECTION("Escaped character \\r")
@@ -90,7 +90,7 @@ SCENARIO("Parse escaped characters with special meaning")
         const std::string regex = "\\r";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000000d");
+        CHECK(ast.print() == "[\\U0000000d-\\U0000000d]");
     }
 
     SECTION("Escaped character \\t")
@@ -98,7 +98,7 @@ SCENARIO("Parse escaped characters with special meaning")
         const std::string regex = "\\t";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000009");
+        CHECK(ast.print() == "[\\U00000009-\\U00000009]");
     }
 
     SECTION("Escaped character \\v")
@@ -106,7 +106,7 @@ SCENARIO("Parse escaped characters with special meaning")
         const std::string regex = "\\v";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000000b");
+        CHECK(ast.print() == "[\\U0000000b-\\U0000000b]");
     }
 
     SECTION("Escaped character \\a")
@@ -114,7 +114,7 @@ SCENARIO("Parse escaped characters with special meaning")
         const std::string regex = "\\a";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000007");
+        CHECK(ast.print() == "[\\U00000007-\\U00000007]");
     }
 
     SECTION("Escaped character \\")
@@ -122,7 +122,7 @@ SCENARIO("Parse escaped characters with special meaning")
         const std::string regex = "\\\\";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000005c");
+        CHECK(ast.print() == "[\\U0000005c-\\U0000005c]");
     }
 }
 
@@ -133,7 +133,7 @@ SCENARIO("Parse escaped meta characters")
         const std::string regex = "\\^";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000005e");
+        CHECK(ast.print() == "[\\U0000005e-\\U0000005e]");
     }
 
     SECTION("Escaped meta character $")
@@ -141,7 +141,7 @@ SCENARIO("Parse escaped meta characters")
         const std::string regex = "\\$";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000024");
+        CHECK(ast.print() == "[\\U00000024-\\U00000024]");
     }
 
     SECTION("Escaped meta character *")
@@ -149,7 +149,7 @@ SCENARIO("Parse escaped meta characters")
         const std::string regex = "\\*";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000002a");
+        CHECK(ast.print() == "[\\U0000002a-\\U0000002a]");
     }
 
     SECTION("Escaped meta character +")
@@ -157,7 +157,7 @@ SCENARIO("Parse escaped meta characters")
         const std::string regex = "\\+";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000002b");
+        CHECK(ast.print() == "[\\U0000002b-\\U0000002b]");
     }
 
     SECTION("Escaped meta character ?")
@@ -165,7 +165,7 @@ SCENARIO("Parse escaped meta characters")
         const std::string regex = "\\?";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000003f");
+        CHECK(ast.print() == "[\\U0000003f-\\U0000003f]");
     }
 
     SECTION("Escaped meta character .")
@@ -173,7 +173,7 @@ SCENARIO("Parse escaped meta characters")
         const std::string regex = "\\.";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000002e");
+        CHECK(ast.print() == "[\\U0000002e-\\U0000002e]");
     }
 
     SECTION("Escaped meta character |")
@@ -181,7 +181,7 @@ SCENARIO("Parse escaped meta characters")
         const std::string regex = "\\|";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000007c");
+        CHECK(ast.print() == "[\\U0000007c-\\U0000007c]");
     }
 
     SECTION("Escaped meta character (")
@@ -189,7 +189,7 @@ SCENARIO("Parse escaped meta characters")
         const std::string regex = "\\(";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000028");
+        CHECK(ast.print() == "[\\U00000028-\\U00000028]");
     }
 
     SECTION("Escaped meta character )")
@@ -197,7 +197,7 @@ SCENARIO("Parse escaped meta characters")
         const std::string regex = "\\)";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000029");
+        CHECK(ast.print() == "[\\U00000029-\\U00000029]");
     }
 
     SECTION("Escaped meta character [")
@@ -205,7 +205,7 @@ SCENARIO("Parse escaped meta characters")
         const std::string regex = "\\[";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000005b");
+        CHECK(ast.print() == "[\\U0000005b-\\U0000005b]");
     }
 
     SECTION("Escaped meta character ]")
@@ -213,7 +213,7 @@ SCENARIO("Parse escaped meta characters")
         const std::string regex = "\\]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000005d");
+        CHECK(ast.print() == "[\\U0000005d-\\U0000005d]");
     }
 }
 
@@ -224,7 +224,7 @@ SCENARIO("Parse character from 4 digit unicode code point")
         const std::string regex = "\\u1234";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00001234");
+        CHECK(ast.print() == "[\\U00001234-\\U00001234]");
     }
 
     SECTION("Unicode code point lower case hex digits")
@@ -232,7 +232,7 @@ SCENARIO("Parse character from 4 digit unicode code point")
         const std::string regex = "\\uabcd";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000abcd");
+        CHECK(ast.print() == "[\\U0000abcd-\\U0000abcd]");
     }
 
     SECTION("Unicode code point upper case hex digits")
@@ -240,7 +240,7 @@ SCENARIO("Parse character from 4 digit unicode code point")
         const std::string regex = "\\uABCD";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U0000abcd");
+        CHECK(ast.print() == "[\\U0000abcd-\\U0000abcd]");
     }
 
     SECTION("Unicode code point mixed digits")
@@ -248,7 +248,7 @@ SCENARIO("Parse character from 4 digit unicode code point")
         const std::string regex = "\\u1Ab3";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00001ab3");
+        CHECK(ast.print() == "[\\U00001ab3-\\U00001ab3]");
     }
 
     SECTION("Throw on incomplete 4 digit unicode codepoint")
@@ -273,7 +273,7 @@ SCENARIO("Parse character from 8 digit unicode code point")
         const std::string regex = "\\U00012345";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00012345");
+        CHECK(ast.print() == "[\\U00012345-\\U00012345]");
     }
 
     SECTION("Unicode code point lower case hex digits")
@@ -281,7 +281,7 @@ SCENARIO("Parse character from 8 digit unicode code point")
         const std::string regex = "\\U000abcde";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U000abcde");
+        CHECK(ast.print() == "[\\U000abcde-\\U000abcde]");
     }
 
     SECTION("Unicode code point upper case hex digits")
@@ -289,7 +289,7 @@ SCENARIO("Parse character from 8 digit unicode code point")
         const std::string regex = "\\U000ABCDE";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U000abcde");
+        CHECK(ast.print() == "[\\U000abcde-\\U000abcde]");
     }
 
     SECTION("Unicode code point mixed digits")
@@ -297,7 +297,7 @@ SCENARIO("Parse character from 8 digit unicode code point")
         const std::string regex = "\\U00012abC";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00012abc");
+        CHECK(ast.print() == "[\\U00012abc-\\U00012abc]");
     }
 
     SECTION("Throw on incomplete 8 digit unicode codepoint")
@@ -333,7 +333,7 @@ SCENARIO("Parse any (.) character")
         const std::string regex = ".";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == regex);
+        CHECK(ast.print() == "[\\U00000000-\\U0010ffff]");
     }
 }
 
@@ -674,7 +674,7 @@ SCENARIO("Parse group")
         const std::string regex = "(a)";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]");
     }
 
     SECTION("Nested group")
@@ -682,7 +682,7 @@ SCENARIO("Parse group")
         const std::string regex = "((a))";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]");
     }
 
     SECTION("Twice nested group")
@@ -690,7 +690,7 @@ SCENARIO("Parse group")
         const std::string regex = "(((a)))";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]");
     }
 
     SECTION("Empty group")
@@ -765,7 +765,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a*";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061{0,}");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]{0,}");
     }
 
     SECTION("Kleene star (*) operating on a group")
@@ -773,7 +773,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a)*";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061{0,}");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]{0,}");
     }
 
     SECTION("Kleene star (*) operating on a character class")
@@ -806,7 +806,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a+";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061{1,}");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]{1,}");
     }
 
     SECTION("Kleene plus (+) operating on a group")
@@ -814,7 +814,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a)+";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061{1,}");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]{1,}");
     }
 
     SECTION("Kleene plus (+) operating on a character class")
@@ -847,7 +847,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a?";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061{0,1}");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]{0,1}");
     }
 
     SECTION("Optional (?) operating on a group")
@@ -855,7 +855,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a)?";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061{0,1}");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]{0,1}");
     }
 
     SECTION("Optional (?) operating on a character class")
@@ -888,7 +888,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a{100}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061{100,100}");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]{100,100}");
     }
 
     SECTION("Ranged quantifier: lower bound only operating on a group")
@@ -896,7 +896,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a){100}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061{100,100}");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]{100,100}");
     }
 
     SECTION("Ranged quantifier: lower bound only operating on a character class")
@@ -912,7 +912,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a{100,}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061{100,}");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]{100,}");
     }
 
     SECTION("Ranged quantifier: upper bound is omitted operating on a group")
@@ -920,7 +920,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a){100,}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061{100,}");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]{100,}");
     }
 
     SECTION("Ranged quantifier: upper bound is omitted operating on a character class")
@@ -936,7 +936,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "a{100,200}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061{100,200}");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]{100,200}");
     }
 
     SECTION("Ranged quantifier: lower and upper bound operating on a group")
@@ -944,7 +944,7 @@ SCENARIO("Parse quantifiers")
         const std::string regex = "(a){100,200}";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "\\U00000061{100,200}");
+        CHECK(ast.print() == "[\\U00000061-\\U00000061]{100,200}");
     }
 
     SECTION("Ranged quantifier: lower and upper bound operating on a character class")
@@ -1017,7 +1017,7 @@ SCENARIO("Parse concatenation")
         const std::string regex = "ab";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(\\U00000061\\U00000062)");
+        CHECK(ast.print() == "([\\U00000061-\\U00000061][\\U00000062-\\U00000062])");
     }
 
     SECTION("Concatenation of two escaped meta characters")
@@ -1025,7 +1025,7 @@ SCENARIO("Parse concatenation")
         const std::string regex = R"(\*\*)";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(\\U0000002a\\U0000002a)");
+        CHECK(ast.print() == "([\\U0000002a-\\U0000002a][\\U0000002a-\\U0000002a])");
     }
 
     SECTION("Concatenation of two escaped characters with special meaning")
@@ -1033,7 +1033,7 @@ SCENARIO("Parse concatenation")
         const std::string regex = R"(\n\r)";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(\\U0000000a\\U0000000d)");
+        CHECK(ast.print() == "([\\U0000000a-\\U0000000a][\\U0000000d-\\U0000000d])");
     }
 
     SECTION("Concatenation of two characters from unicode (4 digits)")
@@ -1041,7 +1041,7 @@ SCENARIO("Parse concatenation")
         const std::string regex = "\\u1111\\u2222";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(\\U00001111\\U00002222)");
+        CHECK(ast.print() == "([\\U00001111-\\U00001111][\\U00002222-\\U00002222])");
     }
 
     SECTION("Concatenation of two characters from unicode (8 digits)")
@@ -1049,7 +1049,7 @@ SCENARIO("Parse concatenation")
         const std::string regex = "\\U0010FFFF\\U00000001";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(\\U0010ffff\\U00000001)");
+        CHECK(ast.print() == "([\\U0010ffff-\\U0010ffff][\\U00000001-\\U00000001])");
     }
 
     SECTION("Concatenation of two character classes")
@@ -1065,7 +1065,7 @@ SCENARIO("Parse concatenation")
         const std::string regex = "(a)(b)";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(\\U00000061\\U00000062)");
+        CHECK(ast.print() == "([\\U00000061-\\U00000061][\\U00000062-\\U00000062])");
     }
 }
 
@@ -1076,7 +1076,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "a|b";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(\\U00000061|\\U00000062)");
+        CHECK(ast.print() == "([\\U00000061-\\U00000061]|[\\U00000062-\\U00000062])");
     }
 
     SECTION("Alternation with empty (epsilon) right hand side")
@@ -1084,7 +1084,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "a|";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(\\U00000061|)");
+        CHECK(ast.print() == "([\\U00000061-\\U00000061]|)");
     }
 
     SECTION("Alternation with empty (epsilon) left hand side")
@@ -1092,7 +1092,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "|b";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(|\\U00000062)");
+        CHECK(ast.print() == "(|[\\U00000062-\\U00000062])");
     }
 
     SECTION("Alternation with empty (epsilon) left and right hand side")
@@ -1108,7 +1108,7 @@ SCENARIO("Parse alternation")
         const std::string regex = R"(\*|\*)";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(\\U0000002a|\\U0000002a)");
+        CHECK(ast.print() == "([\\U0000002a-\\U0000002a]|[\\U0000002a-\\U0000002a])");
     }
 
     SECTION("Alternation of two escaped characters with special meaning")
@@ -1116,7 +1116,7 @@ SCENARIO("Parse alternation")
         const std::string regex = R"(\n|\r)";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(\\U0000000a|\\U0000000d)");
+        CHECK(ast.print() == "([\\U0000000a-\\U0000000a]|[\\U0000000d-\\U0000000d])");
     }
 
     SECTION("Alternation of two characters from unicode (4 digits)")
@@ -1124,7 +1124,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "\\u3333|\\u4444";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(\\U00003333|\\U00004444)");
+        CHECK(ast.print() == "([\\U00003333-\\U00003333]|[\\U00004444-\\U00004444])");
     }
 
     SECTION("Alternation of two characters from unicode (8 digits)")
@@ -1132,7 +1132,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "\\U0010FFFF|\\U00001234";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(\\U0010ffff|\\U00001234)");
+        CHECK(ast.print() == "([\\U0010ffff-\\U0010ffff]|[\\U00001234-\\U00001234])");
     }
 
     SECTION("Alternation of two character classes")
@@ -1148,7 +1148,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "(a)|(b)";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(\\U00000061|\\U00000062)");
+        CHECK(ast.print() == "([\\U00000061-\\U00000061]|[\\U00000062-\\U00000062])");
     }
 
     SECTION("Alternation and concatenation")
@@ -1156,7 +1156,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "123|abc";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(((\\U00000031\\U00000032)\\U00000033)|((\\U00000061\\U00000062)\\U00000063))");
+        CHECK(ast.print() == "((([\\U00000031-\\U00000031][\\U00000032-\\U00000032])[\\U00000033-\\U00000033])|(([\\U00000061-\\U00000061][\\U00000062-\\U00000062])[\\U00000063-\\U00000063]))");
     }
 
     SECTION("Alternation, concatenation and character class")
@@ -1164,7 +1164,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "123|[abc]|z";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(((\\U00000031\\U00000032)\\U00000033)|(([\\U00000061-\\U00000061]|([\\U00000062-\\U00000062]|([\\U00000063-\\U00000063]|)))|\\U0000007a))");
+        CHECK(ast.print() == "((([\\U00000031-\\U00000031][\\U00000032-\\U00000032])[\\U00000033-\\U00000033])|(([\\U00000061-\\U00000061]|([\\U00000062-\\U00000062]|([\\U00000063-\\U00000063]|)))|[\\U0000007a-\\U0000007a]))");
     }
 
     SECTION("Alternation, concatenation and group")
@@ -1172,7 +1172,7 @@ SCENARIO("Parse alternation")
         const std::string regex = "123|(abc|xy)|z";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "(((\\U00000031\\U00000032)\\U00000033)|((((\\U00000061\\U00000062)\\U00000063)|(\\U00000078\\U00000079))|\\U0000007a))");
+        CHECK(ast.print() == "((([\\U00000031-\\U00000031][\\U00000032-\\U00000032])[\\U00000033-\\U00000033])|(((([\\U00000061-\\U00000061][\\U00000062-\\U00000062])[\\U00000063-\\U00000063])|([\\U00000078-\\U00000078][\\U00000079-\\U00000079]))|[\\U0000007a-\\U0000007a]))");
     }
 }
 

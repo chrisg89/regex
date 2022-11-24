@@ -177,41 +177,9 @@ public:
     NodePtr mInner;
 };
 
-class Any : public Node
-{
-    BlackBox makeNFA(Alphabet& alphabet, NFA& nfa) final
-    {
-        auto interval = CodePointInterval{kCodePointMin, kCodePointMax};
-
-        auto entry = nfa.addState(false, false);
-        auto exit = nfa.addState(false, false);
-
-        int index = 0;
-        for (auto& c : alphabet)
-        {
-            if(isSubset(interval, c))
-            {
-                nfa.addTransition(index, entry, exit);
-            }
-            index++;
-        }
-
-        return BlackBox(entry, exit);
-    }
-
-    void makeAlphabet(Alphabet& alphabet) final
-    {
-        alphabet.emplace_back(kCodePointMin, kCodePointMax);
-    }
-
-    void print(std::string& str) final
-    {
-        str+= ".";
-    }
-};
-
 class Epsilon : public Node
 {
+public:
     BlackBox makeNFA(Alphabet& alphabet, NFA& nfa) final
     {
         auto entry = nfa.addState(false, false);
@@ -229,49 +197,6 @@ class Epsilon : public Node
     {
         str+= "";
     }
-};
-
-class Character : public Node
-{
-public:
-    Character(CodePoint character)
-    : mCodePoint{character}
-    {}
-
-    BlackBox makeNFA(Alphabet& alphabet, NFA& nfa) final
-    {
-        auto interval = CodePointInterval{mCodePoint, mCodePoint};
-
-        auto entry = nfa.addState(false, false);
-        auto exit = nfa.addState(false, false);
-
-        int index = 0;
-        for (auto& c : alphabet)
-        {
-            if(isSubset(interval, c))
-            {
-                nfa.addTransition(index, entry, exit);
-            }
-            index++;
-        }
-
-        return BlackBox(entry, exit);
-    }
-
-    void makeAlphabet(Alphabet& alphabet) final
-    {
-        alphabet.emplace_back(mCodePoint,mCodePoint);
-    }
-
-    void print(std::string& str) final
-    {
-        std::stringstream ss;
-        ss << std::hex << std::setfill ('0') << std::setw(8) << mCodePoint;
-        str+= "\\U";
-        str+= ss.str();
-    }
-
-    CodePoint mCodePoint;
 };
 
 class CharacterRange : public Node

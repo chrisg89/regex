@@ -265,9 +265,8 @@ bool Parser::parse(tags::MatchItemTag, NodePtr& astNode)
         return true;
     }
 
-    if(parse<tags::AnyCharacterTag>())
+    if(parse<tags::AnyCharacterTag>(astNode))
     {
-        astNode = std::make_unique<ast::Any>();
         return true;
     }
 
@@ -279,7 +278,7 @@ bool Parser::parse(tags::MatchItemTag, NodePtr& astNode)
     CodePoint cp;
     if(parse<tags::CharacterTag>(cp))
     {
-        astNode = std::make_unique<ast::Character>(cp);
+        astNode = std::make_unique<ast::CharacterRange>(cp);
         return true;
     }
 
@@ -551,9 +550,14 @@ bool Parser::parse(tags::ShorthandCharacterClassWhitespaceNegatedTag, CharacterG
     return false;
 }
 
-bool Parser::parse(tags::AnyCharacterTag)
+bool Parser::parse(tags::AnyCharacterTag, NodePtr& node)
 {
-    return (get() == '.');
+    if (get() == '.')
+    {
+        node = std::make_unique<ast::CharacterRange>(kCodePointMin, kCodePointMax);
+        return true;
+    }
+    return false;
 }
 
 bool Parser::parse(tags::EscapedCharacterTag, CodePoint& cp)
