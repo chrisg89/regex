@@ -38,13 +38,6 @@ void Parser::HandleUnexpected()
         error("Unmatched parenthesis");
     }
     
-    auto dummy1 = NodePtr();
-    auto dummy2 = NodePtr();
-    if(parse<tags::QuantifierTypeTag>(dummy1, dummy2))
-    {
-        error("The preceding token is not quantifiable");
-    }
-
     error("Unknown parse error");
 }
 
@@ -137,11 +130,6 @@ bool Parser::parse(tags::SubexpressionItemTag, NodePtr& astNode)
         return true;
     }
 
-    if(parse<tags::GroupTag>(astNode))
-    {
-        return true;
-    }
-
     return false;
 }
 
@@ -206,9 +194,6 @@ bool Parser::parse(tags::AlternativeTag)
 
 bool Parser::parse(tags::GroupTag, NodePtr& astNode)
 {
-    auto expression = NodePtr();
-    auto quantifier = NodePtr();
-
     if(!parse<tags::GroupOpenTag>())
     {
         return false;
@@ -219,23 +204,14 @@ bool Parser::parse(tags::GroupTag, NodePtr& astNode)
         error("Non-capturing groups are the default. Capturing groups not supported");
     }
 
-    if(!parse<tags::ExpressionTag>(expression))
+    if(!parse<tags::ExpressionTag>(astNode))
     {
-        expression = std::make_unique<ast::Epsilon>();
+        astNode = std::make_unique<ast::Epsilon>();
     }
 
     if(!parse<tags::GroupCloseTag>())
     {
         error("Incomplete group structure");
-    }
-
-    if(parse<tags::QuantifierTag>(quantifier, expression))
-    {
-        std::swap(astNode, quantifier);   
-    }
-    else
-    {
-        std::swap(astNode, expression);
     }
 
     return true;
@@ -263,6 +239,10 @@ bool Parser::parse(tags::MatchTag, NodePtr& astNode)
 
     if(!parse<tags::MatchItemTag>(matchItem))
     {
+        if(parse<tags::QuantifierTag>(quantifier, matchItem))
+        {
+            error("The preceding token is not quantifiable"); 
+        }
         return false;
     }
 
@@ -280,6 +260,11 @@ bool Parser::parse(tags::MatchTag, NodePtr& astNode)
 
 bool Parser::parse(tags::MatchItemTag, NodePtr& astNode)
 {
+    if(parse<tags::GroupTag>(astNode))
+    {
+        return true;
+    }
+
     if(parse<tags::AnyCharacterTag>())
     {
         astNode = std::make_unique<ast::Any>();
@@ -403,7 +388,6 @@ bool Parser::parse(tags::CharacterClassCharacterTag, CodePoint& cp)
     {
         return true;
     }
-
 
     // ignore meta-characters
     // While '-' and '[' and '^' are meta-characters, they may be 

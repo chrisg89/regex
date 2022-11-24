@@ -642,6 +642,7 @@ SCENARIO("Parse quantifiers")
         auto regex = GENERATE
         (
             "*",
+            "(*",
             "a?*",
             "a+*",
             "a**",
@@ -682,6 +683,7 @@ SCENARIO("Parse quantifiers")
         auto regex = GENERATE
         (
             "+",
+            "(+",
             "a?+",
             "a++",
             "a*+",
@@ -721,7 +723,14 @@ SCENARIO("Parse quantifiers")
     {
         auto regex = GENERATE
         (
-            "?"
+            "?",
+            "(?"
+            //"a??",      /* This is lazy modifier and valid syntax*/
+            //"a+?",      /* This is lazy modifier and valid syntax*/
+            //"a*?",      /* This is lazy modifier and valid syntax*/
+            //"a{1}?",    /* This is lazy modifier and valid syntax*/
+            //"a{1,}?",   /* This is lazy modifier and valid syntax*/
+            //"a{1,2}?"   /* This is lazy modifier and valid syntax*/
         );
         auto parser = Parser(regex);
         REQUIRE_THROWS_WITH(parser.parse(), Contains("The preceding token is not quantifiable"));
@@ -804,6 +813,7 @@ SCENARIO("Parse quantifiers")
         auto regex = GENERATE
         (
             "{100}",
+            "({100}",
             "a?{100}",
             "a+{100}",
             "a*{100}",
@@ -811,6 +821,7 @@ SCENARIO("Parse quantifiers")
             "a{1,}{100}",
             "a{1,2}{100}",
             "{100,}",
+            "({100,}",
             "a?{100,}",
             "a+{100,}",
             "a*{100,}",
@@ -818,6 +829,7 @@ SCENARIO("Parse quantifiers")
             "a{1,}{100,}",
             "a{1,2}{100,}",
             "{100,200}",
+            "({100,200}",
             "a?{100,200}",
             "a+{100,200}",
             "a*{100,200}",
