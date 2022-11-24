@@ -56,9 +56,9 @@ CodePoint Parser::get()
     return (mCurser == mEnd ? kEOF : *mCurser++);
 }
 
-bool Parser::parse(tags::RegexTag, NodePtr& astNode)
+bool Parser::parse(tags::RegexTag, NodePtr& node)
 {
-    parse<tags::ExpressionTag>(astNode);
+    parse<tags::ExpressionTag>(node);
 
     if(!parse<tags::EOFTag>())
     {
@@ -68,7 +68,7 @@ bool Parser::parse(tags::RegexTag, NodePtr& astNode)
     return true;
 }
 
-bool Parser::parse(tags::ExpressionTag, NodePtr& astNode)
+bool Parser::parse(tags::ExpressionTag, NodePtr& node)
 {
     auto subexpression = NodePtr();
     auto expression = NodePtr();
@@ -84,17 +84,17 @@ bool Parser::parse(tags::ExpressionTag, NodePtr& astNode)
         {
             expression = std::make_unique<ast::Epsilon>();
         }
-        astNode = std::make_unique<ast::Alternative>(subexpression, expression);
+        node = std::make_unique<ast::Alternative>(subexpression, expression);
     }
     else
     {
-        std::swap(astNode, subexpression);
+        std::swap(node, subexpression);
     }
 
     return true;
 }
 
-bool Parser::parse(tags::SubexpressionTag, NodePtr& astNode)
+bool Parser::parse(tags::SubexpressionTag, NodePtr& node)
 {
     auto subexpr = NodePtr();
     auto next = NodePtr();
@@ -109,23 +109,23 @@ bool Parser::parse(tags::SubexpressionTag, NodePtr& astNode)
         subexpr = std::make_unique<ast::Concatenation>(subexpr, next);
     }
 
-    std::swap(astNode, subexpr);
+    std::swap(node, subexpr);
     return true;
 }
 
-bool Parser::parse(tags::SubexpressionItemTag, NodePtr& astNode)
+bool Parser::parse(tags::SubexpressionItemTag, NodePtr& node)
 {
-    if(parse<tags::BackreferenceTag>(astNode))
+    if(parse<tags::BackreferenceTag>(node))
     {
         error("Backreferences are not supported");
     }
 
-    if(parse<tags::AnchorTag>(astNode))
+    if(parse<tags::AnchorTag>(node))
     {
         error("Anchors are not supported ");
     }
 
-    if(parse<tags::MatchTag>(astNode))
+    if(parse<tags::MatchTag>(node))
     {
         return true;
     }
@@ -133,7 +133,7 @@ bool Parser::parse(tags::SubexpressionItemTag, NodePtr& astNode)
     return false;
 }
 
-bool Parser::parse(tags::AnchorTag, NodePtr& astNode)
+bool Parser::parse(tags::AnchorTag, NodePtr& node)
 {
 
     if(parse<tags::AnchorStartOfStringTag>())
@@ -159,7 +159,7 @@ bool Parser::parse(tags::AnchorEndOfStringTag)
     return (get() == '$');
 }
 
-bool Parser::parse(tags::BackreferenceTag, NodePtr& astNode)
+bool Parser::parse(tags::BackreferenceTag, NodePtr& node)
 {
     uint64_t integer = 0;
     bool overflow = false;
@@ -192,7 +192,7 @@ bool Parser::parse(tags::AlternativeTag)
     return (get() == '|');
 }
 
-bool Parser::parse(tags::GroupTag, NodePtr& astNode)
+bool Parser::parse(tags::GroupTag, NodePtr& node)
 {
     if(!parse<tags::GroupOpenTag>())
     {
@@ -204,9 +204,9 @@ bool Parser::parse(tags::GroupTag, NodePtr& astNode)
         error("Non-capturing groups are the default. Capturing groups not supported");
     }
 
-    if(!parse<tags::ExpressionTag>(astNode))
+    if(!parse<tags::ExpressionTag>(node))
     {
-        astNode = std::make_unique<ast::Epsilon>();
+        node = std::make_unique<ast::Epsilon>();
     }
 
     if(!parse<tags::GroupCloseTag>())
@@ -232,7 +232,7 @@ bool Parser::parse(tags::GroupNonCapturingModifierTag)
     return (get() == '?' && get() == ':');
 }
 
-bool Parser::parse(tags::MatchTag, NodePtr& astNode)
+bool Parser::parse(tags::MatchTag, NodePtr& node)
 {
     auto matchItem = NodePtr();
     auto quantifier = NodePtr();
@@ -248,29 +248,29 @@ bool Parser::parse(tags::MatchTag, NodePtr& astNode)
 
     if(parse<tags::QuantifierTag>(quantifier, matchItem))
     {
-        std::swap(astNode, quantifier);   
+        std::swap(node, quantifier);   
     }
     else
     {
-        std::swap(astNode, matchItem);
+        std::swap(node, matchItem);
     }
 
     return true;
 }
 
-bool Parser::parse(tags::MatchItemTag, NodePtr& astNode)
+bool Parser::parse(tags::MatchItemTag, NodePtr& node)
 {
-    if(parse<tags::GroupTag>(astNode))
+    if(parse<tags::GroupTag>(node))
     {
         return true;
     }
 
-    if(parse<tags::AnyCharacterTag>(astNode))
+    if(parse<tags::AnyCharacterTag>(node))
     {
         return true;
     }
 
-    if(parse<tags::CharacterClassTypeTag>(astNode))
+    if(parse<tags::CharacterClassTypeTag>(node))
     {
         return true;
     }
@@ -278,7 +278,7 @@ bool Parser::parse(tags::MatchItemTag, NodePtr& astNode)
     CodePoint cp;
     if(parse<tags::CharacterTag>(cp))
     {
-        astNode = std::make_unique<ast::CharacterRange>(cp);
+        node = std::make_unique<ast::CharacterRange>(cp);
         return true;
     }
 
@@ -699,9 +699,9 @@ bool Parser::parse(tags::CharacterTag, CodePoint& cp)
     return true;
 }
 
-bool Parser::parse(tags::QuantifierTag, NodePtr& astNode, NodePtr& inner)
+bool Parser::parse(tags::QuantifierTag, NodePtr& node, NodePtr& inner)
 {
-    if(!parse<tags::QuantifierTypeTag>(astNode, inner))
+    if(!parse<tags::QuantifierTypeTag>(node, inner))
     {
         return false;
     }
@@ -714,24 +714,24 @@ bool Parser::parse(tags::QuantifierTag, NodePtr& astNode, NodePtr& inner)
     return true;
 }
 
-bool Parser::parse(tags::QuantifierTypeTag, NodePtr& astNode, NodePtr& inner)
+bool Parser::parse(tags::QuantifierTypeTag, NodePtr& node, NodePtr& inner)
 {
-    if(parse<tags::ZeroOrMoreQuantifierTag>(astNode, inner))
+    if(parse<tags::ZeroOrMoreQuantifierTag>(node, inner))
     {
         return true;
     }
 
-    if(parse<tags::OneOrMoreQuantifierTag>(astNode, inner))
+    if(parse<tags::OneOrMoreQuantifierTag>(node, inner))
     {
         return true;
     }
 
-    if(parse<tags::ZeroOrOneQuantifierTag>(astNode, inner))
+    if(parse<tags::ZeroOrOneQuantifierTag>(node, inner))
     {
         return true;
     }
 
-    if(parse<tags::RangeQuantifierTag>(astNode, inner))
+    if(parse<tags::RangeQuantifierTag>(node, inner))
     {
         return true;
     }
@@ -744,37 +744,37 @@ bool Parser::parse(tags::LazyModifierTag)
     return (get() == '?');
 }
 
-bool Parser::parse(tags::ZeroOrMoreQuantifierTag, NodePtr& astNode, NodePtr& inner)
+bool Parser::parse(tags::ZeroOrMoreQuantifierTag, NodePtr& node, NodePtr& inner)
 {
     if (get() == '*')
     {
-        astNode = std::make_unique<ast::Quantifier>(inner, 0, 0, false);
+        node = std::make_unique<ast::Quantifier>(inner, 0, 0, false);
         return true;
     }
     return false;
 }
 
-bool Parser::parse(tags::OneOrMoreQuantifierTag, NodePtr& astNode, NodePtr& inner)
+bool Parser::parse(tags::OneOrMoreQuantifierTag, NodePtr& node, NodePtr& inner)
 {
     if (get() == '+')
     {
-        astNode = std::make_unique<ast::Quantifier>(inner, 1, 0, false);
+        node = std::make_unique<ast::Quantifier>(inner, 1, 0, false);
         return true;
     }
     return false;
 }
 
-bool Parser::parse(tags::ZeroOrOneQuantifierTag, NodePtr& astNode, NodePtr& inner)
+bool Parser::parse(tags::ZeroOrOneQuantifierTag, NodePtr& node, NodePtr& inner)
 {
     if (get() == '?')
     {
-        astNode = std::make_unique<ast::Quantifier>(inner, 0, 1, true);
+        node = std::make_unique<ast::Quantifier>(inner, 0, 1, true);
         return true;
     }
     return false;
 }
 
-bool Parser::parse(tags::RangeQuantifierTag, NodePtr& astNode, NodePtr& inner)
+bool Parser::parse(tags::RangeQuantifierTag, NodePtr& node, NodePtr& inner)
 {
     uint64_t min = 0;
     uint64_t max = 0;
@@ -822,7 +822,7 @@ bool Parser::parse(tags::RangeQuantifierTag, NodePtr& astNode, NodePtr& inner)
         error("The quantifier range is out of order");
     }
 
-    astNode = std::make_unique<ast::Quantifier>(inner, min, max, isMaxBounded);
+    node = std::make_unique<ast::Quantifier>(inner, min, max, isMaxBounded);
     return true;
 }
 
