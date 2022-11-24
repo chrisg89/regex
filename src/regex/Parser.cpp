@@ -554,7 +554,8 @@ bool Parser::parse(tags::AnyCharacterTag, NodePtr& node)
 {
     if (get() == '.')
     {
-        node = std::make_unique<ast::CharacterRange>(kCodePointMin, kCodePointMax);
+        CharacterGroup group = {{kCodePointMin, '\n'-1}, {'\n'+1, kCodePointMax}};
+        node = buildSubtree(group);
         return true;
     }
     return false;

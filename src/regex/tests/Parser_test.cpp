@@ -333,7 +333,7 @@ SCENARIO("Parse any (.) character")
         const std::string regex = ".";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "[\\U00000000-\\U0010ffff]");
+        CHECK(ast.print() == "([\\U00000000-\\U00000009]|([\\U0000000b-\\U0010ffff]|))");
     }
 }
 
