@@ -253,7 +253,7 @@ bool Parser::parse(tags::GroupCloseTag)
 
 bool Parser::parse(tags::GroupNonCapturingModifierTag)
 {
-    return (get() == '?');
+    return (get() == '?' && get() == ':');
 }
 
 bool Parser::parse(tags::MatchTag, NodePtr& astNode)

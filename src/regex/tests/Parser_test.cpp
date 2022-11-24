@@ -556,7 +556,7 @@ SCENARIO("Parse group")
 
     SECTION("Non-capturing group is not supported")
     {
-        const std::string regex = "(?a)";
+        const std::string regex = "(?:a)";
         auto parser = Parser(regex);
         REQUIRE_THROWS_WITH(parser.parse(), Contains("Non-capturing groups are the default. Capturing groups not supported"));
     }
