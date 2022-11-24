@@ -15,8 +15,6 @@
 namespace regex::ast
 {
 
-// TODO removed any and character by characterRange?
-
 class Node;
 using NodePtr = std::unique_ptr<Node>;
 using NFA = fa::NFA;
@@ -33,8 +31,8 @@ class Alternative : public Node
 {
 public:
     Alternative(NodePtr& lhs, NodePtr& rhs)
-    : mLeft {lhs.release()} //todo replace release with move??
-    , mRight {rhs.release()}
+    : mLeft {std::move(lhs)}
+    , mRight {std::move(rhs)}
     {}
 
     BlackBox makeNFA(Alphabet& alphabet, NFA& nfa) final
@@ -74,8 +72,8 @@ class Concatenation : public Node
 {
 public:
     Concatenation(NodePtr& lhs, NodePtr& rhs)
-    : mLeft {lhs.release()}
-    , mRight {rhs.release()}
+    : mLeft {std::move(lhs)}
+    , mRight {std::move(rhs)}
     {}
 
     BlackBox makeNFA(Alphabet& alphabet, NFA& nfa) final
@@ -111,7 +109,7 @@ class Quantifier : public Node
 {
 public:
     Quantifier(NodePtr& mInner, uint64_t min, uint64_t max, bool isMaxBounded)
-    : mInner {mInner.release()}
+    : mInner {std::move(mInner)}
     , mMin {min}
     , mMax {max}
     , mIsMaxBounded {isMaxBounded}
