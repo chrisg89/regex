@@ -22,9 +22,9 @@ using NFA = fa::NFA;
 class Node
 {
 public:
-    virtual BlackBox makeNFA(Alphabet& alphabet, NFA& nfa) = 0;
-    virtual void print(std::string&) = 0;
-    virtual void makeAlphabet(Alphabet&) = 0; 
+    virtual BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const = 0;
+    virtual void print(std::string&) const = 0;
+    virtual void makeAlphabet(Alphabet&) const = 0; 
 };
 
 class Alternative : public Node
@@ -35,7 +35,7 @@ public:
     , mRight {std::move(rhs)}
     {}
 
-    BlackBox makeNFA(Alphabet& alphabet, NFA& nfa) final
+    BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
     {
         auto BB1 = mLeft->makeNFA(alphabet, nfa);
         auto BB2 = mRight->makeNFA(alphabet, nfa);
@@ -49,13 +49,13 @@ public:
         return BlackBox(entry, exit);
     }
 
-    void makeAlphabet(Alphabet& alphabet) final
+    void makeAlphabet(Alphabet& alphabet) const final
     {
         mLeft->makeAlphabet(alphabet);
         mRight->makeAlphabet(alphabet);
     }
 
-    void print(std::string& str) final
+    void print(std::string& str) const final
     {
         str+= "(";
         mLeft->print(str);
@@ -76,7 +76,7 @@ public:
     , mRight {std::move(rhs)}
     {}
 
-    BlackBox makeNFA(Alphabet& alphabet, NFA& nfa) final
+    BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
     {
         auto BB1 = mLeft->makeNFA(alphabet, nfa);
         auto BB2 = mRight->makeNFA(alphabet, nfa);
@@ -87,13 +87,13 @@ public:
         return BlackBox(entry, exit);
     }
 
-    void makeAlphabet(Alphabet& alphabet) final
+    void makeAlphabet(Alphabet& alphabet) const final
     {
         mLeft->makeAlphabet(alphabet);
         mRight->makeAlphabet(alphabet);
     }
 
-    void print(std::string& str) final
+    void print(std::string& str) const final
     {
         str+= "(";
         mLeft->print(str);
@@ -115,7 +115,7 @@ public:
     , mIsMaxBounded {isMaxBounded}
     {}
 
-    BlackBox makeNFA(Alphabet& alphabet, NFA& nfa) final
+    BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
     {
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
@@ -151,12 +151,12 @@ public:
         return BlackBox(entry, exit);
     }
 
-    void makeAlphabet(Alphabet& alphabet) final
+    void makeAlphabet(Alphabet& alphabet) const final
     {
         mInner->makeAlphabet(alphabet);
     }
 
-    void print(std::string& str) final
+    void print(std::string& str) const final
     {
         mInner->print(str);
         if(mIsMaxBounded)
@@ -178,7 +178,7 @@ public:
 class Epsilon : public Node
 {
 public:
-    BlackBox makeNFA(Alphabet& alphabet, NFA& nfa) final
+    BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
     {
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
@@ -186,12 +186,12 @@ public:
         return BlackBox(entry, exit);
     }
 
-    void makeAlphabet(Alphabet& alphabet) final
+    void makeAlphabet(Alphabet& alphabet) const final
     {
         /* Do nothing */
     }
 
-    void print(std::string& str) final
+    void print(std::string& str) const final
     {
         str+= "";
     }
@@ -210,7 +210,7 @@ public:
     , mEnd{codepoint}
     {}
 
-    BlackBox makeNFA(Alphabet& alphabet, NFA& nfa) final
+    BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
     {
         auto interval = CodePointInterval{mStart, mEnd};
 
@@ -218,7 +218,7 @@ public:
         auto exit = nfa.addState(false, false);
 
         int index = 0;
-        for (auto& c : alphabet)
+        for (const auto c : alphabet)
         {
             if(isSubset(interval, c))
             {
@@ -230,12 +230,12 @@ public:
         return BlackBox(entry, exit);
     }
 
-    void makeAlphabet(Alphabet& alphabet) final
+    void makeAlphabet(Alphabet& alphabet) const final
     {
         alphabet.emplace_back(mStart, mEnd);
     }
 
-    void print(std::string& str) final
+    void print(std::string& str) const final
     {
         std::stringstream ss;
         ss << "[";
@@ -257,14 +257,14 @@ public:
     AST(NodePtr& node ) : mRoot{std::move(node)}
     {}
 
-    std::string print()
+    std::string print() const
     {
         std::string str;
         mRoot->print(str);
         return str;
     }
 
-    Alphabet makeAlphabet()
+    Alphabet makeAlphabet() const
     {
         Alphabet alphabet;
         mRoot->makeAlphabet(alphabet);
@@ -272,7 +272,7 @@ public:
         return alphabet;
     }
 
-    NFA makeNFA(Alphabet& alphabet)
+    NFA makeNFA(const Alphabet& alphabet) const
     {
         // Make the NFA's alphabet
         auto nfaAlphabet = fa::Alphabet(alphabet.size());
@@ -287,7 +287,7 @@ public:
         auto end = nfa.addState(false, true);
         nfa.addTransition(fa::kEpsilon, start, bb.entry);
         nfa.addTransition(fa::kEpsilon, bb.exit, end);
-        
+
         return nfa;
     }
 
