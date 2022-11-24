@@ -7,7 +7,7 @@
 namespace regex::parser
 {
 
-NodePtr buildSubtree(CharacterGroup& Segments)
+NodePtr buildSubtree(const CharacterGroup& Segments)
 {
     NodePtr out = std::make_unique<ast::Epsilon>();
 

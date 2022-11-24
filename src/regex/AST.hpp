@@ -218,7 +218,7 @@ public:
         auto exit = nfa.addState(false, false);
 
         int index = 0;
-        for (const auto c : alphabet)
+        for (auto c : alphabet)
         {
             if(isSubset(interval, c))
             {
