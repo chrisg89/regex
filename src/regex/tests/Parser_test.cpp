@@ -467,6 +467,59 @@ SCENARIO("Parse backreference")
     }
 }
 
+SCENARIO("Parse Anchors") 
+{
+    SECTION("Start of string anchor (^) is not supported")
+    {
+        const std::string regex = "^abc";
+        auto parser = Parser(regex);
+        REQUIRE_THROWS_WITH(parser.parse(), Contains("Anchors are not supported"));
+    }
+
+    SECTION("End of string anchor ($) is not supported")
+    {
+        const std::string regex = "abc$";
+        auto parser = Parser(regex);
+        REQUIRE_THROWS_WITH(parser.parse(), Contains("Anchors are not supported"));
+    }
+
+    SECTION("Word boundry anchor (\\b) is not recognized")
+    {
+        const std::string regex = "\\b";
+        auto parser = Parser(regex);
+        REQUIRE_THROWS_WITH(parser.parse(), Contains("This token has no special meaning and has thus been rendered erroneous"));
+    }
+
+    SECTION("Non-word boundry anchor (\\B) is not recognized")
+    {
+        const std::string regex = "\\B";
+        auto parser = Parser(regex);
+        REQUIRE_THROWS_WITH(parser.parse(), Contains("This token has no special meaning and has thus been rendered erroneous"));
+    }
+
+    SECTION("Anchor given by \\A is not recognized")
+    {
+        const std::string regex = "\\A";
+        auto parser = Parser(regex);
+        REQUIRE_THROWS_WITH(parser.parse(), Contains("This token has no special meaning and has thus been rendered erroneous"));
+    }
+
+    SECTION("Anchor given by \\Z is not recognized")
+    {
+        const std::string regex = "\\Z";
+        auto parser = Parser(regex);
+        REQUIRE_THROWS_WITH(parser.parse(), Contains("This token has no special meaning and has thus been rendered erroneous"));
+    }
+
+    SECTION("Anchor given by \\z is not recognized")
+    {
+        const std::string regex = "\\z";
+        auto parser = Parser(regex);
+        REQUIRE_THROWS_WITH(parser.parse(), Contains("This token has no special meaning and has thus been rendered erroneous"));
+    }
+}
+
+
 SCENARIO("Parse group") 
 {
     SECTION("Simple group")

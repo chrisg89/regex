@@ -65,11 +65,6 @@ CodePoint Parser::get()
 
 bool Parser::parse(tags::RegexTag, NodePtr& astNode)
 {
-    if(parse<tags::AnchorStartOfStringTag>())
-    {
-        error("Anchors not supported ");
-    }
-
     parse<tags::ExpressionTag>(astNode);
 
     if(!parse<tags::EOFTag>())
@@ -153,32 +148,7 @@ bool Parser::parse(tags::SubexpressionItemTag, NodePtr& astNode)
 bool Parser::parse(tags::AnchorTag, NodePtr& astNode)
 {
 
-    if(parse<tags::AnchorWordBoundaryTag>())
-    {
-        return true;
-    }
-
-    if(parse<tags::AnchorNonWordBoundaryTag>())
-    {
-        return true;
-    }
-
-    if(parse<tags::AnchorStartOfStringOnlyTag>())
-    {
-        return true;
-    }
-
-    if(parse<tags::AnchorEndOfStringOnlyNotNewlineTag>())
-    {
-        return true;
-    }
-
-    if(parse<tags::AnchorEndOfStringOnlyTag>())
-    {
-        return true;
-    }
-
-    if(parse<tags::AnchorPreviousMatchEndTag>())
+    if(parse<tags::AnchorStartOfStringTag>())
     {
         return true;
     }
@@ -199,36 +169,6 @@ bool Parser::parse(tags::AnchorStartOfStringTag)
 bool Parser::parse(tags::AnchorEndOfStringTag)
 {
     return (get() == '$');
-}
-
-bool Parser::parse(tags::AnchorWordBoundaryTag)
-{
-    return ((get() == '\\') && (get() == 'b'));
-}
-
-bool Parser::parse(tags::AnchorNonWordBoundaryTag)
-{
-    return ((get() == '\\') && (get() == 'B'));
-}
-
-bool Parser::parse(tags::AnchorStartOfStringOnlyTag)
-{
-    return ((get() == '\\') && (get() == 'A'));
-}
-
-bool Parser::parse(tags::AnchorEndOfStringOnlyNotNewlineTag)
-{
-    return ((get() == '\\') && (get() == 'z'));
-}
-
-bool Parser::parse(tags::AnchorEndOfStringOnlyTag)
-{
-    return ((get() == '\\') && (get() == 'Z'));
-}
-
-bool Parser::parse(tags::AnchorPreviousMatchEndTag)
-{
-    return ((get() == '\\') && (get() == 'G'));
 }
 
 bool Parser::parse(tags::BackreferenceTag, NodePtr& astNode)

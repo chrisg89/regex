@@ -19,16 +19,10 @@ namespace tags
     struct SubexpressionTag{};
     struct SubexpressionItemTag{};
 
-    // Anchor TODO: some of these need to be renamed...
+    // Anchors
     struct AnchorTag{};
     struct AnchorStartOfStringTag{};
     struct AnchorEndOfStringTag{};
-    struct AnchorWordBoundaryTag{};
-    struct AnchorNonWordBoundaryTag{};
-    struct AnchorStartOfStringOnlyTag{};
-    struct AnchorEndOfStringOnlyNotNewlineTag{};
-    struct AnchorEndOfStringOnlyTag{};
-    struct AnchorPreviousMatchEndTag{};
 
     // Backreference
     struct BackreferenceTag{};
@@ -93,7 +87,6 @@ namespace tags
     struct RangeSeparatorTag{};
 
     // Numeric
-
     struct Unicode4DigitCodePointTag{};
     struct Unicode8DigitCodePointTag{};
     struct UnicodeTag{};
@@ -132,17 +125,10 @@ private:
     bool parse(tags::SubexpressionTag, NodePtr&);
     bool parse(tags::SubexpressionItemTag, NodePtr&);
 
-    // Anchor TODO: some of these need to be renamed...
-    //TODO : test anchors. Rename /B to word boundary?
+    // Anchors
     bool parse(tags::AnchorTag, NodePtr&);
     bool parse(tags::AnchorStartOfStringTag);
     bool parse(tags::AnchorEndOfStringTag);
-    bool parse(tags::AnchorWordBoundaryTag);
-    bool parse(tags::AnchorNonWordBoundaryTag);
-    bool parse(tags::AnchorStartOfStringOnlyTag);
-    bool parse(tags::AnchorEndOfStringOnlyNotNewlineTag);
-    bool parse(tags::AnchorEndOfStringOnlyTag);
-    bool parse(tags::AnchorPreviousMatchEndTag);
 
     // Backreference
     bool parse(tags::BackreferenceTag, NodePtr&);
