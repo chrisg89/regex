@@ -15,8 +15,7 @@ class Regex
 {
 
 public:
-    Regex();
-    void compile(std::string regex);
+    Regex(const std::string& regex);
     bool match(std::string string);
     bool search(std::string string);
 

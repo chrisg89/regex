@@ -229,9 +229,9 @@ public:
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
 
-        for(auto i =0; i<alphabet.size(); i++)
+        for(auto i=0; i<alphabet.size(); i++)
         {
-            if(isSubset(interval, alphabet[i]))
+            if(isSubset(alphabet[i], interval))
             {
                 nfa.addTransition(i, entry, exit);
             }

@@ -7,7 +7,7 @@
 namespace regex
 {
 
-bool isSubset(const CodePointInterval outer, const CodePointInterval inner)  //TODO move to codePoint?
+bool isSubset(const CodePointInterval inner, const CodePointInterval outer)
 {
     if(outer.first <= inner.first && outer.second >= inner.second)
     {

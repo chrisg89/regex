@@ -8,11 +8,8 @@
 namespace regex
 {
 
-Regex::Regex()
-: mDFA{{}} //TODO: create default constructor?
-{}
-
-void Regex::compile(std::string regex)
+Regex::Regex(const std::string& regex)
+: mDFA{}
 {
     auto parser = parser::Parser(regex);
     auto ast = parser.parse();
@@ -39,26 +36,24 @@ fa::InputType Regex::findInAlphabet(CodePoint input)
 
 bool Regex::match(const std::string string)
 {
+    auto state = mDFA.getFirst();
 
-    auto current = mDFA.getFirst();
-
-    Utf8Iterator utf8It = string.cbegin();
-
-    while( utf8It != string.end() ) //TODO chnage to for loop
+    for( Utf8Iterator it = string.cbegin(); it != string.cend(); it++ )
     {
-        //Translate CP to int
-        auto input = findInAlphabet(*utf8It);
-        current = mDFA.step(current, input);
+        // lookup the codepoint in the alphabet
+        auto input = findInAlphabet(*it);
+
+        // advance the DFA
+        state = mDFA.step(state, input);
         
-        if(mDFA.isDeadState(current))
+        // exit on a dead state
+        if(mDFA.isDeadState(state))
         {
             break;
         }
-
-        utf8It++;
     }
 
-    return mDFA.isFinalState(current);
+    return mDFA.isFinalState(state);
 }
 
 bool Regex::search(std::string string)

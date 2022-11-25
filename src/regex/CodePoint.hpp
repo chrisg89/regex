@@ -6,11 +6,11 @@
 namespace regex
 {
 
-using CodePoint = char32_t; //TODO
-using CodePointInterval = std::pair<CodePoint, CodePoint>;   //TODO make custom POD?
+using CodePoint = char32_t;
+using CodePointInterval = std::pair<CodePoint, CodePoint>;
 
-constexpr CodePoint kCodePointMin = 0x0000'0000U;  //TODO
-constexpr CodePoint kCodePointMax = 0x0010'FFFFU; //TODO
+constexpr CodePoint kCodePointMin = 0x0000'0000U;
+constexpr CodePoint kCodePointMax = 0x0010'FFFFU;
 
 constexpr CodePoint kEOF = 0xFFFF'FFFFU; 
 

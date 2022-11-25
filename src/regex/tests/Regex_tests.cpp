@@ -145,16 +145,15 @@ SCENARIO( "XXX", "[xxxx]" )
 SCENARIO( "Empty", "[empty]" ) 
 {
     {
-        auto regex = Regex();
-        regex.compile("a");
+        auto regex = Regex("a");
         REQUIRE(!regex.match(""));
         REQUIRE(regex.match("a"));
         REQUIRE(!regex.match("aa"));
     }
 
     {
-        auto regex = Regex();
-        regex.compile("a|b");
+        
+        auto regex = Regex("a|b");
         REQUIRE(regex.match("a"));
         REQUIRE(regex.match("b"));
         REQUIRE(!regex.match("aa"));
@@ -165,8 +164,8 @@ SCENARIO( "Empty", "[empty]" )
     }
 
     {
-        auto regex = Regex();
-        regex.compile("ab");
+        
+        auto regex = Regex("ab");
         REQUIRE(regex.match("ab"));
         REQUIRE(!regex.match("a"));
         REQUIRE(!regex.match("b"));
@@ -179,8 +178,8 @@ SCENARIO( "Empty", "[empty]" )
     }
 
     {
-        auto regex = Regex();
-        regex.compile("a*");
+        
+        auto regex = Regex("a*");
         REQUIRE(regex.match(""));
         REQUIRE(regex.match("a"));
         REQUIRE(regex.match("aa"));
@@ -188,8 +187,8 @@ SCENARIO( "Empty", "[empty]" )
     }
 
     {
-        auto regex = Regex();
-        regex.compile("a+");
+        
+        auto regex = Regex("a+");
         REQUIRE(!regex.match(""));
         REQUIRE(regex.match("a"));
         REQUIRE(regex.match("aa"));
@@ -197,8 +196,8 @@ SCENARIO( "Empty", "[empty]" )
     }
 
     {
-        auto regex = Regex();
-        regex.compile("a?");
+        
+        auto regex = Regex("a?");
         REQUIRE(regex.match(""));
         REQUIRE(regex.match("a"));
         REQUIRE(!regex.match("aa"));
@@ -206,8 +205,8 @@ SCENARIO( "Empty", "[empty]" )
     }
 
     {
-        auto regex = Regex();
-        regex.compile("a*(b|c)");
+        
+        auto regex = Regex("a*(b|c)");
         REQUIRE(regex.match("b"));
         REQUIRE(regex.match("ab"));
         REQUIRE(regex.match("aab"));
@@ -230,8 +229,8 @@ SCENARIO( "Empty", "[empty]" )
     }
 
     {
-        auto regex = Regex();
-        regex.compile("((ab)|(cd))*e");
+        
+        auto regex = Regex("((ab)|(cd))*e");
         REQUIRE(regex.match("e"));
         REQUIRE(regex.match("abe"));
         REQUIRE(regex.match("cde"));
@@ -242,26 +241,26 @@ SCENARIO( "Empty", "[empty]" )
     }
 
     {
-        auto regex = Regex();
-        regex.compile("A\\|\\|B");
+        
+        auto regex = Regex("A\\|\\|B");
         REQUIRE(regex.match("A||B"));
     }
 
     {
-        auto regex = Regex();
-        regex.compile("A\\*B");
+        
+        auto regex = Regex("A\\*B");
         REQUIRE(regex.match("A*B"));
     }
 
     {
-        auto regex = Regex();
-        regex.compile("\\(abc\\)");
+        
+        auto regex = Regex("\\(abc\\)");
         REQUIRE(regex.match("(abc)"));
     }
 
     {
-        auto regex = Regex();
-        regex.compile("while|if|void|break");
+        
+        auto regex = Regex("while|if|void|break");
         REQUIRE(regex.match("if"));
         REQUIRE(regex.match("while"));
         REQUIRE(regex.match("void"));
@@ -271,16 +270,16 @@ SCENARIO( "Empty", "[empty]" )
 
     //  ANY (.)
     {
-        auto regex = Regex();
-        regex.compile("a.*b");
+        
+        auto regex = Regex("a.*b");
         REQUIRE(regex.match("a123b"));
         REQUIRE(regex.match("a456b"));
     }
 
     //  Digit (\d)
     {
-        auto regex = Regex();
-        regex.compile("a\\db");
+        
+        auto regex = Regex("a\\db");
         REQUIRE(regex.match("a0b"));
         REQUIRE(regex.match("a1b"));
         REQUIRE(regex.match("a2b"));
@@ -295,8 +294,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //  NonDigit (\D)
     {
-        auto regex = Regex();
-        regex.compile("a\\Db");
+        
+        auto regex = Regex("a\\Db");
         REQUIRE(!regex.match("a0b"));
         REQUIRE(!regex.match("a1b"));
         REQUIRE(!regex.match("a2b"));
@@ -311,8 +310,8 @@ SCENARIO( "Empty", "[empty]" )
 
         //  Whitespace (\s)
     {
-        auto regex = Regex();
-        regex.compile("a\\sb");
+        
+        auto regex = Regex("a\\sb");
         REQUIRE(regex.match("a b"));
         REQUIRE(regex.match("a\tb"));
         REQUIRE(regex.match("a\nb"));
@@ -324,8 +323,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //  Whitespace (\s)
     {
-        auto regex = Regex();
-        regex.compile("a\\Sb");
+        
+        auto regex = Regex("a\\Sb");
         REQUIRE(!regex.match("a b"));
         REQUIRE(!regex.match("a\tb"));
         REQUIRE(!regex.match("a\nb"));
@@ -337,8 +336,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //  Word Character (\w)
     {
-        auto regex = Regex();
-        regex.compile("a\\wb");
+        
+        auto regex = Regex("a\\wb");
         REQUIRE(regex.match("aab"));
         REQUIRE(regex.match("a1b"));
         REQUIRE(regex.match("a_b"));
@@ -349,8 +348,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //  Non Word Character (\W)
     {
-        auto regex = Regex();
-        regex.compile("a\\Wb");
+        
+        auto regex = Regex("a\\Wb");
         REQUIRE(!regex.match("aab"));
         REQUIRE(!regex.match("a1b"));
         REQUIRE(!regex.match("a_b"));
@@ -361,43 +360,43 @@ SCENARIO( "Empty", "[empty]" )
 
     //  Newline
     {
-        auto regex = Regex();
-        regex.compile("\\n");
+        
+        auto regex = Regex("\\n");
         REQUIRE(regex.match("\n"));
     }
 
     //  FormFeed
     {
-        auto regex = Regex();
-        regex.compile("\\f");
+        
+        auto regex = Regex("\\f");
         REQUIRE(regex.match("\f"));
     }
 
     //  CarriageReturn
     {
-        auto regex = Regex();
-        regex.compile("\\r");
+        
+        auto regex = Regex("\\r");
         REQUIRE(regex.match("\r"));
     }
 
     //  Horizontal Tab
     {
-        auto regex = Regex();
-        regex.compile("\\t");
+        
+        auto regex = Regex("\\t");
         REQUIRE(regex.match("\t"));
     }
 
     //  Vertical Tab
     {
-        auto regex = Regex();
-        regex.compile("\\v");
+        
+        auto regex = Regex("\\v");
         REQUIRE(regex.match("\v"));
     }
 
     //  Realistic tests using dates
     {
-        auto regex = Regex();
-        regex.compile("\\d\\d-(\\d\\d|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)-\\d\\d(\\d\\d)?");
+        
+        auto regex = Regex("\\d\\d-(\\d\\d|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)-\\d\\d(\\d\\d)?");
         REQUIRE(regex.match("12-12-22"));
         REQUIRE(regex.match("12-12-2022"));
         REQUIRE(regex.match("12-OCT-2022"));
@@ -408,16 +407,16 @@ SCENARIO( "Empty", "[empty]" )
         // 「こんにちは世界」 - Hello World! (Kanji)
         const char utf8String[] = {'\xE3', '\x80', '\x8C', '\xE3', '\x81', '\x93', '\xE3', '\x82', '\x93', '\xE3', '\x81', '\xAB', '\xE3', '\x81', '\xA1', '\xE3', '\x81', '\xAF', '\xE4', '\xB8', '\x96', '\xE7', '\x95', '\x8C', '\xE3', '\x80', '\x8D', '\x00'};
         std::string string = utf8String;
-        auto regex = Regex();
-        regex.compile(string);
+        
+        auto regex = Regex(string);
         REQUIRE(regex.match(utf8String));
         REQUIRE(!regex.match("hello world!"));
     }
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[abc]");
+        
+        auto regex = Regex("[abc]");
         REQUIRE(regex.match("a"));
         REQUIRE(regex.match("b"));
         REQUIRE(regex.match("c"));
@@ -427,8 +426,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[a-c]");
+        
+        auto regex = Regex("[a-c]");
         REQUIRE(regex.match("a"));
         REQUIRE(regex.match("b"));
         REQUIRE(regex.match("c"));
@@ -438,8 +437,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[a-c1-3]");
+        
+        auto regex = Regex("[a-c1-3]");
         REQUIRE(regex.match("a"));
         REQUIRE(regex.match("b"));
         REQUIRE(regex.match("c"));
@@ -452,23 +451,23 @@ SCENARIO( "Empty", "[empty]" )
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[-]");
+        
+        auto regex = Regex("[-]");
         REQUIRE(regex.match("-"));
     }
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[a-]");
+        
+        auto regex = Regex("[a-]");
         REQUIRE(regex.match("-"));
         REQUIRE(regex.match("a"));
     }
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[ab-]");
+        
+        auto regex = Regex("[ab-]");
         REQUIRE(regex.match("-"));
         REQUIRE(regex.match("a"));
         REQUIRE(regex.match("b"));
@@ -476,8 +475,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[^-]");
+        
+        auto regex = Regex("[^-]");
         REQUIRE(!regex.match("-"));
         REQUIRE(regex.match("a"));
         REQUIRE(regex.match("b"));
@@ -486,8 +485,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[^-a-c]");
+        
+        auto regex = Regex("[^-a-c]");
         REQUIRE(!regex.match("-"));
         REQUIRE(!regex.match("a"));
         REQUIRE(!regex.match("b"));
@@ -496,8 +495,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[^\\-a-c]");
+        
+        auto regex = Regex("[^\\-a-c]");
         REQUIRE(!regex.match("-"));
         REQUIRE(!regex.match("a"));
         REQUIRE(!regex.match("b"));
@@ -506,8 +505,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[^a-c\\-]");
+        
+        auto regex = Regex("[^a-c\\-]");
         REQUIRE(!regex.match("-"));
         REQUIRE(!regex.match("a"));
         REQUIRE(!regex.match("b"));
@@ -516,8 +515,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[^-a]");
+        
+        auto regex = Regex("[^-a]");
         REQUIRE(!regex.match("-"));
         REQUIRE(!regex.match("a"));
         REQUIRE(regex.match("b"));
@@ -525,8 +524,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[-a]");
+        
+        auto regex = Regex("[-a]");
         REQUIRE(regex.match("-"));
         REQUIRE(regex.match("a"));
         REQUIRE(!regex.match("b"));
@@ -534,8 +533,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[b-b]");
+        
+        auto regex = Regex("[b-b]");
         REQUIRE(regex.match("b"));
         REQUIRE(!regex.match("a"));
         REQUIRE(!regex.match("c"));
@@ -543,8 +542,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //Character class
     {
-        auto regex = Regex();
-        regex.compile("[^b-b]");
+        
+        auto regex = Regex("[^b-b]");
         REQUIRE(!regex.match("b"));
         REQUIRE(regex.match("a"));
         REQUIRE(regex.match("c"));
@@ -555,8 +554,8 @@ SCENARIO( "Empty", "[empty]" )
 
     //Character class with shorthand
     {
-        auto regex = Regex();
-        regex.compile("[\\d]");
+        
+        auto regex = Regex("[\\d]");
         REQUIRE(regex.match("0"));
         REQUIRE(regex.match("1"));
         REQUIRE(regex.match("2"));
@@ -573,45 +572,45 @@ SCENARIO( "Empty", "[empty]" )
 
     //Character class
     {
-        auto regex = Regex();
-        REQUIRE_THROWS_AS(regex.compile("[c-a]"), std::runtime_error);
+        
+        REQUIRE_THROWS_AS(Regex("[c-a]"), std::runtime_error);
     }
 
     //Character class
     {
-        auto regex = Regex();
-        REQUIRE_THROWS_AS(regex.compile("[b-a]"), std::runtime_error);
+        
+        REQUIRE_THROWS_AS(Regex("[b-a]"), std::runtime_error);
     }
 
 
 /*
     {
-        auto regex = Regex();
-        regex.compile("c");
+        
+        auto regex = Regex("c");
         regex.search("abcde");
     }
 
     {
-        auto regex = Regex();
-        regex.compile("abc");
+        
+        auto regex = Regex("abc");
         regex.search("abcde");
     }
 
     {
-        auto regex = Regex();
-        regex.compile("abc");
+        
+        auto regex = Regex("abc");
         regex.search("abcabcabc");
     }
 
     {
-        auto regex = Regex();
-        regex.compile("cat|hat");
+        
+        auto regex = Regex("cat|hat");
         regex.search("the cat has a hat");
     }
 
     {
-        auto regex = Regex();
-        regex.compile("cat|hat|h.s");
+        
+        auto regex = Regex("cat|hat|h.s");
         regex.search("the cat has a hat");
     }
 
@@ -714,8 +713,8 @@ SCENARIO("Shorthand \\d matches [0-9]")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\d]");
+    
+    auto regex = Regex("[\\d]");
 
     if( i >= '0' && i <= '9')
     {
@@ -732,8 +731,8 @@ SCENARIO("Shorthand \\D matches [^0-9]")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\D]");
+    
+    auto regex = Regex("[\\D]");
 
     if( i >= '0' && i <= '9')
     {
@@ -750,8 +749,8 @@ SCENARIO("Shorthand \\s matches [\r\n\t\f\v ]")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\s]");
+    
+    auto regex = Regex("[\\s]");
 
     if( i == '\r' || i == '\n' || i == '\t' || i == '\f' || i == '\v' || i == ' ')
     {
@@ -768,8 +767,8 @@ SCENARIO("Shorthand \\S matches [^\\r\\n\\t\\f\\v ]")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\S]");
+    
+    auto regex = Regex("[\\S]");
 
     if( i == '\r' || i == '\n' || i == '\t' || i == '\f' || i == '\v' || i == ' ')
     {
@@ -785,8 +784,8 @@ SCENARIO("Shorthand \\w matches [a-zA-Z0-9_]")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\w]");
+    
+    auto regex = Regex("[\\w]");
 
     if( (i >= 'a' && i <= 'z') || 
         (i >= 'A' && i <= 'Z') || 
@@ -806,8 +805,8 @@ SCENARIO("Shorthand \\W matches [^a-zA-Z0-9_]")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\W]");
+    
+    auto regex = Regex("[\\W]");
 
     if( (i >= 'a' && i <= 'z') || 
         (i >= 'A' && i <= 'Z') || 
@@ -826,8 +825,8 @@ SCENARIO("Character escape \\n matches new line")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\n]");
+    
+    auto regex = Regex("[\\n]");
 
     if( i == '\n')
     {
@@ -843,8 +842,8 @@ SCENARIO("Character escape \\f matches form feed")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\f]");
+    
+    auto regex = Regex("[\\f]");
 
     if( i == '\f')
     {
@@ -860,8 +859,8 @@ SCENARIO("Character escape \\r matches carriage return")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\r]");
+    
+    auto regex = Regex("[\\r]");
 
     if( i == '\r')
     {
@@ -877,8 +876,8 @@ SCENARIO("Character escape \\t matches horizontal tab")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\t]");
+    
+    auto regex = Regex("[\\t]");
 
     if( i == '\t')
     {
@@ -894,8 +893,8 @@ SCENARIO("Character escape \\v matches vertical tab")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\v]");
+    
+    auto regex = Regex("[\\v]");
 
     if( i == '\v')
     {
@@ -911,8 +910,8 @@ SCENARIO("Character escape \\a matches bell")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\a]");
+    
+    auto regex = Regex("[\\a]");
 
     if( i == '\a')
     {
@@ -928,8 +927,8 @@ SCENARIO("Character escape \\b matches backspace")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\b]");
+    
+    auto regex = Regex("[\\b]");
 
     if( i == '\b')
     {
@@ -946,8 +945,8 @@ SCENARIO("Character escape \\b matches escape")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\b]");
+    
+    auto regex = Regex("[\\b]");
 
     if( i == 0x1B)
     {
@@ -963,8 +962,8 @@ SCENARIO("Character escape for meta-character '\\'")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\\\]");
+    
+    auto regex = Regex("[\\\\]");
 
     if( i == '\\')
     {
@@ -980,8 +979,8 @@ SCENARIO("Character escape for meta-character '^'")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\^]");
+    
+    auto regex = Regex("[\\^]");
 
     if( i == '^')
     {
@@ -997,8 +996,8 @@ SCENARIO("Character escape for meta-character '['")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\[]");
+    
+    auto regex = Regex("[\\[]");
 
     if( i == '[')
     {
@@ -1014,8 +1013,8 @@ SCENARIO("Character escape for meta-character ']'")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\]]");
+    
+    auto regex = Regex("[\\]]");
 
     if( i == ']')
     {
@@ -1031,8 +1030,8 @@ SCENARIO("Character escape for meta-character '-'")
 {
     auto i = GENERATE(range(0x000001, 0x110000));
 
-    auto regex = Regex();
-    regex.compile("[\\-]");
+    
+    auto regex = Regex("[\\-]");
 
     if( i == '-')
     {
@@ -1050,38 +1049,38 @@ SCENARIO("Character by codepoint using syntax \\uXXXXXX")
 {
     SECTION("1 digit Codepoint is rejected")
     {
-        auto regex = Regex();
-        REQUIRE_THROWS_AS(regex.compile("[\\uF]"), std::runtime_error);
+        
+        REQUIRE_THROWS_AS(auto regex = Regex("[\\uF]"), std::runtime_error);
     }
 
     SECTION("2 digit Codepoint is rejected")
     {
-        auto regex = Regex();
-        REQUIRE_THROWS_AS(regex.compile("[\\uFF]"), std::runtime_error);
+        
+        REQUIRE_THROWS_AS(auto regex = Regex("[\\uFF]"), std::runtime_error);
     }
 
     SECTION("3 digit Codepoint is rejected")
     {
-        auto regex = Regex();
-        REQUIRE_THROWS_AS(regex.compile("[\\uFFF]"), std::runtime_error);
+        
+        REQUIRE_THROWS_AS(auto regex = Regex("[\\uFFF]"), std::runtime_error);
     }
 
     SECTION("4 digit Codepoint is rejected")
     {
-        auto regex = Regex();
-        REQUIRE_THROWS_AS(regex.compile("[\\uFFFF]"), std::runtime_error);
+        
+        REQUIRE_THROWS_AS(auto regex = Regex("[\\uFFFF]"), std::runtime_error);
     }
 
     SECTION("5 digit Codepoint is rejected")
     {
-        auto regex = Regex();
-        REQUIRE_THROWS_AS(regex.compile("[\\uFFFFF]"), std::runtime_error);
+        
+        REQUIRE_THROWS_AS(auto regex = Regex("[\\uFFFFF]"), std::runtime_error);
     }
 
     SECTION("Codepoint 0x000000 is rejected") //TODO should this code point be supported? 
     {
-        auto regex = Regex();
-        REQUIRE_THROWS_AS(regex.compile("[\\u000000]"), std::runtime_error);
+        
+        REQUIRE_THROWS_AS(auto regex = Regex("[\\u000000]"), std::runtime_error);
     }
 
     SECTION("Codepoints 0x110000 to 0xFFFFFF are rejected")
@@ -1092,8 +1091,8 @@ SCENARIO("Character by codepoint using syntax \\uXXXXXX")
         ss << "[\\u" << std::setfill('0') << std::setw(6) << std::hex << i << "]";
         auto exp = ss.str();
         
-        auto regex = Regex();
-        REQUIRE_THROWS_AS(regex.compile(exp), std::runtime_error);
+        
+        REQUIRE_THROWS_AS(auto regex = Regex(exp), std::runtime_error);
     }
 
     SECTION("Codepoints 0x000001 to 0x10FFFF are accepted")
@@ -1106,8 +1105,8 @@ SCENARIO("Character by codepoint using syntax \\uXXXXXX")
         auto exp = ss.str();
         auto target = utf8Encode(i);
 
-        auto regex = Regex();
-        regex.compile(exp);
+        
+        auto regex = Regex(exp);
         REQUIRE(regex.match(target));
     }
 }
@@ -1118,8 +1117,8 @@ SCENARIO("Character by codepoint using syntax \\u{XXXXXX}")
 {
     SECTION("Codepoint 0x000000 is rejected") //TODO should this code point be supported? 
     {
-        auto regex = Regex();
-        REQUIRE_THROWS_AS(regex.compile("[\\u{000000}]"), std::runtime_error);
+        
+        REQUIRE_THROWS_AS(auto regex = Regex("[\\u{000000}]"), std::runtime_error);
     }
 
     SECTION("Invalid syntax: brackets contains non-hexidecimal digit")
@@ -1132,14 +1131,14 @@ SCENARIO("Character by codepoint using syntax \\u{XXXXXX}")
             "[\\u{0000X0}]",
             "[\\u{00000X}]"
         );
-        auto regex = Regex();
-        REQUIRE_THROWS_AS(regex.compile(input), std::runtime_error);
+        
+        REQUIRE_THROWS_AS(auto regex = Regex(input), std::runtime_error);
     }
 
     SECTION("Invalid syntax: brackets contain more than 6 hexidecimal digits")
     {
-        auto regex = Regex();
-        REQUIRE_THROWS_AS(regex.compile("[\\u{1234567}]"), std::runtime_error);
+        
+        REQUIRE_THROWS_AS(auto regex = Regex("[\\u{1234567}]"), std::runtime_error);
     }
 
     SECTION("Codepoints 0x110000 to 0xFFFFFF are rejected")
@@ -1150,8 +1149,8 @@ SCENARIO("Character by codepoint using syntax \\u{XXXXXX}")
         ss << "[\\u{" << std::setfill('0') << std::setw(6) << std::hex << i << "}]";
         auto exp = ss.str();
         
-        auto regex = Regex();
-        REQUIRE_THROWS_AS(regex.compile(exp), std::runtime_error);
+        
+        REQUIRE_THROWS_AS(auto regex = Regex(exp), std::runtime_error);
     }
 
     SECTION("1 digit Codepoints 0x1-0xF are accepted")
@@ -1163,8 +1162,8 @@ SCENARIO("Character by codepoint using syntax \\u{XXXXXX}")
         auto exp = ss.str();
         auto target = utf8Encode(i);
         
-        auto regex = Regex();
-        regex.compile(exp);
+        
+        auto regex = Regex(exp);
         REQUIRE(regex.match(target));
     }
 
@@ -1177,8 +1176,8 @@ SCENARIO("Character by codepoint using syntax \\u{XXXXXX}")
         auto exp = ss.str();
         auto target = utf8Encode(i);
         
-        auto regex = Regex();
-        regex.compile(exp);
+        
+        auto regex = Regex(exp);
         REQUIRE(regex.match(target));
     }
 
@@ -1191,8 +1190,8 @@ SCENARIO("Character by codepoint using syntax \\u{XXXXXX}")
         auto exp = ss.str();
         auto target = utf8Encode(i);
         
-        auto regex = Regex();
-        regex.compile(exp);
+        
+        auto regex = Regex(exp);
         REQUIRE(regex.match(target));
     }
 
@@ -1205,8 +1204,8 @@ SCENARIO("Character by codepoint using syntax \\u{XXXXXX}")
         auto exp = ss.str();
         auto target = utf8Encode(i);
         
-        auto regex = Regex();
-        regex.compile(exp);
+        
+        auto regex = Regex(exp);
         REQUIRE(regex.match(target));
     }
 
@@ -1219,8 +1218,8 @@ SCENARIO("Character by codepoint using syntax \\u{XXXXXX}")
         auto exp = ss.str();
         auto target = utf8Encode(i);
         
-        auto regex = Regex();
-        regex.compile(exp);
+        
+        auto regex = Regex(exp);
         REQUIRE(regex.match(target));
     }
 
@@ -1233,8 +1232,8 @@ SCENARIO("Character by codepoint using syntax \\u{XXXXXX}")
         auto exp = ss.str();
         auto target = utf8Encode(i);
         
-        auto regex = Regex();
-        regex.compile(exp);
+        
+        auto regex = Regex(exp);
         REQUIRE(regex.match(target));
     }
 }
