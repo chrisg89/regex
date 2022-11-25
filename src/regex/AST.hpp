@@ -3,7 +3,6 @@
 #include "Alphabet.hpp"
 #include "CodePoint.hpp"
 #include "NFA.hpp"
-#include "ThompsonConstruction.hpp"
 
 #include <iomanip>
 #include <memory>
@@ -14,6 +13,19 @@
 
 namespace regex::ast
 {
+
+using StateId = fa::StateId;
+
+struct BlackBox
+{
+    BlackBox(StateId entry, StateId exit)
+    : entry {entry}
+    , exit {exit}
+    {}
+
+    StateId entry;
+    StateId exit;
+};
 
 class Node;
 using NodePtr = std::unique_ptr<Node>;
@@ -217,14 +229,12 @@ public:
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
 
-        int index = 0;
-        for (auto c : alphabet)
+        for(auto i =0; i<alphabet.size(); i++)
         {
-            if(isSubset(interval, c))
+            if(isSubset(interval, alphabet[i]))
             {
-                nfa.addTransition(index, entry, exit);
+                nfa.addTransition(i, entry, exit);
             }
-            index++;
         }
 
         return BlackBox(entry, exit);

@@ -1,7 +1,6 @@
 
 add_library(regex_lib
     Regex.cpp
-    ThompsonConstruction.cpp
     Utf8Iterator.cpp
     Parser.cpp
     Alphabet.cpp
