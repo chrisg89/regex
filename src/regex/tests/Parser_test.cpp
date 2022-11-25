@@ -339,7 +339,7 @@ SCENARIO("Parse any (.) character")
 
 SCENARIO("Parse shorthand character classes") 
 {
-    SECTION("Digit")
+    SECTION("Digit character")
     {
         const std::string regex = "\\d";
         auto parser = Parser(regex);
@@ -423,6 +423,14 @@ SCENARIO("Parse character classes")
         CHECK(ast.print() == "([\\U00000000-\\U0000002f]|([\\U0000003a-\\U00000040]|([\\U0000005b-\\U0000005e]|([\\U00000060-\\U00000060]|([\\U0000007b-\\U0010ffff]|)))))");
     }
 
+    SECTION("Negated character class with \\w and \\W")
+    {
+        const std::string regex = "[^\\w\\W]";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "");
+    }
+
     SECTION("Character class with shorthand \\d")
     {
         const std::string regex = "[\\d]";
@@ -439,6 +447,14 @@ SCENARIO("Parse character classes")
         CHECK(ast.print() == "([\\U00000000-\\U0000002f]|([\\U0000003a-\\U0010ffff]|))");
     }
 
+    SECTION("Negated character class with \\d and \\D")
+    {
+        const std::string regex = "[^\\d\\D]";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "");
+    }
+
     SECTION("Character class with shorthand \\s")
     {
         const std::string regex = "[\\s]";
@@ -453,6 +469,14 @@ SCENARIO("Parse character classes")
         auto parser = Parser(regex);
         auto ast = parser.parse();
         CHECK(ast.print() == "([\\U00000000-\\U00000008]|([\\U0000000e-\\U0000001f]|([\\U00000021-\\U0010ffff]|)))");
+    }
+
+    SECTION("Negated character class with \\s and \\S")
+    {
+        const std::string regex = "[^\\s\\S]";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "");
     }
 
     SECTION("Character class with escaped characters that have special meaning")
@@ -519,12 +543,12 @@ SCENARIO("Parse character classes")
         CHECK(ast.print() == "([\\U00000061-\\U00000061]|([\\U0000002d-\\U0000002d]|))");
     }
 
-    SECTION("Character class where hyphen is treated literally in presence of shorthand character class")
+    SECTION("Character class where hyphen is treated literally because it is surrounded by shorthand character classes")
     {
         const std::string regex = "[\\d-\\D]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "([\\U00000000-\\U0000002f]|([\\U0000003a-\\U0010ffff]|))");
+        CHECK(ast.print() == "([\\U00000030-\\U00000039]|([\\U0000002d-\\U0000002d]|([\\U00000000-\\U0000002f]|([\\U0000003a-\\U0010ffff]|))))");
     }
 
     SECTION("Character class where closing bracket is first character")

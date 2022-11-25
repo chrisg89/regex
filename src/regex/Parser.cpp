@@ -480,7 +480,10 @@ bool Parser::parse(tags::ShorthandCharacterClassWordTag, CharacterGroup& group)
     {
         return false;
     }
-    group = {{0x30, 0x39}, {0x41, 0x5A}, {0x5F, 0x5F}, {0x61, 0x7A}};
+    group.emplace_back(0x30, 0x39);
+    group.emplace_back(0x41, 0x5A);
+    group.emplace_back(0x5F, 0x5F);
+    group.emplace_back(0x61, 0x7A);
     return true;
 }
 
@@ -494,7 +497,11 @@ bool Parser::parse(tags::ShorthandCharacterClassWordNegatedTag, CharacterGroup& 
     {
         return false;
     }
-    group = {{kCodePointMin, 0x2F}, {0x3A, 0x40}, {0x5B, 0x5E}, {0x60, 0x60}, {0x7B, kCodePointMax}};
+    group.emplace_back(kCodePointMin, 0x2F);
+    group.emplace_back(0x3A, 0x40);
+    group.emplace_back(0x5B, 0x5E);
+    group.emplace_back(0x60, 0x60);
+    group.emplace_back(0x7B, kCodePointMax);
     return true;
 }
 
@@ -508,7 +515,7 @@ bool Parser::parse(tags::ShorthandCharacterClassDigitTag, CharacterGroup& group)
     {
         return false;
     }
-    group = {{0x30, 0x39}};
+    group.emplace_back(0x30, 0x39);
     return true;
 }
 
@@ -522,7 +529,8 @@ bool Parser::parse(tags::ShorthandCharacterClassDigitNegatedTag, CharacterGroup&
     {
         return false;
     }
-    group = {{kCodePointMin, 0x2F}, {0x3A, kCodePointMax}};
+    group.emplace_back(kCodePointMin, 0x2F);
+    group.emplace_back(0x3A, kCodePointMax);
     return true;
 }
 
@@ -531,7 +539,8 @@ bool Parser::parse(tags::ShorthandCharacterClassWhitespaceTag, CharacterGroup& g
     CodePoint cp;
     if(get() == '\\' && get() == 's')
     {
-        group = {{0x09, 0x0D}, {0x20, 0x20}};
+        group.emplace_back(0x09, 0x0D);
+        group.emplace_back(0x20, 0x20);
         return true;
     }
     return false;
@@ -542,7 +551,9 @@ bool Parser::parse(tags::ShorthandCharacterClassWhitespaceNegatedTag, CharacterG
     CodePoint cp;
     if(get() == '\\' && get() == 'S')
     {
-        group = {{kCodePointMin, 0x08}, {0x0E, 0x1F}, {0x21, kCodePointMax}};
+        group.emplace_back(kCodePointMin, 0x08);
+        group.emplace_back(0x0E, 0x1F);
+        group.emplace_back(0x21, kCodePointMax);
         return true;
     }
     return false;
