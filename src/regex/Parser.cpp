@@ -403,12 +403,10 @@ bool Parser::parse(tags::CharacterClassCharacterTag, CodePoint& cp)
 
 bool Parser::parse(tags::CharacterRangeTag, CharacterGroup& group)
 {
-    NodePtr start;
-    NodePtr end;
-    CodePoint startCP; 
-    CodePoint endCP; 
+    CodePoint start; 
+    CodePoint end; 
     
-    if(!parse<tags::CharacterClassCharacterTag>(startCP))
+    if(!parse<tags::CharacterClassCharacterTag>(start))
     {
         return false;
     }
@@ -418,17 +416,17 @@ bool Parser::parse(tags::CharacterRangeTag, CharacterGroup& group)
         return false;
     }
 
-    if(!parse<tags::CharacterClassCharacterTag>(endCP))
+    if(!parse<tags::CharacterClassCharacterTag>(end))
     {
         return false;
     }
 
-    if(startCP > endCP)
+    if(start > end)
     {
         error("Character range is out of order");
     }
 
-    group.emplace_back(startCP, endCP);
+    group.emplace_back(start, end);
     return true;
 }
 
