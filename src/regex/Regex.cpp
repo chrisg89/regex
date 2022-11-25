@@ -1,6 +1,7 @@
 #include "Regex.hpp" 
 #include "Parser.hpp"
 
+#include <algorithm>
 #include <cassert> //todo try to replace with excpetion everywhere
 
 #include "Utf8Iterator.hpp"
@@ -20,18 +21,16 @@ Regex::Regex(const std::string& regex)
 
 fa::InputType Regex::findInAlphabet(CodePoint input)
 {
-    int index = 0;
-    for(auto& x : mAlphabet)
-    {
-        if(input>= x.first && input <= x.second)
-        {
-            return index;
-        }
-        index++;
-    }
+    const auto within = [input](CodePointInterval interval)
+    { 
+        return input>= interval.first && input <= interval.second; 
+    };
 
-    assert(false); //TODO throw exception //TODO restructure this function
-    return 0;
+    auto begin = mAlphabet.begin();
+    auto end = mAlphabet.end();
+    auto result = std::find_if(begin, end, within);
+    assert(result != end);
+    return std::distance(begin, result);
 }
 
 bool Regex::match(const std::string string)
