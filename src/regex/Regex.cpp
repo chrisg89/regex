@@ -2,7 +2,7 @@
 #include "Parser.hpp"
 
 #include <algorithm>
-#include <cassert> //todo try to replace with excpetion everywhere
+#include <cassert>
 
 #include "Utf8Iterator.hpp"
 

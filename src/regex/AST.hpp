@@ -278,7 +278,7 @@ public:
     {
         Alphabet alphabet;
         mRoot->makeAlphabet(alphabet);
-        DisjoinOverlap(alphabet, kCodePointMin, kCodePointMax);
+        disjoinOverlap(alphabet, kCodePointMin, kCodePointMax);
         return alphabet;
     }
 

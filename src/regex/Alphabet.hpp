@@ -11,7 +11,7 @@ namespace regex
 using Alphabet = std::vector<CodePointInterval>;
 
 bool isSubset(CodePointInterval inner, CodePointInterval outer);
-void DisjoinOverlap(Alphabet& alphabet, CodePoint min, CodePoint max);
+void disjoinOverlap(Alphabet& alphabet, CodePoint min, CodePoint max);
 void negate(Alphabet& alphabet);
 
 }

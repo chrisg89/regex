@@ -17,7 +17,7 @@ bool isSubset(const CodePointInterval inner, const CodePointInterval outer)
     return false;
 }
 
-void DisjoinOverlap(Alphabet& alphabet, CodePoint min, CodePoint max)
+void disjoinOverlap(Alphabet& alphabet, CodePoint min, CodePoint max)
 {
     enum class EndpointType { eStart , eEnd};
     using Point = std::pair<CodePoint, EndpointType>;
