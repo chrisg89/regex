@@ -8,6 +8,17 @@ namespace {
 
 using Catch::Contains;
 
+SCENARIO("Parse empty regex")
+{
+    SECTION("Empty Regex")
+    {
+        const std::string regex = "";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "");
+    }
+}
+
 SCENARIO("Parse characters")
 {
     SECTION("Ascii character")
