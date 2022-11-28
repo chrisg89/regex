@@ -37,14 +37,6 @@ SCENARIO("Parse characters")
         CHECK(ast.print() == "[\\U0000040a-\\U0000040a]");
     }
 
-    SECTION("Cyrillic Capital Letter Nje")
-    {
-        const std::string regex = "Њ";
-        auto parser = Parser(regex);
-        auto ast = parser.parse();
-        CHECK(ast.print() == "[\\U0000040a-\\U0000040a]");
-    }
-
     SECTION("Armenian capital latter Ayb")
     {
         const std::string regex = "Ա";
@@ -401,7 +393,6 @@ SCENARIO("Parse shorthand character classes")
 
 SCENARIO("Parse character classes") 
 {
-
     SECTION("Simple character class")
     {
         const std::string regex = "[abc]";
@@ -704,6 +695,14 @@ SCENARIO("Parse Anchors")
 
 SCENARIO("Parse group") 
 {
+    SECTION("Empty group")
+    {
+        const std::string regex = "()";
+        auto parser = Parser(regex);
+        auto ast = parser.parse();
+        CHECK(ast.print() == "");
+    }
+
     SECTION("Simple group")
     {
         const std::string regex = "(a)";
@@ -726,14 +725,6 @@ SCENARIO("Parse group")
         auto parser = Parser(regex);
         auto ast = parser.parse();
         CHECK(ast.print() == "[\\U00000061-\\U00000061]");
-    }
-
-    SECTION("Empty group")
-    {
-        const std::string regex = "()";
-        auto parser = Parser(regex);
-        auto ast = parser.parse();
-        CHECK(ast.print() == "");
     }
 
     SECTION("Non-capturing group is not supported")
