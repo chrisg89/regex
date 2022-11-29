@@ -1137,6 +1137,20 @@ SCENARIO("Match character class")
         REQUIRE(!regex.match("A"));
     }
 
+    SECTION("Negated character class where hyphen is first character")
+    {
+        auto regex = Regex("[^-a]");
+
+        // Positive test case(s)
+        REQUIRE(regex.match("A"));
+        REQUIRE(regex.match("1"));
+        REQUIRE(regex.match("!"));
+
+        // Negative test case(s)
+        REQUIRE(!regex.match("-"));
+        REQUIRE(!regex.match("a"));
+    }
+
     SECTION("Character class where hyphen is final character")
     {
         auto regex = Regex("[a-]");
@@ -1174,6 +1188,19 @@ SCENARIO("Match character class")
         // Negative test case(s)
         REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
+    }
+
+    SECTION("Negated character class where closing bracket is first character")
+    {
+        auto regex = Regex("[^]]");
+
+        // Positive test case(s)
+        REQUIRE(regex.match("A"));
+        REQUIRE(regex.match("1"));
+        REQUIRE(regex.match("!"));
+
+        // Negative test case(s)
+        REQUIRE(!regex.match("]"));
     }
 
     SECTION("Character class with range (literal characters)")
@@ -1350,6 +1377,20 @@ SCENARIO("Match quantifiers")
         REQUIRE(!regex.match("!"));
     }
 
+    SECTION("Kleene star (*) operating on dot (any)")
+    {
+        auto regex = Regex(".*");
+
+        // Positive test case(s)
+        REQUIRE(regex.match(""));
+        REQUIRE(regex.match("a"));
+        REQUIRE(regex.match("aa"));
+        REQUIRE(regex.match("xyz"));
+
+        // Negative test case(s)
+        REQUIRE(!regex.match("\n"));
+    }
+
     SECTION("Kleene star (*) operating on a group")
     {
         auto regex = Regex("(a)*");
@@ -1406,6 +1447,20 @@ SCENARIO("Match quantifiers")
         REQUIRE(!regex.match("!"));
     }
 
+    SECTION("Kleene plus (+) operating on dot (any)")
+    {
+        auto regex = Regex(".+");
+
+        // Positive test case(s)
+        REQUIRE(regex.match("a"));
+        REQUIRE(regex.match("aa"));
+        REQUIRE(regex.match("xyz"));
+
+        // Negative test case(s)
+        REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match("\n"));
+    }
+
     SECTION("Kleene plus (+) operating on a group")
     {
         auto regex = Regex("(a)+");
@@ -1458,6 +1513,19 @@ SCENARIO("Match quantifiers")
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
+    }
+
+    SECTION("Optional (?) operating on dot (any)")
+    {
+        auto regex = Regex(".?");
+
+        // Positive test case(s)
+        REQUIRE(regex.match(""));
+        REQUIRE(regex.match("a"));
+        REQUIRE(regex.match("b"));
+
+        // Negative test case(s)
+        REQUIRE(!regex.match("\n"));
     }
 
     SECTION("Optional (?) operating on a group")
@@ -1515,6 +1583,15 @@ SCENARIO("Match quantifiers")
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
+    }
+
+    SECTION("Ranged quantifier: lower bound only operating on dot (any)")
+    {
+        auto regex = Regex(".{3}");
+
+        // Positive test case(s)
+        REQUIRE(regex.match("abc"));
+        REQUIRE(regex.match("xyz"));
     }
 
     SECTION("Ranged quantifier: lower bound only operating on a group")
@@ -1598,6 +1675,15 @@ SCENARIO("Match quantifiers")
         REQUIRE(!regex.match("!"));
     }
 
+    SECTION("Ranged quantifier: upper bound is omitted operating on dot (any)")
+    {
+        auto regex = Regex(".{3,}");
+
+        // Positive test case(s)
+        REQUIRE(regex.match("abcdefgh"));
+        REQUIRE(regex.match("xyz"));
+    }
+
     SECTION("Ranged quantifier: upper bound is omitted operating on a group")
     {
         auto regex = Regex("a{3,}");
@@ -1676,6 +1762,15 @@ SCENARIO("Match quantifiers")
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
+    }
+
+    SECTION("Ranged quantifier: lower and upper bound operating on dot (any)")
+    {
+        auto regex = Regex(".{3,4}");
+
+        // Positive test case(s)
+        REQUIRE(regex.match("abcd"));
+        REQUIRE(regex.match("xyz"));
     }
 
     SECTION("Ranged quantifier: lower and upper bound operating on a group")
@@ -1819,7 +1914,7 @@ SCENARIO("Match concatenation")
         REQUIRE(!regex.match(""));
     }
 
-    SECTION("Concatenation of two character classes")
+    SECTION("Concatenation of two groups")
     {
         auto regex = Regex("(a)(b)");
 
@@ -1828,6 +1923,22 @@ SCENARIO("Match concatenation")
 
         // Negative test case(s)
         REQUIRE(!regex.match(""));
+    }
+
+    SECTION("Concatenation of two empty groups")
+    {
+        auto regex = Regex("()()");
+
+        // Positive test case(s)
+        REQUIRE(regex.match(""));
+    }
+
+    SECTION("Concatenation of empty and non-empty group")
+    {
+        auto regex = Regex("()(a)");
+
+        // Positive test case(s)
+        REQUIRE(regex.match("a"));
     }
 }
 
@@ -1967,7 +2078,7 @@ SCENARIO("Match alternation")
         REQUIRE(!regex.match("!"));
     }
 
-    SECTION("Alternation of two character classes")
+    SECTION("Alternation of two groups")
     {
         auto regex = Regex("(a)|(b)");
 
@@ -1980,6 +2091,24 @@ SCENARIO("Match alternation")
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
+    }
+
+
+    SECTION("Alternation of two empty groups")
+    {
+        auto regex = Regex("()|()");
+
+        // Positive test case(s)
+        REQUIRE(regex.match(""));
+    }
+
+    SECTION("Alternation of empty and non-empty group")
+    {
+        auto regex = Regex("()|(a)");
+
+        // Positive test case(s)
+        REQUIRE(regex.match(""));
+        REQUIRE(regex.match("a"));
     }
 
     SECTION("Alternation and concatenation")
