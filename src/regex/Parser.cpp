@@ -7,13 +7,13 @@
 namespace regex::parser
 {
 
-NodePtr buildSubtree(const CharacterGroup& Segments)
+NodePtr buildSubtree(const CharacterGroup& segments)
 {
-    NodePtr out = std::make_unique<ast::Epsilon>();
+    NodePtr out = std::make_unique<ast::Null>();
 
-    for(auto it = Segments.rbegin(); it != Segments.rend(); ++it) 
+    for(auto it = segments.rbegin(); it != segments.rend(); ++it) 
     {
-        if(it == Segments.rbegin()) //todo !out
+        if(it == segments.rbegin())
         {
             out = std::make_unique<ast::CharacterRange>(it->first, it->second);
             continue;
@@ -21,7 +21,6 @@ NodePtr buildSubtree(const CharacterGroup& Segments)
 
         NodePtr segment = std::make_unique<ast::CharacterRange>(it->first, it->second);
         out = std::make_unique<ast::Alternative>(segment, out);
-
     }
     return out;
 }

@@ -911,20 +911,6 @@ SCENARIO("Match character class")
         REQUIRE(!regex.match("_"));
     }
 
-    SECTION("Negated character class with \\w and \\W")
-    {
-        auto regex = Regex("[^\\w\\W]");
-
-        // Positive test case(s)
-        REQUIRE(regex.match(""));
-
-        // Negative test case(s)
-        //REQUIRE(!regex.match("")); //chris TODO
-        REQUIRE(!regex.match("A"));
-        REQUIRE(!regex.match("1"));
-        REQUIRE(!regex.match("!"));
-    }
-
     SECTION("Character class with shorthand \\d")
     {
         auto regex = Regex("\\d");
@@ -969,20 +955,6 @@ SCENARIO("Match character class")
         REQUIRE(!regex.match("9"));
     }
 
-    SECTION("Negated character class with \\d and \\D")
-    {
-        auto regex = Regex("[^\\d\\D]");
-
-        // Positive test case(s)
-        REQUIRE(regex.match(""));
-
-        // Negative test case(s)
-        //TODO REQUIRE(!regex.match(""));
-        REQUIRE(!regex.match("A"));
-        REQUIRE(!regex.match("1"));
-        REQUIRE(!regex.match("!"));
-    }
-
     SECTION("Character class with shorthand \\s")
     {
         auto regex = Regex("\\s");
@@ -1017,20 +989,48 @@ SCENARIO("Match character class")
         REQUIRE(!regex.match(" "));
     }
 
-    SECTION("Negated character class with \\s and \\S")
+    SECTION("Empty character class due to negation of \\w and \\W")
     {
-        auto regex = Regex("[^\\s\\S]");
+        auto regex = Regex("[^\\w\\W]");
 
         // Positive test case(s)
-        REQUIRE(regex.match(""));
+        // None - no matches
 
         // Negative test case(s)
-        //TODO REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
     }
 
+    SECTION("Empty character class due to negation of \\d and \\D")
+    {
+        auto regex = Regex("[^\\d\\D]");
+
+        // Positive test case(s)
+        // None - no matches
+
+        // Negative test case(s)
+        REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match("A"));
+        REQUIRE(!regex.match("1"));
+        REQUIRE(!regex.match("!"));
+    }
+
+    SECTION("Empty character class due to negation of \\s and \\S")
+    {
+        auto regex = Regex("[^\\s\\S]");
+
+        // Positive test case(s)
+        // None - no matches
+
+        // Negative test case(s)
+        REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match("A"));
+        REQUIRE(!regex.match("1"));
+        REQUIRE(!regex.match("!"));
+    }    
+    
     SECTION("Character class with escaped characters that have special meaning")
     {
         auto regex = Regex("[\\n\\f\\r\\t\\v\\a\\\\]");

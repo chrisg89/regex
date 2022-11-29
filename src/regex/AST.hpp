@@ -209,6 +209,28 @@ public:
     }
 };
 
+class Null : public Node
+{
+public:
+    BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
+    {
+        //entry and exit are not connected by any transition
+        auto entry = nfa.addState(false, false);
+        auto exit = nfa.addState(false, false);
+        return BlackBox(entry, exit);
+    }
+
+    void makeAlphabet(Alphabet& alphabet) const final
+    {
+        /* Do nothing */
+    }
+
+    void print(std::string& str) const final
+    {
+        str+= "";
+    }
+};
+
 class CharacterRange : public Node
 {
 public:
