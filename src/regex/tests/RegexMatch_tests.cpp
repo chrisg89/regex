@@ -474,7 +474,7 @@ SCENARIO("Match any (.) character")
         REQUIRE(regex.match("ﻚ"));
 
         // Negative test case(s)
-        // REQUIRE(!regex.match(""));  TODO BUG
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("\n"));
     }
 }
@@ -498,7 +498,7 @@ SCENARIO("Match 'digit' shorthand character class")
         REQUIRE(regex.match("9"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     }
 }
@@ -515,7 +515,7 @@ SCENARIO("Match 'non-digit' shorthand character class")
         REQUIRE(regex.match("c"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("0"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("2"));
@@ -601,7 +601,7 @@ SCENARIO("Match 'word' shorthand character class")
         REQUIRE(regex.match("_"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("?"));
         REQUIRE(!regex.match("."));
         REQUIRE(!regex.match("&"));
@@ -620,7 +620,7 @@ SCENARIO("Match 'non-word' shorthand character class")
         REQUIRE(regex.match("&"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("0"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("2"));
@@ -702,7 +702,7 @@ SCENARIO("Match 'whitespace' shorthand character class")
         REQUIRE(regex.match(" "));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     }
 }
@@ -717,7 +717,7 @@ SCENARIO("Match 'non-whitespace' shorthand character class")
         REQUIRE(regex.match("A"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("\t"));
         REQUIRE(!regex.match("\r"));
         REQUIRE(!regex.match("\n"));
@@ -739,7 +739,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("c"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     } 
 
@@ -753,7 +753,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("!"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("a"));
         REQUIRE(!regex.match("b"));
         REQUIRE(!regex.match("c"));
@@ -829,7 +829,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("_"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("?"));
         REQUIRE(!regex.match("."));
         REQUIRE(!regex.match("&"));
@@ -845,7 +845,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("&"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("0"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("2"));
@@ -919,7 +919,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match(""));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        //REQUIRE(!regex.match("")); //chris TODO
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
@@ -942,7 +942,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("9"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     }
 
@@ -956,7 +956,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("c"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("0"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("2"));
@@ -977,7 +977,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match(""));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        //TODO REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
@@ -996,7 +996,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match(" "));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     }
 
@@ -1008,7 +1008,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("A"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("\t"));
         REQUIRE(!regex.match("\r"));
         REQUIRE(!regex.match("\n"));
@@ -1025,7 +1025,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match(""));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        //TODO REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
@@ -1045,7 +1045,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("\\"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
@@ -1062,7 +1062,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("-"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
@@ -1082,7 +1082,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match(")"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
@@ -1120,7 +1120,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("-"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     }
 
@@ -1133,7 +1133,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("a"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     }
 
@@ -1146,7 +1146,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("a"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     }
 
@@ -1160,7 +1160,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("1"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     }
 
@@ -1172,7 +1172,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("["));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     }
 
@@ -1186,7 +1186,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("d"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("a"));
         REQUIRE(!regex.match("e"));
     }
@@ -1199,7 +1199,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("^"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     }
 
@@ -1214,7 +1214,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("a"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("]"));
         REQUIRE(!regex.match("b"));
     }
@@ -1232,7 +1232,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("4"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("a"));
         REQUIRE(!regex.match("e"));
         REQUIRE(!regex.match("1"));
@@ -1247,7 +1247,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("a"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     }
 
@@ -1265,7 +1265,7 @@ SCENARIO("Match character class")
         REQUIRE(regex.match("\a"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     }
 }
@@ -1280,7 +1280,6 @@ SCENARIO("Match group")
         REQUIRE(regex.match(""));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("("));
@@ -1346,7 +1345,6 @@ SCENARIO("Match quantifiers")
         REQUIRE(regex.match("aaa"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
@@ -1363,7 +1361,6 @@ SCENARIO("Match quantifiers")
         REQUIRE(regex.match("aaa"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
@@ -1387,7 +1384,6 @@ SCENARIO("Match quantifiers")
         REQUIRE(regex.match("bcabcabc"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
@@ -1443,7 +1439,7 @@ SCENARIO("Match quantifiers")
         REQUIRE(regex.match("bcabcabc"));
 
         // Negative test case(s)
-        //REQUIRE(!regex.match(""));  //TODO BUG
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
@@ -1572,15 +1568,15 @@ SCENARIO("Match quantifiers")
         REQUIRE(regex.match("ccc"));
 
         // Negative test case(s)
-        //REQUIRE(!regex.match("")); //TODO BUG
-        //REQUIRE(!regex.match("a")); //TODO BUG
-        //REQUIRE(!regex.match("aa")); //TODO BUG
+        REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match("a"));
+        REQUIRE(!regex.match("aa"));
         REQUIRE(!regex.match("aaaa"));
-        //REQUIRE(!regex.match("b")); //TODO BUG
-        //REQUIRE(!regex.match("bb")); //TODO BUG
+        REQUIRE(!regex.match("b"));
+        REQUIRE(!regex.match("bb"));
         REQUIRE(!regex.match("bbbb"));
-        //REQUIRE(!regex.match("c")); //TODO BUG
-        //REQUIRE(!regex.match("cc")); //TODO BUG
+        REQUIRE(!regex.match("c"));
+        REQUIRE(!regex.match("cc"));
         REQUIRE(!regex.match("cccc"));
     }
 
@@ -1655,13 +1651,13 @@ SCENARIO("Match quantifiers")
         REQUIRE(regex.match("bacbacbcabc"));
 
         // Negative test case(s)
-        //REQUIRE(!regex.match("")); //TODO BUG
-        //REQUIRE(!regex.match("a")); //TODO BUG
-        //REQUIRE(!regex.match("aa")); //TODO BUG
-        //REQUIRE(!regex.match("b")); //TODO BUG
-        //REQUIRE(!regex.match("bb")); //TODO BUG
-        //REQUIRE(!regex.match("c")); //TODO BUG
-        //REQUIRE(!regex.match("cc")); //TODO BUG
+        REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match("a"));
+        REQUIRE(!regex.match("aa"));
+        REQUIRE(!regex.match("b"));
+        REQUIRE(!regex.match("bb"));
+        REQUIRE(!regex.match("c"));
+        REQUIRE(!regex.match("cc"));
     }
 
     SECTION("Ranged quantifier: lower and upper bound")
@@ -1737,9 +1733,9 @@ SCENARIO("Match quantifiers")
         REQUIRE(regex.match("cabc"));
 
         // Negative test case(s)
-        //REQUIRE(!regex.match("")); //TODO BUG
-        //REQUIRE(!regex.match("a")); //TODO BUG
-        //REQUIRE(!regex.match("aa")); //TODO BUG
+        REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match("a"));
+        REQUIRE(!regex.match("aa"));
         REQUIRE(!regex.match("aaaaa"));
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
@@ -1820,7 +1816,7 @@ SCENARIO("Match concatenation")
         REQUIRE(regex.match("c3"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
     }
 
     SECTION("Concatenation of two character classes")
@@ -1966,7 +1962,7 @@ SCENARIO("Match alternation")
         REQUIRE(regex.match("3"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("!"));
     }
@@ -2010,7 +2006,7 @@ SCENARIO("Match alternation")
         REQUIRE(regex.match("z"));
 
         // Negative test case(s)
-        //TODO BUG REQUIRE(!regex.match(""));
+        REQUIRE(!regex.match(""));
     }
 
     SECTION("Alternation, concatenation and group")
@@ -2028,9 +2024,8 @@ SCENARIO("Match alternation")
     }
 }
 
-SCENARIO("Random Tests")
+SCENARIO("Random tests")
 {
-
     SECTION("Realistic tests using dates")
     {
         

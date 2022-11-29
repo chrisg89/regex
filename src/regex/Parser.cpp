@@ -11,9 +11,17 @@ NodePtr buildSubtree(const CharacterGroup& Segments)
 {
     NodePtr out = std::make_unique<ast::Epsilon>();
 
-    for(auto it = Segments.rbegin(); it != Segments.rend(); ++it) {
+    for(auto it = Segments.rbegin(); it != Segments.rend(); ++it) 
+    {
+        if(it == Segments.rbegin()) //todo !out
+        {
+            out = std::make_unique<ast::CharacterRange>(it->first, it->second);
+            continue;
+        }
+
         NodePtr segment = std::make_unique<ast::CharacterRange>(it->first, it->second);
         out = std::make_unique<ast::Alternative>(segment, out);
+
     }
     return out;
 }
