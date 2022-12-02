@@ -885,7 +885,7 @@ bool Parser::parse(tags::Unicode8DigitCodePointTag, CodePoint& cp)
     constexpr auto kNumDigits = 8u;
     
     cp = 0;
-    for(int i=0; i < kNumDigits; i++)
+    for(int i=0; i < kNumDigits; ++i)
     {
         CodePoint digit = get();
         if(!isxdigit(digit))
@@ -910,7 +910,7 @@ bool Parser::parse(tags::Unicode4DigitCodePointTag, CodePoint& cp)
     constexpr auto kNumDigits = 4u;
     
     cp = 0;
-    for(int i=0; i < kNumDigits; i++)
+    for(int i=0; i < kNumDigits; ++i)
     {
         CodePoint digit = get();
         if(!isxdigit(digit))

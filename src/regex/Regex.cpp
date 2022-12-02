@@ -37,7 +37,7 @@ bool Regex::match(const std::string string)
 {
     auto state = mDFA.getFirst();
 
-    for( Utf8Iterator it = string.cbegin(); it != string.cend(); it++ )
+    for( Utf8Iterator it = string.cbegin(); it != string.cend(); ++it )
     {
         // lookup the codepoint in the alphabet
         auto input = findInAlphabet(*it);

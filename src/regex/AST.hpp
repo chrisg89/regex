@@ -133,7 +133,7 @@ public:
         auto exit = nfa.addState(false, false);
         auto prev = entry;
 
-        for(uint64_t min = 0; min < mMin; min++)
+        for(uint64_t min = 0; min < mMin; ++min)
         {
             auto next = mInner->makeNFA(alphabet, nfa);
             nfa.addTransition(fa::kEpsilon, prev, next.entry);
@@ -142,7 +142,7 @@ public:
 
         if(mIsMaxBounded)
         {
-            for(uint64_t max = mMin; max < mMax; max++)
+            for(uint64_t max = mMin; max < mMax; ++max)
             {
                 auto next = mInner->makeNFA(alphabet, nfa);
                 nfa.addTransition(fa::kEpsilon, prev, next.entry);
@@ -251,7 +251,7 @@ public:
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
 
-        for(auto i=0; i<alphabet.size(); i++)
+        for(auto i=0; i<alphabet.size(); ++i)
         {
             if(isSubset(alphabet[i], interval))
             {
