@@ -4,22 +4,13 @@
 #include "Automata.hpp"
 #include "DFA.hpp"
 
-#include <vector>
-#include <iostream>
 #include <map>
-
+#include <vector>
 
 namespace automata
 {
 
-
-
-
 using EpsilonClusureMap = std::map<StateId,std::vector<StateId>>;
-
-
-
-
 
 class NFAState
 {

@@ -1,12 +1,12 @@
 #include "NFA.hpp"
 #include "Bimap.hpp"
 
-#include <cassert>
-#include <stack>
 #include <algorithm>
-#include <unordered_set>
-#include <set>
+#include <cassert>
 #include <deque>
+#include <set>
+#include <stack>
+#include <unordered_set>
 
 namespace automata
 {
@@ -20,20 +20,6 @@ struct VectorHasher {
         return hash;
     }
 };
-
-
-
-
-using StateMapper = Bimap<std::vector<StateId>, StateId, VectorHasher>;  //TODO change to set<StateId>
-
-
-
-
-
-
-
-
-
 
 NFAState::NFAState(StateId id, bool isStart, bool isFinal)
     : mId{id}
@@ -59,7 +45,7 @@ StateId NFA::addState(bool isStart, bool isFinal)
 {
     if(isStart)
     {
-        assert(mStartState == kNullState); //TODO replace with exception
+        assert(mStartState == kNullState);
         mStartState = mStateCount;
     }
 
@@ -108,7 +94,6 @@ std::string NFA::serialize()
     return out;
 }
 
-
 DFA NFA::toDFA()
 {
     // TODO: explain
@@ -121,7 +106,6 @@ DFA NFA::toDFA()
     dfa.minimizeDFA();
 
     return dfa;
-
 }
 
 void NFA::EpsilonNFAToNFAConversion()
@@ -246,17 +230,16 @@ bool NFA::ContainsFinalState(const std::vector<StateId>& composite )  //TODO cle
 
 DFA NFA::NFAToDFAConversion()
 {
+    using StateMapper = Bimap<std::vector<StateId>, StateId, VectorHasher>;  //TODO change to set<StateId>
 
     DFA dfa(mAlphabet);
     std::deque<StateId> queue;
     StateMapper mapper;
     std::set<StateId> set;
 
-
     auto dfaState = dfa.addState(true, mStates.at(mStartState).mIsFinal);
     mapper.insert(dfaState, {mStartState});
     queue.push_back(dfaState);
-
 
     while(!queue.empty())
     {
@@ -267,7 +250,6 @@ DFA NFA::NFAToDFAConversion()
 
         for(auto c : mAlphabet)
         {
-
             set.clear();
 
             for(auto nfaState : nfaStates)

@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <unordered_set>
-#include <iostream> //todo remove
 
 namespace automata
 {
@@ -37,7 +36,7 @@ StateId DFA::addState(bool isStart, bool isFinal)
 {
     if(isStart)
     {
-        assert(mStartState == kNullState); //TODO replace with exception
+        assert(mStartState == kNullState);
         mStartState = mStateCount;
     }
 
@@ -130,7 +129,6 @@ struct Partition
     PartitionId ID;
 };
 
-
 struct PartitionPool
 {
     PartitionPool();
@@ -175,7 +173,6 @@ ParitionMap PartitionPool::makePartitionMap()
 
 void DFA::minimizeDFA()
 {
-
     PartitionPool pool;
     ParitionMap prevPartitionMap;
     ParitionMap currPartitionMap;

@@ -3,15 +3,13 @@
 
 #include "Automata.hpp"
 
-#include <vector>
 #include <map>
 #include <string>
 #include <unordered_map>
-
+#include <vector>
 
 namespace automata
 {
-
 
 using PartitionId = int;
 using ParitionMap = std::unordered_map<StateId,PartitionId>;  //todo change to vector?
@@ -32,7 +30,6 @@ public:
     std::map<InputType, StateId> mTransitions;
 };
 
-
 class DFA
 {
 public:
@@ -52,8 +49,6 @@ public:
     bool isFinalState(StateId current);
 
     void minimizeDFA();
-
-
 
 private:
     std::vector<DFAState> mStates;
