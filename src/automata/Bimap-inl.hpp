@@ -14,17 +14,9 @@ Bimap<Type1, Type2, Type1Hasher, Type2Hasher>::Bimap()
 template <typename Type1, typename Type2, typename Type1Hasher, typename Type2Hasher>
 void Bimap<Type1, Type2, Type1Hasher, Type2Hasher>::insert(Type1 type1, Type2 type2)
 {
-    // TODO the assertions below should be replaced with the following.
-    // Or even better use contains()
-    //assert(unordered_map1.find(type1) != unordered_map1.end()); // TODO why did I add this again?
-    //assert(unordered_map2.find(type2) != unordered_map2.end()); // TODO why did I add this again?
-
-    if (unordered_map1.find(type1) != unordered_map1.end())
-        assert(false);  //todo replace with exception
-
-    if (unordered_map2.find(type2) != unordered_map2.end())
-        assert(false);  //todo replace with exception
-
+    // We could allow re-insertion but its not required by NFA
+    assert (!contains(type1));
+    assert (!contains(type2));
     unordered_map1[type1] = type2;
     unordered_map2[type2] = type1;
 }
@@ -32,17 +24,9 @@ void Bimap<Type1, Type2, Type1Hasher, Type2Hasher>::insert(Type1 type1, Type2 ty
 template <typename Type1, typename Type2, typename Type1Hasher, typename Type2Hasher>
 void Bimap<Type1, Type2, Type1Hasher, Type2Hasher>::insert(Type2 type2, Type1 type1)
 {
-    // TODO the assertions below should be replaced with the following.
-    // Or even better use contains()
-    //assert(unordered_map1.find(type1) != unordered_map1.end()); // TODO why did I add this again?
-    //assert(unordered_map2.find(type2) != unordered_map2.end()); // TODO why did I add this again?
-    
-    if (unordered_map1.find(type1) != unordered_map1.end())
-        assert(false);  //todo replace with exception
-
-    if (unordered_map2.find(type2) != unordered_map2.end())
-        assert(false);  //todo replace with exception
-        
+    // We could allow re-insertion but its not required by NFA
+    assert (!contains(type1));
+    assert (!contains(type2));
     unordered_map1[type1] = type2;
     unordered_map2[type2] = type1;
 }
