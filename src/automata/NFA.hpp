@@ -1,7 +1,7 @@
 
 #pragma once 
 
-#include "FA.hpp"
+#include "Automata.hpp"
 #include "DFA.hpp"
 
 #include <vector>
@@ -9,7 +9,7 @@
 #include <map>
 
 
-namespace fa
+namespace automata
 {
 
 
@@ -63,10 +63,8 @@ private:
     uint mStateCount;
     StateId mStartState;
     std::vector<StateId> mFinalStates;
-    
 };
 
-
-} //namespace fa
+} //namespace automata
 
 

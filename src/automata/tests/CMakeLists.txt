@@ -5,7 +5,7 @@ add_executable(fa_tests
 
 TARGET_LINK_LIBRARIES( fa_tests
     catch
-    fa_lib
+    automata_lib
     )
 
     

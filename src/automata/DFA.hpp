@@ -1,7 +1,7 @@
 
 #pragma once 
 
-#include "FA.hpp"
+#include "Automata.hpp"
 
 #include <vector>
 #include <map>
@@ -9,7 +9,7 @@
 #include <unordered_map>
 
 
-namespace fa
+namespace automata
 {
 
 
@@ -66,7 +66,6 @@ private:
     bool checkEquivalence(ParitionMap paritionMap, StateId stateA, StateId stateB);
 };
 
-
-} //namespace fa
+} //namespace automata
 
 

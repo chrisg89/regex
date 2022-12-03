@@ -3,8 +3,11 @@
 #include "DFA.hpp"
 #include "NFA.hpp"
 
-namespace fa{
-namespace{
+namespace automata
+{
+
+namespace
+{
 
 //TODO rename to PLantUml to serialize()
 
@@ -226,4 +229,4 @@ SCENARIO( "NFA", "[empty]" )
 }
 
 } //namespace
-} //namespace fa
+} //namespace automata

@@ -8,7 +8,7 @@
 #include <set>
 #include <deque>
 
-namespace fa
+namespace automata
 {
 
 struct VectorHasher {
@@ -297,8 +297,5 @@ DFA NFA::NFAToDFAConversion()
     return dfa;
 }
 
-
-
-
-} //namespace fa
+} //namespace automata
 

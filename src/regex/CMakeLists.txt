@@ -7,7 +7,7 @@ add_library(regex_lib
     )
 
 TARGET_LINK_LIBRARIES( regex_lib
-    fa_lib
+    automata_lib
     )
 
 target_include_directories(regex_lib

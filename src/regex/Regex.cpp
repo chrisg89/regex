@@ -19,7 +19,7 @@ Regex::Regex(const std::string& regex)
     mDFA = nfa.toDFA();
 }
 
-fa::InputType Regex::findInAlphabet(CodePoint input)
+automata::InputType Regex::findInAlphabet(CodePoint input)
 {
     const auto within = [input](CodePointInterval interval)
     { 

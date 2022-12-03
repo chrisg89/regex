@@ -9,7 +9,7 @@
 namespace regex
 {
 
-using DFA = fa::DFA;
+using DFA = automata::DFA;
 
 class Regex
 {
@@ -22,7 +22,7 @@ public:
 private:
     DFA mDFA;
     Alphabet mAlphabet;
-    fa::InputType findInAlphabet(CodePoint input); // should be free standing function
+    automata::InputType findInAlphabet(CodePoint input); // todo should be free standing function
 };
 
 } //namespace regex

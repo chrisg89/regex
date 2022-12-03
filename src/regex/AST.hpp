@@ -14,7 +14,7 @@
 namespace regex::ast
 {
 
-using StateId = fa::StateId;
+using StateId = automata::StateId;
 
 struct BlackBox
 {
@@ -29,7 +29,7 @@ struct BlackBox
 
 class Node;
 using NodePtr = std::unique_ptr<Node>;
-using NFA = fa::NFA;
+using NFA = automata::NFA;
 
 class Node
 {
@@ -54,10 +54,10 @@ public:
 
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
-        nfa.addTransition(fa::kEpsilon, entry, BB1.entry);
-        nfa.addTransition(fa::kEpsilon, entry, BB2.entry);
-        nfa.addTransition(fa::kEpsilon, BB1.exit, exit);
-        nfa.addTransition(fa::kEpsilon, BB2.exit, exit);
+        nfa.addTransition(automata::kEpsilon, entry, BB1.entry);
+        nfa.addTransition(automata::kEpsilon, entry, BB2.entry);
+        nfa.addTransition(automata::kEpsilon, BB1.exit, exit);
+        nfa.addTransition(automata::kEpsilon, BB2.exit, exit);
         return BlackBox(entry, exit);
     }
 
@@ -95,7 +95,7 @@ public:
 
         auto entry = BB1.entry;
         auto exit = BB2.exit;
-        nfa.addTransition(fa::kEpsilon, BB1.exit, BB2.entry);
+        nfa.addTransition(automata::kEpsilon, BB1.exit, BB2.entry);
         return BlackBox(entry, exit);
     }
 
@@ -136,7 +136,7 @@ public:
         for(uint64_t min = 0; min < mMin; ++min)
         {
             auto next = mInner->makeNFA(alphabet, nfa);
-            nfa.addTransition(fa::kEpsilon, prev, next.entry);
+            nfa.addTransition(automata::kEpsilon, prev, next.entry);
             prev = next.exit;
         }
 
@@ -145,21 +145,21 @@ public:
             for(uint64_t max = mMin; max < mMax; ++max)
             {
                 auto next = mInner->makeNFA(alphabet, nfa);
-                nfa.addTransition(fa::kEpsilon, prev, next.entry);
-                nfa.addTransition(fa::kEpsilon, prev, exit);
+                nfa.addTransition(automata::kEpsilon, prev, next.entry);
+                nfa.addTransition(automata::kEpsilon, prev, exit);
                 prev = next.exit;
             }
         }
         else
         {
             auto next = mInner->makeNFA(alphabet, nfa);
-            nfa.addTransition(fa::kEpsilon, prev, next.entry);
-            nfa.addTransition(fa::kEpsilon, prev, exit);
-            nfa.addTransition(fa::kEpsilon, next.exit, next.entry);
+            nfa.addTransition(automata::kEpsilon, prev, next.entry);
+            nfa.addTransition(automata::kEpsilon, prev, exit);
+            nfa.addTransition(automata::kEpsilon, next.exit, next.entry);
             prev = next.exit;
         }
 
-        nfa.addTransition(fa::kEpsilon, prev, exit);
+        nfa.addTransition(automata::kEpsilon, prev, exit);
         return BlackBox(entry, exit);
     }
 
@@ -194,7 +194,7 @@ public:
     {
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
-        nfa.addTransition(fa::kEpsilon, entry, exit);
+        nfa.addTransition(automata::kEpsilon, entry, exit);
         return BlackBox(entry, exit);
     }
 
@@ -307,7 +307,7 @@ public:
     NFA makeNFA(const Alphabet& alphabet) const
     {
         // Make the NFA's alphabet
-        auto nfaAlphabet = fa::Alphabet(alphabet.size());
+        auto nfaAlphabet = automata::Alphabet(alphabet.size());
         std::iota(std::begin(nfaAlphabet), std::end(nfaAlphabet), 0);
 
         // Make the empty NFA
@@ -317,8 +317,8 @@ public:
         auto bb = mRoot->makeNFA(alphabet, nfa);
         auto start = nfa.addState(true, false);
         auto end = nfa.addState(false, true);
-        nfa.addTransition(fa::kEpsilon, start, bb.entry);
-        nfa.addTransition(fa::kEpsilon, bb.exit, end);
+        nfa.addTransition(automata::kEpsilon, start, bb.entry);
+        nfa.addTransition(automata::kEpsilon, bb.exit, end);
 
         return nfa;
     }

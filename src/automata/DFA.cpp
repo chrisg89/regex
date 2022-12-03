@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <iostream> //todo remove
 
-namespace fa
+namespace automata
 {
 
 DFAState::DFAState(StateId id, bool isStart, bool isFinal)
@@ -300,4 +300,4 @@ bool DFA::checkEquivalence(ParitionMap paritionMap, StateId stateA, StateId stat
     return true;
 }
 
-} //namespace fa
+} //namespace automata

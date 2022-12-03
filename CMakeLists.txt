@@ -10,7 +10,7 @@ set(CMAKE_BUILD_TYPE Debug)
 # set the project name
 project(Regex)
 
-add_subdirectory(src/fa)
+add_subdirectory(src/automata)
 add_subdirectory(src/regex)
 add_subdirectory(src/catch)
  
