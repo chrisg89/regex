@@ -1,3 +1,0 @@
-
-
-\uFFFFFF where FFFFFF are exactly 6 hexidecimal digits between 0x000001 and 0x10FFFF
