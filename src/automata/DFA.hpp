@@ -44,7 +44,7 @@ public:
     std::string serialize();
 
     StateId step(StateId current, InputType input);
-    StateId getFirst();
+    StateId getStartState();
     bool isDeadState(StateId current);
     bool isFinalState(StateId current);
 

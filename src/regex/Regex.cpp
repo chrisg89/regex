@@ -35,7 +35,7 @@ automata::InputType Regex::findInAlphabet(CodePoint input)
 
 bool Regex::match(const std::string string)
 {
-    auto state = mDFA.getFirst();
+    auto state = mDFA.getStartState();
 
     for( Utf8Iterator it = string.cbegin(); it != string.cend(); ++it )
     {

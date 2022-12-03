@@ -84,7 +84,7 @@ std::string DFA::serialize()
     return out;
 }
 
-StateId DFA::getFirst() //TODO rename getStartState
+StateId DFA::getStartState()
 {
     assert(mStartState != kNullState);
     return mStartState;
