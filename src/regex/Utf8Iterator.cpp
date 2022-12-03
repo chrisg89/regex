@@ -1,17 +1,13 @@
 #include "Utf8Iterator.hpp"
 
-//source 
-// http://www.nubaria.com/en/blog/?p=371
-//TODO: add check for illegal utf8 encodings and exception
-
 namespace regex
 {
 
-const unsigned char kFirstBitMask = 128; // 1000000
-const unsigned char kSecondBitMask = 64; // 0100000
-const unsigned char kThirdBitMask = 32; // 0010000
-const unsigned char kFourthBitMask = 16; // 0001000
-const unsigned char kFifthBitMask = 8; // 0000100
+const unsigned char kFirstBitMask = 128;
+const unsigned char kSecondBitMask = 64;
+const unsigned char kThirdBitMask = 32;
+const unsigned char kFourthBitMask = 16;
+const unsigned char kFifthBitMask = 8;
 
 Utf8Iterator::Utf8Iterator(std::string::const_iterator it) :
 mStringIterator(it),
@@ -34,10 +30,6 @@ Utf8Iterator& Utf8Iterator::operator=(const Utf8Iterator& rhs)
     mDirty = rhs.mDirty;
  
     return *this;
-}
- 
-Utf8Iterator::~Utf8Iterator()
-{
 }
 
 Utf8Iterator& Utf8Iterator::operator++()

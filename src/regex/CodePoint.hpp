@@ -14,6 +14,4 @@ constexpr CodePoint kCodePointMax = 0x0010'FFFFU;
 
 constexpr CodePoint kEOF = 0xFFFF'FFFFU; 
 
-//TODO Add calculation logic here for Codepoints?
-
 }
