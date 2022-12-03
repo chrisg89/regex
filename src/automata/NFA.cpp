@@ -153,7 +153,7 @@ void NFA::EpsilonNFAToNFAConversion()
     }
 
     //STEP3: replace old NFA with new NFA
-    *this = newNFA;  // TODO: should use move semantics here?
+    *this = std::move(newNFA);
 }
 
 EpsilonClusureMap NFA::CreateEpsilonClosureMap()

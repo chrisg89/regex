@@ -268,13 +268,10 @@ void DFA::minimizeDFA()
             auto targetState = currPartitionMap.at(mStates.at(partition.Leader).mTransitions.at(c));
             newDFA.addTransition(c, newState, targetState);
         }
-        
-
-
     }
 
     //STEP3: replace old DFA with new DFA
-    *this = newDFA;  // TODO: should use move semantics here?
+    *this = std::move(newDFA);
 
 }
 
