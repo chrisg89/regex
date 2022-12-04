@@ -195,7 +195,7 @@ bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination) const
         auto state = stack.top();
         stack.pop();
 
-        auto transitions = mStates.at(state).mTransitions;
+        const auto& transitions = mStates.at(state).mTransitions;
         if(transitions.count(kEpsilon))
         {
             for (const auto adjacent : transitions.at(kEpsilon))
