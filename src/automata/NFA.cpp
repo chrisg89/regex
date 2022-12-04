@@ -96,13 +96,15 @@ std::string NFA::serialize()
 
 DFA NFA::toDFA()
 {
-    // TODO: explain
+    // The NFA built via Thompson-Construction contains epsilon
+    // transitions and called an "Epsilon NFA". The Epsilon NFA
+    // must be transformed by eliminating the epsilon
     EpsilonNFAToNFAConversion();
 
-    // TODO: explain
+    // Next, convert the NFA to a DFA
     auto dfa = NFAToDFAConversion();
 
-    // TODO: explain
+    // Finally, minimize the DFA
     dfa.minimizeDFA();
 
     return dfa;
