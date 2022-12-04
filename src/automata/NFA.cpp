@@ -110,6 +110,54 @@ DFA NFA::toDFA()
     return dfa;
 }
 
+bool isReachableByEpsilonClosure(EpsilonClusureMap& map, StateId source, StateId destination)
+{
+    auto& reachable = map[source];
+
+    if (std::find(reachable.begin(), reachable.end(), destination) != reachable.end())
+    {
+        return true;
+    }
+
+    return false;
+}
+
+EpsilonClusureMap NFA::CreateEpsilonClosureMap() const
+{
+    EpsilonClusureMap map;
+
+    for (const auto& source : mStates)
+    {
+        auto& reachable = map[source.Id];
+
+        std::stack<StateId> stack;
+
+        stack.push(source.Id);
+        reachable.push_back(source.Id);
+
+        while(!stack.empty())
+        {
+            auto state = stack.top();
+            stack.pop();
+
+            const auto& transitions = mStates.at(state).Transitions;
+            if(transitions.count(kEpsilon))
+            {
+                for (const auto adjacent : transitions.at(kEpsilon))
+                {
+                    if (std::find(reachable.begin(), reachable.end(), adjacent) == reachable.end())
+                    {
+                        stack.push(adjacent);
+                        reachable.push_back(adjacent);
+                    }
+                }
+            }
+        }
+    }
+
+    return map;
+}
+
 void NFA::EpsilonNFAToNFAConversion()
 {
     NFA newNFA(mAlphabet);
@@ -154,55 +202,6 @@ void NFA::EpsilonNFAToNFAConversion()
 
     //STEP3: replace old NFA with new NFA
     *this = std::move(newNFA);
-}
-
-EpsilonClusureMap NFA::CreateEpsilonClosureMap() const
-{
-    EpsilonClusureMap map;
-
-    for (const auto& source : mStates)
-    {
-        auto& reachable = map[source.Id];
-
-        std::stack<StateId> stack;
-
-        stack.push(source.Id);
-        reachable.push_back(source.Id);
-
-        while(!stack.empty())
-        {
-            auto state = stack.top();
-            stack.pop();
-
-            const auto& transitions = mStates.at(state).Transitions;
-            if(transitions.count(kEpsilon))
-            {
-                for (const auto adjacent : transitions.at(kEpsilon))
-                {
-                    if (std::find(reachable.begin(), reachable.end(), adjacent) == reachable.end())
-                    {
-                        stack.push(adjacent);
-                        reachable.push_back(adjacent);
-                    }
-                }
-            }
-        }
-    }
-
-    return map;
-}
-
-// TODO make this a free function
-bool NFA::isReachableByEpsilonClosure(EpsilonClusureMap& map, StateId source, StateId destination) const
-{
-    auto& reachable = map[source];
-
-    if (std::find(reachable.begin(), reachable.end(), destination) != reachable.end())
-    {
-        return true;
-    }
-
-    return false;
 }
 
 bool NFA::ContainsFinalState(const std::vector<StateId>& composite )  //TODO clean up. Rename?

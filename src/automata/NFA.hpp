@@ -42,7 +42,6 @@ private:
 
     void EpsilonNFAToNFAConversion();
     EpsilonClusureMap CreateEpsilonClosureMap() const;
-    bool isReachableByEpsilonClosure(EpsilonClusureMap& map, StateId source, StateId destination) const;
 
     DFA NFAToDFAConversion();
     bool ContainsFinalState(const std::vector<StateId>& composite );
