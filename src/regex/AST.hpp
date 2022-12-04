@@ -14,7 +14,7 @@
 namespace regex::ast
 {
 
-using StateId = automata::StateId;
+using automata::StateId;
 
 struct BlackBox
 {
@@ -29,7 +29,7 @@ struct BlackBox
 
 class Node;
 using NodePtr = std::unique_ptr<Node>;
-using NFA = automata::NFA;
+using automata::NFA;
 
 class Node
 {

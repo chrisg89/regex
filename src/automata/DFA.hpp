@@ -34,7 +34,6 @@ class DFA
 {
 public:
 
-    DFA(){}; //TODO make pretty?
     DFA(Alphabet alphabet);
 
     StateId addState(bool isStart, bool isFinal);

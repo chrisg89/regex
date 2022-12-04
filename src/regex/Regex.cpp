@@ -1,4 +1,4 @@
-#include "Regex.hpp" 
+#include "Regex.hpp"
 #include "Parser.hpp"
 
 #include <algorithm>
@@ -9,15 +9,16 @@
 namespace regex
 {
 
+using parser::Parser;
+
 Regex::Regex(const std::string& regex)
-: mDFA{}
-{
-    auto parser = parser::Parser(regex);
-    auto ast = parser.parse();
-    mAlphabet = ast.makeAlphabet();
-    auto nfa = ast.makeNFA(mAlphabet); 
-    mDFA = nfa.toDFA();
-}
+: Regex{Parser(regex).parse()}
+{}
+
+Regex::Regex(const ast::AST& ast)
+: mAlphabet{ast.makeAlphabet()}
+, mDFA{ast.makeNFA(mAlphabet).toDFA()}
+{}
 
 automata::InputType Regex::findInAlphabet(CodePoint input)
 {
@@ -33,7 +34,7 @@ automata::InputType Regex::findInAlphabet(CodePoint input)
     return std::distance(begin, result);
 }
 
-bool Regex::match(const std::string string)
+bool Regex::match(const std::string& string)
 {
     auto state = mDFA.getStartState();
 
@@ -55,7 +56,7 @@ bool Regex::match(const std::string string)
     return mDFA.isFinalState(state);
 }
 
-bool Regex::search(std::string string)
+bool Regex::search(const std::string& string)
 {
     //TODO broken
     /*

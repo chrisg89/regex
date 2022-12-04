@@ -4,25 +4,30 @@
 #include "Alphabet.hpp"
 #include "CodePoint.hpp"
 #include "DFA.hpp"
+#include "AST.hpp"
 #include <string>
 
 namespace regex
 {
 
-using DFA = automata::DFA;
+using automata::DFA;
 
 class Regex
 {
 
 public:
     Regex(const std::string& regex);
-    bool match(std::string string);
-    bool search(std::string string);
+    bool match(const std::string& string);
+    bool search(const std::string& string);
 
 private:
-    DFA mDFA;
+
+    Regex(const ast::AST& ast);
+
+    automata::InputType findInAlphabet(CodePoint input);
+
     Alphabet mAlphabet;
-    automata::InputType findInAlphabet(CodePoint input); // todo should be free standing function
+    DFA mDFA;
 };
 
 } //namespace regex
