@@ -22,7 +22,7 @@ public:
 
     void addTransition(InputType input, StateId destination);
 
-//private:
+//private: //todo
     StateId mId;
     bool mIsStart;
     bool mIsFinal;
@@ -40,7 +40,7 @@ public:
 
     void addTransition(InputType input, StateId source, StateId destination);
 
-    std::string serialize();
+    std::string serialize() const;
 
     StateId step(StateId current, InputType input);
     StateId getStartState();

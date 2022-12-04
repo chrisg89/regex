@@ -55,11 +55,11 @@ void DFA::addTransition(InputType input, StateId source, StateId destination)
     mStates.at(source).addTransition(input, destination);
 }
 
-std::string DFA::serialize()
+std::string DFA::serialize() const
 {
     std::string out = "";
     
-    for (auto state : mStates)
+    for (const auto& state : mStates)
     {
         out += std::to_string(state.mId);
         out += " : Start =" ;
@@ -160,9 +160,9 @@ ParitionMap PartitionPool::makePartitionMap()
 {
     ParitionMap map;
 
-    for (auto parition : Partitions)
+    for (const auto& parition : Partitions)
     {
-        for (auto state : parition.States)
+        for (const auto state : parition.States)
         {
             map[state] = parition.ID;
         }
@@ -180,7 +180,7 @@ void DFA::minimizeDFA()
     auto partitionFinal = kNullPartition;
     auto partitionNonFinal = kNullPartition;
 
-    for (auto state : mStates)
+    for (const auto& state : mStates)
     {
         if (!state.mIsFinal)
         {
@@ -212,7 +212,7 @@ void DFA::minimizeDFA()
         {
             movedStates.clear();
 
-            for (auto state : pool.Partitions[parition].States)
+            for (const auto state : pool.Partitions[parition].States)
             {
                 if(state != pool.Partitions[parition].Leader)
                 {
@@ -227,7 +227,7 @@ void DFA::minimizeDFA()
             {
                 auto newPartition = pool.addPartition();
 
-                for (auto state : movedStates)
+                for (const auto state : movedStates)
                 {
                     pool.Partitions[parition].States.erase(state);
                     pool.Partitions[newPartition].insert(state);
@@ -249,21 +249,21 @@ void DFA::minimizeDFA()
 
     DFA newDFA(mAlphabet);
 
-    for (auto partition : pool.Partitions)
+    for (const auto& partition : pool.Partitions)
     {
         bool isStart = false;
         bool isFinal = false;
 
-        for (auto state : pool.Partitions[partition.ID].States)
+        for (const auto state : pool.Partitions[partition.ID].States)
         {
-            isStart |= mStates.at(state).mIsStart;
-            isFinal |= mStates.at(state).mIsFinal;
+            isStart = mStates.at(state).mIsStart;
+            isFinal = mStates.at(state).mIsFinal;
         }
 
         // parition id => new state id
         auto newState = newDFA.addState(isStart, isFinal);
 
-        for(auto c : mAlphabet)
+        for(const auto c : mAlphabet)
         {
             auto targetState = currPartitionMap.at(mStates.at(partition.Leader).mTransitions.at(c));
             newDFA.addTransition(c, newState, targetState);
@@ -277,7 +277,7 @@ void DFA::minimizeDFA()
 
 bool DFA::checkEquivalence(ParitionMap paritionMap, StateId stateA, StateId stateB)
 {
-    for(auto c : mAlphabet)
+    for(const auto c : mAlphabet)
     {
         auto stateADest = mStates.at(stateA).mTransitions.at(c);
         auto stateBDest = mStates.at(stateB).mTransitions.at(c);

@@ -25,7 +25,7 @@ void disjoinOverlap(Alphabet& alphabet, CodePoint min, CodePoint max)
 
     auto points = Points{};
 
-    for (auto& codePointInterval : alphabet)
+    for (const auto& codePointInterval : alphabet)
     {
         points.emplace(codePointInterval.first, EndpointType::eStart);
         points.emplace(codePointInterval.second, EndpointType::eEnd);
@@ -35,7 +35,7 @@ void disjoinOverlap(Alphabet& alphabet, CodePoint min, CodePoint max)
     // this needs to be large enough to prevent overflow errors
     unsigned long long int current = min;
 
-    for (auto& point : points)
+    for (const auto& point : points)
     {
         if(point.second == EndpointType::eStart)
         {

@@ -64,11 +64,11 @@ void NFA::addTransition(InputType input, StateId source, StateId destination)
     mStates.at(source).addTransition(input, destination);
 }
 
-std::string NFA::serialize()
+std::string NFA::serialize() const
 {
     std::string out = "";
     
-    for (auto state : mStates)
+    for (const auto& state : mStates)
     {
         out += std::to_string(state.mId);
         out += " : Start = ";
@@ -79,7 +79,7 @@ std::string NFA::serialize()
         
         for (auto const& [input, destinations] : state.mTransitions)
         {
-            for (auto destination: destinations)
+            for (const auto destination: destinations)
             {
                 out += std::to_string(state.mId);
                 out += " -> ";
@@ -119,7 +119,7 @@ void NFA::EpsilonNFAToNFAConversion()
 
     // STEP1: Calculate the new states and insert
     // them into the new NFA
-    for (auto state : mStates)
+    for (const auto& state : mStates)
     {
         //TODO: can optimize this further?
         newNFA.addState(state.mIsStart, isReachableByEpsilonClosure(state.mId, mFinalStates[0]));
@@ -130,15 +130,15 @@ void NFA::EpsilonNFAToNFAConversion()
     // STEP2: Calculate the new transitions and insert
     // them into the new NFA
     std::unordered_set<StateId> reachableByEpsilonClosureSet;
-    for(auto c : mAlphabet)
+    for(const auto c : mAlphabet)
     {
-        for (auto state : mStates)
+        for (const auto& state : mStates)
         {
-            for (auto reachableByEpsilonClosure1 : map.at(state.mId))
+            for (const auto reachableByEpsilonClosure1 : map.at(state.mId))
             {
-                for(auto destination : mStates.at(reachableByEpsilonClosure1).mTransitions[c])
+                for(const auto destination : mStates.at(reachableByEpsilonClosure1).mTransitions[c])
                 {
-                    for (auto reachableByEpsilonClosure2 : map.at(destination))
+                    for (const auto reachableByEpsilonClosure2 : map.at(destination))
                     {
                         reachableByEpsilonClosureSet.insert(reachableByEpsilonClosure2);
                     }
@@ -146,7 +146,7 @@ void NFA::EpsilonNFAToNFAConversion()
             }
 
             // insert into new nfa
-            for (auto reachableByEpsilon : reachableByEpsilonClosureSet)
+            for (const auto reachableByEpsilon : reachableByEpsilonClosureSet)
             {
                 newNFA.addTransition(c, state.mId, reachableByEpsilon);
             }
@@ -158,13 +158,13 @@ void NFA::EpsilonNFAToNFAConversion()
     *this = std::move(newNFA);
 }
 
-EpsilonClusureMap NFA::CreateEpsilonClosureMap()
+EpsilonClusureMap NFA::CreateEpsilonClosureMap() const
 {
     EpsilonClusureMap map;
 
-    for (auto source : mStates)
+    for (const auto& source : mStates)
     {
-        for (auto destination : mStates)
+        for (const auto& destination : mStates)
         {
             if(isReachableByEpsilonClosure(source.mId, destination.mId))
             {
@@ -177,7 +177,7 @@ EpsilonClusureMap NFA::CreateEpsilonClosureMap()
 }
 
 //TODO: there are alot of optimizations I can make here. fill in closure map as I go
-bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination)
+bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination) const
 {
     std::stack<StateId> stack;
     std::vector<StateId> visited;
@@ -195,19 +195,21 @@ bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination)
         auto state = stack.top();
         stack.pop();
 
-        for (auto transition : mStates.at(state).mTransitions[kEpsilon])  //mTransitions[kEpsilon] will create empy vector. Could optimize
+        auto transitions = mStates.at(state).mTransitions;
+        if(transitions.count(kEpsilon))
         {
-            auto adjacent = transition; //TODO rename transition to something better
-
-            if(adjacent == destination)
+            for (const auto adjacent : transitions.at(kEpsilon))
             {
-                return true;
-            }
+                if(adjacent == destination)
+                {
+                    return true;
+                }
 
-            if (std::find(visited.begin(), visited.end(), adjacent) == visited.end())
-            {
-                stack.push(adjacent);
-                visited.push_back(adjacent);
+                if (std::find(visited.begin(), visited.end(), adjacent) == visited.end())
+                {
+                    stack.push(adjacent);
+                    visited.push_back(adjacent);
+                }
             }
         }
     }
@@ -217,9 +219,9 @@ bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination)
 
 bool NFA::ContainsFinalState(const std::vector<StateId>& composite )  //TODO clean up. Rename?
 {
-    for(auto state1 : composite)
+    for(const auto state1 : composite)
     {
-        for(auto state2 : mFinalStates)
+        for(const auto state2 : mFinalStates)
         {
             if (state1 == state2)
             {
@@ -250,11 +252,11 @@ DFA NFA::NFAToDFAConversion()
 
         auto nfaStates = mapper.get(dfaState);
 
-        for(auto c : mAlphabet)
+        for(const auto c : mAlphabet)
         {
             set.clear();
 
-            for(auto nfaState : nfaStates)
+            for(const auto nfaState : nfaStates)
             {
                 // calc  union of all dest states
                 auto destinations = mStates.at(nfaState).mTransitions[c];

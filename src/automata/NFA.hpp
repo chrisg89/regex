@@ -19,7 +19,7 @@ public:
 
     void addTransition(InputType input, StateId destination);
 
-//private:
+//private:  //todo
     StateId mId;
     bool mIsStart;
     bool mIsFinal;
@@ -37,13 +37,13 @@ public:
 
     DFA toDFA();
 
-    std::string serialize();
+    std::string serialize() const;
 
 private:
 
     void EpsilonNFAToNFAConversion();
-    EpsilonClusureMap CreateEpsilonClosureMap();
-    bool isReachableByEpsilonClosure(StateId source, StateId destination);
+    EpsilonClusureMap CreateEpsilonClosureMap() const;
+    bool isReachableByEpsilonClosure(StateId source, StateId destination) const;
 
     DFA NFAToDFAConversion();
     bool ContainsFinalState(const std::vector<StateId>& composite );
