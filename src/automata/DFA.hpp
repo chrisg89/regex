@@ -12,7 +12,7 @@ namespace automata
 {
 
 using PartitionId = int;
-using ParitionMap = std::unordered_map<StateId,PartitionId>;  //todo change to vector?
+using ParitionMap = std::unordered_map<StateId,PartitionId>;
 constexpr PartitionId kNullPartition = -1;
 
 class DFAState
@@ -22,7 +22,6 @@ public:
 
     void addTransition(InputType input, StateId destination);
 
-//private: //todo
     StateId mId;
     bool mIsStart;
     bool mIsFinal;
@@ -57,7 +56,7 @@ private:
     StateId mStartState;
     std::vector<StateId> mFinalStates;
 
-    bool checkEquivalence(ParitionMap paritionMap, StateId stateA, StateId stateB);
+    bool checkEquivalence(const ParitionMap& paritionMap, StateId stateA, StateId stateB);
 };
 
 } //namespace automata

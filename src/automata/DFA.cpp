@@ -237,7 +237,7 @@ void DFA::minimizeDFA()
             parition++;
         }
 
-        prevPartitionMap = currPartitionMap;
+        std::swap(prevPartitionMap, currPartitionMap);
         currPartitionMap = pool.makePartitionMap();
 
         
@@ -275,7 +275,7 @@ void DFA::minimizeDFA()
 
 }
 
-bool DFA::checkEquivalence(ParitionMap paritionMap, StateId stateA, StateId stateB)
+bool DFA::checkEquivalence(const ParitionMap& paritionMap, StateId stateA, StateId stateB)
 {
     for(const auto c : mAlphabet)
     {
@@ -284,7 +284,7 @@ bool DFA::checkEquivalence(ParitionMap paritionMap, StateId stateA, StateId stat
 
         if (stateADest != stateBDest)
         {
-            if(paritionMap[stateADest] != paritionMap[stateBDest])
+            if(paritionMap.at(stateADest) != paritionMap.at(stateBDest))
             {
                 return false;
             }

@@ -156,7 +156,6 @@ void NFA::EpsilonNFAToNFAConversion()
     *this = std::move(newNFA);
 }
 
-// TODO make this a free function
 EpsilonClusureMap NFA::CreateEpsilonClosureMap() const
 {
     EpsilonClusureMap map;
@@ -193,6 +192,7 @@ EpsilonClusureMap NFA::CreateEpsilonClosureMap() const
     return map;
 }
 
+// TODO make this a free function
 bool NFA::isReachableByEpsilonClosure(EpsilonClusureMap& map, StateId source, StateId destination) const
 {
     auto& reachable = map[source];
