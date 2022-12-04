@@ -114,21 +114,19 @@ void NFA::EpsilonNFAToNFAConversion()
 {
     NFA newNFA(mAlphabet);
 
-    // This algorithm assumes only one final state
-    assert(mFinalStates.size() == 1);
-
-    // STEP1: Calculate the new states and insert
-    // them into the new NFA
-    for (const auto& state : mStates)
-    {
-        //TODO: can optimize this further?
-        newNFA.addState(state.mIsStart, isReachableByEpsilonClosure(state.mId, mFinalStates[0]));
-    }
-
     auto map = CreateEpsilonClosureMap();
 
-    // STEP2: Calculate the new transitions and insert
-    // them into the new NFA
+    // STEP1: Calculate the new states and insert them into the new NFA
+
+    // Thompson-Contruction should yield an epsilon-NFA with only one final state
+    assert(mFinalStates.size() == 1);
+    auto finalState = mFinalStates.front();
+    for (const auto& state : mStates)
+    {
+        newNFA.addState(state.mIsStart, isReachableByEpsilonClosure(map, state.mId, finalState));
+    }
+
+    // STEP2: Calculate the new transitions and insert them into the new NFA
     std::unordered_set<StateId> reachableByEpsilonClosureSet;
     for(const auto c : mAlphabet)
     {
@@ -158,17 +156,36 @@ void NFA::EpsilonNFAToNFAConversion()
     *this = std::move(newNFA);
 }
 
+// TODO make this a free function
 EpsilonClusureMap NFA::CreateEpsilonClosureMap() const
 {
     EpsilonClusureMap map;
 
     for (const auto& source : mStates)
     {
-        for (const auto& destination : mStates)
+        auto& reachable = map[source.mId];
+
+        std::stack<StateId> stack;
+
+        stack.push(source.mId);
+        reachable.push_back(source.mId);
+
+        while(!stack.empty())
         {
-            if(isReachableByEpsilonClosure(source.mId, destination.mId))
+            auto state = stack.top();
+            stack.pop();
+
+            const auto& transitions = mStates.at(state).mTransitions;
+            if(transitions.count(kEpsilon))
             {
-                map[source.mId].push_back(destination.mId);
+                for (const auto adjacent : transitions.at(kEpsilon))
+                {
+                    if (std::find(reachable.begin(), reachable.end(), adjacent) == reachable.end())
+                    {
+                        stack.push(adjacent);
+                        reachable.push_back(adjacent);
+                    }
+                }
             }
         }
     }
@@ -176,42 +193,13 @@ EpsilonClusureMap NFA::CreateEpsilonClosureMap() const
     return map;
 }
 
-//TODO: there are alot of optimizations I can make here. fill in closure map as I go
-bool NFA::isReachableByEpsilonClosure(StateId source, StateId destination) const
+bool NFA::isReachableByEpsilonClosure(EpsilonClusureMap& map, StateId source, StateId destination) const
 {
-    std::stack<StateId> stack;
-    std::vector<StateId> visited;
+    auto& reachable = map[source];
 
-    if (source == destination)
+    if (std::find(reachable.begin(), reachable.end(), destination) != reachable.end())
     {
         return true;
-    }
-
-    stack.push(source);
-    visited.push_back(source);
-
-    while(!stack.empty())
-    {
-        auto state = stack.top();
-        stack.pop();
-
-        const auto& transitions = mStates.at(state).mTransitions;
-        if(transitions.count(kEpsilon))
-        {
-            for (const auto adjacent : transitions.at(kEpsilon))
-            {
-                if(adjacent == destination)
-                {
-                    return true;
-                }
-
-                if (std::find(visited.begin(), visited.end(), adjacent) == visited.end())
-                {
-                    stack.push(adjacent);
-                    visited.push_back(adjacent);
-                }
-            }
-        }
     }
 
     return false;
