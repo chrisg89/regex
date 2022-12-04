@@ -22,11 +22,11 @@ public:
 
     void addTransition(InputType input, StateId destination);
 
-    StateId mId;
-    bool mIsStart;
-    bool mIsFinal;
-    bool mIsDead;
-    std::map<InputType, StateId> mTransitions;
+    StateId Id;
+    bool IsStart;
+    bool IsFinal;
+    bool IsDead;
+    std::map<InputType, StateId> Transitions;
 };
 
 class DFA

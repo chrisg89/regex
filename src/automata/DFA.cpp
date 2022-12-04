@@ -7,20 +7,20 @@ namespace automata
 {
 
 DFAState::DFAState(StateId id, bool isStart, bool isFinal)
-    : mId{id}
-    , mIsStart{isStart}
-    , mIsFinal{isFinal}
-    , mTransitions{}
-    , mIsDead{true}
+    : Id{id}
+    , IsStart{isStart}
+    , IsFinal{isFinal}
+    , Transitions{}
+    , IsDead{true}
 {}
 
 void DFAState::addTransition(InputType input, StateId destination)
 {
-    mTransitions[input] = destination;
+    Transitions[input] = destination;
 
-    if(destination != mId)
+    if(destination != Id)
     {
-        mIsDead = false;
+        IsDead = false;
     }
 }
 
@@ -61,18 +61,18 @@ std::string DFA::serialize() const
     
     for (const auto& state : mStates)
     {
-        out += std::to_string(state.mId);
+        out += std::to_string(state.Id);
         out += " : Start =" ;
-        out += (state.mIsStart? "true" : "false");
+        out += (state.IsStart? "true" : "false");
         out += " , Final = ";
-        out += (state.mIsFinal ? "true" : "false");
+        out += (state.IsFinal ? "true" : "false");
         out += " , Dead = ";
-        out += (state.mIsDead ? "true" : "false");
+        out += (state.IsDead ? "true" : "false");
         out += "\n";
 
-        for (auto const& [input, destination] : state.mTransitions)
+        for (auto const& [input, destination] : state.Transitions)
         {
-            out += std::to_string(state.mId);
+            out += std::to_string(state.Id);
             out += " -> ";
             out += std::to_string(destination);
             out += " : ";
@@ -92,18 +92,18 @@ StateId DFA::getStartState()
 
 StateId DFA::step(StateId current, InputType input)
 {
-    auto next = mStates.at(current).mTransitions.at(input);
-    return mStates.at(next).mId;
+    auto next = mStates.at(current).Transitions.at(input);
+    return mStates.at(next).Id;
 }
 
 bool DFA::isDeadState(StateId current)
 {
-    return mStates.at(current).mIsDead;
+    return mStates.at(current).IsDead;
 }
 
 bool DFA::isFinalState(StateId current)
 {
-    return mStates.at(current).mIsFinal;
+    return mStates.at(current).IsFinal;
 }
 
 struct Partition
@@ -182,13 +182,13 @@ void DFA::minimizeDFA()
 
     for (const auto& state : mStates)
     {
-        if (!state.mIsFinal)
+        if (!state.IsFinal)
         {
             if(partitionNonFinal == kNullState)
             {
                 partitionNonFinal = pool.addPartition();
             }
-            pool.Partitions[partitionNonFinal].insert(state.mId);
+            pool.Partitions[partitionNonFinal].insert(state.Id);
         }
         else
         {
@@ -196,7 +196,7 @@ void DFA::minimizeDFA()
             {
                 partitionFinal = pool.addPartition();
             }
-            pool.Partitions[partitionFinal].insert(state.mId);
+            pool.Partitions[partitionFinal].insert(state.Id);
         }
     }
 
@@ -256,8 +256,8 @@ void DFA::minimizeDFA()
 
         for (const auto state : pool.Partitions[partition.ID].States)
         {
-            isStart = mStates.at(state).mIsStart;
-            isFinal = mStates.at(state).mIsFinal;
+            isStart = mStates.at(state).IsStart;
+            isFinal = mStates.at(state).IsFinal;
         }
 
         // parition id => new state id
@@ -265,7 +265,7 @@ void DFA::minimizeDFA()
 
         for(const auto c : mAlphabet)
         {
-            auto targetState = currPartitionMap.at(mStates.at(partition.Leader).mTransitions.at(c));
+            auto targetState = currPartitionMap.at(mStates.at(partition.Leader).Transitions.at(c));
             newDFA.addTransition(c, newState, targetState);
         }
     }
@@ -279,8 +279,8 @@ bool DFA::checkEquivalence(const ParitionMap& paritionMap, StateId stateA, State
 {
     for(const auto c : mAlphabet)
     {
-        auto stateADest = mStates.at(stateA).mTransitions.at(c);
-        auto stateBDest = mStates.at(stateB).mTransitions.at(c);
+        auto stateADest = mStates.at(stateA).Transitions.at(c);
+        auto stateBDest = mStates.at(stateB).Transitions.at(c);
 
         if (stateADest != stateBDest)
         {

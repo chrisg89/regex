@@ -19,11 +19,10 @@ public:
 
     void addTransition(InputType input, StateId destination);
 
-//private:  //todo
-    StateId mId;
-    bool mIsStart;
-    bool mIsFinal;
-    std::map<InputType, std::vector<StateId>> mTransitions;
+    StateId Id;
+    bool IsStart;
+    bool IsFinal;
+    std::map<InputType, std::vector<StateId>> Transitions;
 };
 
 class NFA

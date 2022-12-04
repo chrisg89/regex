@@ -22,15 +22,15 @@ struct VectorHasher {
 };
 
 NFAState::NFAState(StateId id, bool isStart, bool isFinal)
-    : mId{id}
-    , mIsStart{isStart}
-    , mIsFinal{isFinal}
-    , mTransitions{}
+    : Id{id}
+    , IsStart{isStart}
+    , IsFinal{isFinal}
+    , Transitions{}
 {}
 
 void NFAState::addTransition(InputType input, StateId destination)
 {
-    mTransitions[input].emplace_back(destination);
+    Transitions[input].emplace_back(destination);
 }
 
 NFA::NFA(Alphabet alphabet)
@@ -70,18 +70,18 @@ std::string NFA::serialize() const
     
     for (const auto& state : mStates)
     {
-        out += std::to_string(state.mId);
+        out += std::to_string(state.Id);
         out += " : Start = ";
-        out += (state.mIsStart? "true" : "false");
+        out += (state.IsStart? "true" : "false");
         out += " | Final = ";
-        out += (state.mIsFinal ? "true" : "false");
+        out += (state.IsFinal ? "true" : "false");
         out += "\n";
         
-        for (auto const& [input, destinations] : state.mTransitions)
+        for (auto const& [input, destinations] : state.Transitions)
         {
             for (const auto destination: destinations)
             {
-                out += std::to_string(state.mId);
+                out += std::to_string(state.Id);
                 out += " -> ";
                 out += std::to_string(destination);
                 out += " : ";
@@ -123,7 +123,7 @@ void NFA::EpsilonNFAToNFAConversion()
     auto finalState = mFinalStates.front();
     for (const auto& state : mStates)
     {
-        newNFA.addState(state.mIsStart, isReachableByEpsilonClosure(map, state.mId, finalState));
+        newNFA.addState(state.IsStart, isReachableByEpsilonClosure(map, state.Id, finalState));
     }
 
     // STEP2: Calculate the new transitions and insert them into the new NFA
@@ -132,9 +132,9 @@ void NFA::EpsilonNFAToNFAConversion()
     {
         for (const auto& state : mStates)
         {
-            for (const auto reachableByEpsilonClosure1 : map.at(state.mId))
+            for (const auto reachableByEpsilonClosure1 : map.at(state.Id))
             {
-                for(const auto destination : mStates.at(reachableByEpsilonClosure1).mTransitions[c])
+                for(const auto destination : mStates.at(reachableByEpsilonClosure1).Transitions[c])
                 {
                     for (const auto reachableByEpsilonClosure2 : map.at(destination))
                     {
@@ -146,7 +146,7 @@ void NFA::EpsilonNFAToNFAConversion()
             // insert into new nfa
             for (const auto reachableByEpsilon : reachableByEpsilonClosureSet)
             {
-                newNFA.addTransition(c, state.mId, reachableByEpsilon);
+                newNFA.addTransition(c, state.Id, reachableByEpsilon);
             }
             reachableByEpsilonClosureSet.clear();
         }
@@ -162,19 +162,19 @@ EpsilonClusureMap NFA::CreateEpsilonClosureMap() const
 
     for (const auto& source : mStates)
     {
-        auto& reachable = map[source.mId];
+        auto& reachable = map[source.Id];
 
         std::stack<StateId> stack;
 
-        stack.push(source.mId);
-        reachable.push_back(source.mId);
+        stack.push(source.Id);
+        reachable.push_back(source.Id);
 
         while(!stack.empty())
         {
             auto state = stack.top();
             stack.pop();
 
-            const auto& transitions = mStates.at(state).mTransitions;
+            const auto& transitions = mStates.at(state).Transitions;
             if(transitions.count(kEpsilon))
             {
                 for (const auto adjacent : transitions.at(kEpsilon))
@@ -229,7 +229,7 @@ DFA NFA::NFAToDFAConversion()
     StateMapper mapper;
     std::set<StateId> set;
 
-    auto dfaState = dfa.addState(true, mStates.at(mStartState).mIsFinal);
+    auto dfaState = dfa.addState(true, mStates.at(mStartState).IsFinal);
     mapper.insert(dfaState, {mStartState});
     queue.push_back(dfaState);
 
@@ -247,7 +247,7 @@ DFA NFA::NFAToDFAConversion()
             for(const auto nfaState : nfaStates)
             {
                 // calc  union of all dest states
-                auto destinations = mStates.at(nfaState).mTransitions[c];
+                auto destinations = mStates.at(nfaState).Transitions[c];
                 std::copy(destinations.begin(), destinations.end(), std::inserter(set, set.end()));
             }
 
