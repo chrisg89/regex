@@ -25,10 +25,10 @@ NodePtr buildSubtree(const CharacterGroup& segments)
     return out;
 }
 
-Parser::Parser(const std::string& regex)
-: mCurser{regex.begin()}
-, mBegin {regex.begin()}
-, mEnd {regex.end()}
+Parser::Parser(const std::string& pattern)
+: mCurser{pattern.begin()}
+, mBegin {pattern.begin()}
+, mEnd {pattern.end()}
 {}
 
 AST Parser::parse()

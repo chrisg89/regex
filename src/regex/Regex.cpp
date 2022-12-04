@@ -11,8 +11,8 @@ namespace regex
 
 using parser::Parser;
 
-Regex::Regex(const std::string& regex)
-: Regex{Parser(regex).parse()}
+Regex::Regex(const std::string& pattern)
+: Regex{Parser(pattern).parse()}
 {}
 
 Regex::Regex(const ast::AST& ast)
@@ -34,11 +34,11 @@ automata::InputType Regex::findInAlphabet(CodePoint input)
     return std::distance(begin, result);
 }
 
-bool Regex::match(const std::string& string)
+bool Regex::match(const std::string& target)
 {
     auto state = mDFA.getStartState();
 
-    for( Utf8Iterator it = string.cbegin(); it != string.cend(); ++it )
+    for( Utf8Iterator it = target.cbegin(); it != target.cend(); ++it )
     {
         // lookup the codepoint in the alphabet
         auto input = findInAlphabet(*it);
@@ -56,11 +56,11 @@ bool Regex::match(const std::string& string)
     return mDFA.isFinalState(state);
 }
 
-bool Regex::search(const std::string& string)
+bool Regex::search(const std::string& target)
 {
     //TODO broken
     /*
-    for(auto result : mDFA.search(string))
+    for(auto result : mDFA.search(target))
     {
         std::cout << result << std::endl;
     }

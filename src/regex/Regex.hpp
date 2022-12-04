@@ -16,9 +16,9 @@ class Regex
 {
 
 public:
-    Regex(const std::string& regex);
-    bool match(const std::string& string);
-    bool search(const std::string& string);
+    Regex(const std::string& pattern);
+    bool match(const std::string& target);
+    bool search(const std::string& target);
 
 private:
 
