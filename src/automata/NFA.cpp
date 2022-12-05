@@ -107,9 +107,9 @@ DFA NFA::makeDFA() const
     return dfa;
 }
 
-bool isReachableByEpsilonClosure(EpsilonClusureMap& map, StateId source, StateId destination)
+bool isReachableByEpsilonClosure(const EpsilonClusureMap& map, StateId source, StateId destination)
 {
-    auto& reachable = map[source];
+    auto& reachable = map.at(source);
 
     if (std::find(reachable.begin(), reachable.end(), destination) != reachable.end())
     {
@@ -134,7 +134,7 @@ EpsilonClusureMap NFA::CreateEpsilonClosureMap() const
 
         while(!stack.empty())
         {
-            auto state = stack.top();
+            const auto state = stack.top();
             stack.pop();
 
             const auto& transitions = mStates.at(state).Transitions;
@@ -159,13 +159,13 @@ void NFA::removeEpsilonTransitions()
 {
     NFA newNFA(mAlphabet);
 
-    auto map = CreateEpsilonClosureMap();
+    const auto map = CreateEpsilonClosureMap();
 
     // STEP1: Calculate the new states and insert them into the new NFA
 
     // Thompson-Contruction should yield an epsilon-NFA with only one final state
     assert(mFinalStates.size() == 1);
-    auto finalState = mFinalStates.front();
+    const auto finalState = mFinalStates.front();
     for (const auto& state : mStates)
     {
         newNFA.addState(state.IsStart, isReachableByEpsilonClosure(map, state.Id, finalState));
@@ -218,7 +218,7 @@ DFA NFA::buildDFA() const
         dfaState = queue.front();
         queue.pop_front();
 
-        auto nfaStates = mapper.get(dfaState);
+        const auto& nfaStates = mapper.get(dfaState);
 
         std::set<StateId> set;
         for(const auto c : mAlphabet)
@@ -230,7 +230,7 @@ DFA NFA::buildDFA() const
                 const auto& transitions = mStates.at(nfaState).Transitions;
                 if(transitions.count(c))
                 {
-                    auto destinations = transitions.at(c);
+                    const auto& destinations = transitions.at(c);
                     std::copy(destinations.begin(), destinations.end(), std::inserter(set, set.end()));
                 }
             }
@@ -242,12 +242,12 @@ DFA NFA::buildDFA() const
             }
             else
             {
-                auto isFinal = std::any_of(set.begin(), set.end(), 
+                const auto isFinal = std::any_of(set.begin(), set.end(), 
                     [this](auto stateId)
                     {
                         return mStates[stateId].IsFinal;
                     });
-                newDfaState = dfa.addState(false, isFinal );
+                newDfaState = dfa.addState(false, isFinal);
                 mapper.insert(newDfaState, set);
                 queue.push_back(newDfaState);
             }

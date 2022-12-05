@@ -92,7 +92,7 @@ StateId DFA::getStartState() const
 
 StateId DFA::step(StateId current, InputType input) const
 {
-    auto next = mStates.at(current).Transitions.at(input);
+    const auto next = mStates.at(current).Transitions.at(input);
     return mStates.at(next).Id;
 }
 
@@ -111,7 +111,7 @@ struct Partition
     Partition(PartitionId id)
     : States{}
     , Leader{kNullState}
-    , ID{id}
+    , Id{id}
     {}
 
     void insert(StateId state)
@@ -126,7 +126,7 @@ struct Partition
 
     std::unordered_set<StateId> States;
     StateId Leader;
-    PartitionId ID;
+    const PartitionId Id;
 };
 
 struct PartitionPool
@@ -135,7 +135,7 @@ struct PartitionPool
 
     PartitionId addPartition();
 
-    ParitionMap makePartitionMap();
+    ParitionMap makePartitionMap() const;
 
     void addState(PartitionId partition, StateId state);
 
@@ -156,7 +156,7 @@ PartitionId PartitionPool::addPartition()
     return PartitionCount++;
 }
 
-ParitionMap PartitionPool::makePartitionMap()
+ParitionMap PartitionPool::makePartitionMap() const
 {
     ParitionMap map;
 
@@ -164,7 +164,7 @@ ParitionMap PartitionPool::makePartitionMap()
     {
         for (const auto state : parition.States)
         {
-            map[state] = parition.ID;
+            map[state] = parition.Id;
         }
     }
 
@@ -173,6 +173,7 @@ ParitionMap PartitionPool::makePartitionMap()
 
 void DFA::minimize()
 {
+    //STEP1: TODO ????
     PartitionPool pool;
     ParitionMap prevPartitionMap;
     ParitionMap currPartitionMap;
@@ -204,7 +205,6 @@ void DFA::minimize()
 
     while(currPartitionMap != prevPartitionMap)
     {
-
         auto parition = PartitionId{0};
         std::vector<StateId> movedStates{};
 
@@ -225,7 +225,7 @@ void DFA::minimize()
 
             if(!movedStates.empty())
             {
-                auto newPartition = pool.addPartition();
+                const auto newPartition = pool.addPartition();
 
                 for (const auto state : movedStates)
                 {
@@ -239,13 +239,10 @@ void DFA::minimize()
 
         std::swap(prevPartitionMap, currPartitionMap);
         currPartitionMap = pool.makePartitionMap();
-
-        
     }
 
 
-
-    //////////////////////////////////////////////////////////////////////////////////////
+    //STEP2: TODO ????
 
     DFA newDFA(mAlphabet);
 
@@ -254,18 +251,17 @@ void DFA::minimize()
         bool isStart = false;
         bool isFinal = false;
 
-        for (const auto state : pool.Partitions[partition.ID].States)
+        for (const auto state : pool.Partitions[partition.Id].States)
         {
-            isStart = mStates.at(state).IsStart;
-            isFinal = mStates.at(state).IsFinal;
+            isStart |= mStates.at(state).IsStart;
+            isFinal |= mStates.at(state).IsFinal;
         }
 
-        // parition id => new state id
-        auto newState = newDFA.addState(isStart, isFinal);
+        const auto newState = newDFA.addState(isStart, isFinal);
 
         for(const auto c : mAlphabet)
         {
-            auto targetState = currPartitionMap.at(mStates.at(partition.Leader).Transitions.at(c));
+            const auto targetState = currPartitionMap.at(mStates.at(partition.Leader).Transitions.at(c));
             newDFA.addTransition(c, newState, targetState);
         }
     }
@@ -279,8 +275,8 @@ bool DFA::checkEquivalence(const ParitionMap& paritionMap, StateId stateA, State
 {
     for(const auto c : mAlphabet)
     {
-        auto stateADest = mStates.at(stateA).Transitions.at(c);
-        auto stateBDest = mStates.at(stateB).Transitions.at(c);
+        const auto stateADest = mStates.at(stateA).Transitions.at(c);
+        const auto stateBDest = mStates.at(stateB).Transitions.at(c);
 
         if (stateADest != stateBDest)
         {
