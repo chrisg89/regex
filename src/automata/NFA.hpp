@@ -44,7 +44,6 @@ private:
     EpsilonClusureMap CreateEpsilonClosureMap() const;
 
     DFA NFAToDFAConversion();
-    bool ContainsFinalState(const std::vector<StateId>& composite );
 
     std::vector<NFAState> mStates;
     Alphabet mAlphabet;

@@ -11,8 +11,10 @@
 namespace automata
 {
 
-struct VectorHasher {
-    int operator()(const std::vector<StateId> &V) const {
+// todo: This hasher is too expensive (especially on non-sequential containers such as sets). 
+// Need to find another way to create a bi-map or replace the bi-map entirely
+struct SetHasher {
+    int operator()(const std::set<StateId> &V) const {
         int hash = V.size();
         for(auto &i : V) {
             hash ^= i + 0x9e3779b9 + (hash << 6) + (hash >> 2);
@@ -204,29 +206,13 @@ void NFA::EpsilonNFAToNFAConversion()
     *this = std::move(newNFA);
 }
 
-bool NFA::ContainsFinalState(const std::vector<StateId>& composite )  //TODO clean up. Rename?
-{
-    for(const auto state1 : composite)
-    {
-        for(const auto state2 : mFinalStates)
-        {
-            if (state1 == state2)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 DFA NFA::NFAToDFAConversion()
 {
-    using StateMapper = Bimap<std::vector<StateId>, StateId, VectorHasher>;  //TODO change to set<StateId>
+    using StateMapper = Bimap<std::set<StateId>, StateId, SetHasher>;
 
     DFA dfa(mAlphabet);
     std::deque<StateId> queue;
     StateMapper mapper;
-    std::set<StateId> set;
 
     auto dfaState = dfa.addState(true, mStates.at(mStartState).IsFinal);
     mapper.insert(dfaState, {mStartState});
@@ -239,27 +225,31 @@ DFA NFA::NFAToDFAConversion()
 
         auto nfaStates = mapper.get(dfaState);
 
+        std::set<StateId> set;
         for(const auto c : mAlphabet)
         {
             set.clear();
 
             for(const auto nfaState : nfaStates)
             {
-                // calc  union of all dest states
                 auto destinations = mStates.at(nfaState).Transitions[c];
                 std::copy(destinations.begin(), destinations.end(), std::inserter(set, set.end()));
             }
 
-            std::vector<StateId> composite(set.begin(), set.end());  // TODO call this union?
             auto newDfaState = StateId{kNullState};
-            if(mapper.contains(composite))
+            if(mapper.contains(set))
             {
-                newDfaState = mapper.get(composite);
+                newDfaState = mapper.get(set);
             }
             else
             {
-                newDfaState = dfa.addState(false, ContainsFinalState(composite));
-                mapper.insert(newDfaState, composite);
+                auto isFinal = std::any_of(set.begin(), set.end(), 
+                    [this](auto stateId)
+                    {
+                        return mStates[stateId].IsFinal;
+                    });
+                newDfaState = dfa.addState(false, isFinal );
+                mapper.insert(newDfaState, set);
                 queue.push_back(newDfaState);
             }
 
