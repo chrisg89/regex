@@ -11,5 +11,3 @@ target_include_directories(automata_lib
     PUBLIC
     ./
     ) 
-
-add_subdirectory(tests)
