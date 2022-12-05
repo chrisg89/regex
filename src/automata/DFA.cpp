@@ -84,24 +84,24 @@ std::string DFA::serialize() const
     return out;
 }
 
-StateId DFA::getStartState()
+StateId DFA::getStartState() const
 {
     assert(mStartState != kNullState);
     return mStartState;
 }
 
-StateId DFA::step(StateId current, InputType input)
+StateId DFA::step(StateId current, InputType input) const
 {
     auto next = mStates.at(current).Transitions.at(input);
     return mStates.at(next).Id;
 }
 
-bool DFA::isDeadState(StateId current)
+bool DFA::isDeadState(StateId current) const
 {
     return mStates.at(current).IsDead;
 }
 
-bool DFA::isFinalState(StateId current)
+bool DFA::isFinalState(StateId current) const
 {
     return mStates.at(current).IsFinal;
 }
@@ -171,7 +171,7 @@ ParitionMap PartitionPool::makePartitionMap()
     return map;
 }
 
-void DFA::minimizeDFA()
+void DFA::minimize()
 {
     PartitionPool pool;
     ParitionMap prevPartitionMap;
@@ -275,7 +275,7 @@ void DFA::minimizeDFA()
 
 }
 
-bool DFA::checkEquivalence(const ParitionMap& paritionMap, StateId stateA, StateId stateB)
+bool DFA::checkEquivalence(const ParitionMap& paritionMap, StateId stateA, StateId stateB) const
 {
     for(const auto c : mAlphabet)
     {

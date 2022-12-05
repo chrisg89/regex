@@ -96,18 +96,13 @@ std::string NFA::serialize() const
     return out;
 }
 
-DFA NFA::toDFA()
+DFA NFA::makeDFA() const
 {
-    // The NFA built via Thompson-Construction contains epsilon
-    // transitions and called an "Epsilon NFA". The Epsilon NFA
-    // must be transformed by eliminating the epsilon
-    EpsilonNFAToNFAConversion();
+    // Convert the NFA to a DFA
+    auto dfa = buildDFA();
 
-    // Next, convert the NFA to a DFA
-    auto dfa = NFAToDFAConversion();
-
-    // Finally, minimize the DFA
-    dfa.minimizeDFA();
+    // Minimize the DFA
+    dfa.minimize();
 
     return dfa;
 }
@@ -160,7 +155,7 @@ EpsilonClusureMap NFA::CreateEpsilonClosureMap() const
     return map;
 }
 
-void NFA::EpsilonNFAToNFAConversion()
+void NFA::removeEpsilonTransitions()
 {
     NFA newNFA(mAlphabet);
 
@@ -206,7 +201,7 @@ void NFA::EpsilonNFAToNFAConversion()
     *this = std::move(newNFA);
 }
 
-DFA NFA::NFAToDFAConversion()
+DFA NFA::buildDFA() const
 {
     using StateMapper = Bimap<std::set<StateId>, StateId, SetHasher>;
 
@@ -232,8 +227,12 @@ DFA NFA::NFAToDFAConversion()
 
             for(const auto nfaState : nfaStates)
             {
-                auto destinations = mStates.at(nfaState).Transitions[c];
-                std::copy(destinations.begin(), destinations.end(), std::inserter(set, set.end()));
+                const auto& transitions = mStates.at(nfaState).Transitions;
+                if(transitions.count(c))
+                {
+                    auto destinations = transitions.at(c);
+                    std::copy(destinations.begin(), destinations.end(), std::inserter(set, set.end()));
+                }
             }
 
             auto newDfaState = StateId{kNullState};

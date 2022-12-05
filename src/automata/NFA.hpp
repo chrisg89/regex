@@ -19,9 +19,9 @@ public:
 
     void addTransition(InputType input, StateId destination);
 
-    StateId Id;
-    bool IsStart;
-    bool IsFinal;
+    const StateId Id;
+    const bool IsStart;
+    const bool IsFinal;
     std::map<InputType, std::vector<StateId>> Transitions;
 };
 
@@ -34,16 +34,17 @@ public:
 
     void addTransition(InputType input, StateId source, StateId destination);
 
-    DFA toDFA();
+    DFA makeDFA() const;
 
     std::string serialize() const;
+    
+    void removeEpsilonTransitions();
 
 private:
 
-    void EpsilonNFAToNFAConversion();
     EpsilonClusureMap CreateEpsilonClosureMap() const;
 
-    DFA NFAToDFAConversion();
+    DFA buildDFA() const;
 
     std::vector<NFAState> mStates;
     Alphabet mAlphabet;

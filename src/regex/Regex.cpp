@@ -17,7 +17,7 @@ Regex::Regex(const std::string& pattern)
 
 Regex::Regex(const ast::AST& ast)
 : mAlphabet{ast.makeAlphabet()}
-, mDFA{ast.makeNFA(mAlphabet).toDFA()}
+, mDFA{ast.makeNFA(mAlphabet).makeDFA()}
 {}
 
 automata::InputType Regex::findInAlphabet(CodePoint input)

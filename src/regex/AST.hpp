@@ -320,6 +320,11 @@ public:
         nfa.addTransition(automata::kEpsilon, start, bb.entry);
         nfa.addTransition(automata::kEpsilon, bb.exit, end);
 
+        // The NFA built via Thompson-Construction is an "Epsilon NFA"
+        // Such NFA contains epsilon transitions. Removal of said 
+        // transitions yields a standard NFA.
+        nfa.removeEpsilonTransitions();
+
         return nfa;
     }
 
