@@ -18,7 +18,6 @@ class Regex
 public:
     explicit Regex(const std::string& pattern);
     bool match(const std::string& target);
-    bool search(const std::string& target);
 
 private:
 

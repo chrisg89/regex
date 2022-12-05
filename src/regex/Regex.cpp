@@ -56,17 +56,4 @@ bool Regex::match(const std::string& target)
     return mDFA.isFinalState(state);
 }
 
-bool Regex::search(const std::string& target)
-{
-    //TODO broken
-    /*
-    for(auto result : mDFA.search(target))
-    {
-        std::cout << result << std::endl;
-    }
-    */
-
-    return true; //todo
-}
-
 } //namespace regex
