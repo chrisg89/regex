@@ -173,7 +173,10 @@ ParitionMap PartitionPool::makePartitionMap() const
 
 void DFA::minimize()
 {
-    //STEP1: TODO ????
+    // Using the partitioning method of DFA minimization 
+
+    //STEP1: parition the original dfa
+
     PartitionPool pool;
     ParitionMap prevPartitionMap;
     ParitionMap currPartitionMap;
@@ -242,7 +245,7 @@ void DFA::minimize()
     }
 
 
-    //STEP2: TODO ????
+    //STEP2: create new DFA from partitions
 
     DFA newDFA(mAlphabet);
 
@@ -268,7 +271,6 @@ void DFA::minimize()
 
     //STEP3: replace old DFA with new DFA
     *this = std::move(newDFA);
-
 }
 
 bool DFA::checkEquivalence(const ParitionMap& paritionMap, StateId stateA, StateId stateB) const
