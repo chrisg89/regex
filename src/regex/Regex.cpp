@@ -27,8 +27,8 @@ automata::InputType Regex::findInAlphabet(CodePoint input)
         return input>= interval.first && input <= interval.second; 
     };
 
-    auto begin = mAlphabet.begin();
-    auto end = mAlphabet.end();
+    const auto begin = mAlphabet.begin();
+    const auto end = mAlphabet.end();
     auto result = std::find_if(begin, end, within);
     assert(result != end);
     return std::distance(begin, result);
