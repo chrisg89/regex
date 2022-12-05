@@ -28,7 +28,7 @@ public:
 class NFA
 {
 public:
-    NFA(Alphabet alphabet);
+    explicit NFA(Alphabet alphabet);
 
     StateId addState(bool isStart, bool isFinal);
 

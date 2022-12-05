@@ -33,7 +33,7 @@ class DFA
 {
 public:
 
-    DFA(Alphabet alphabet);
+    explicit DFA(Alphabet alphabet);
 
     StateId addState(bool isStart, bool isFinal);
 

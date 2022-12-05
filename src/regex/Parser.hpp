@@ -100,7 +100,7 @@ namespace tags
 class Parser
 {
 public:
-    Parser(const std::string&);
+    explicit Parser(const std::string&);
     AST parse();
 
 private:

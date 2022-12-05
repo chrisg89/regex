@@ -239,7 +239,7 @@ public:
     , mEnd{end}
     {}
 
-    CharacterRange(CodePoint codepoint)  
+    explicit CharacterRange(CodePoint codepoint)  
     : mStart{codepoint}
     , mEnd{codepoint}
     {}
@@ -286,7 +286,7 @@ class AST
 {
 public:
 
-    AST(NodePtr& node ) : mRoot{std::move(node)}
+    explicit AST(NodePtr& node ) : mRoot{std::move(node)}
     {}
 
     std::string print() const
