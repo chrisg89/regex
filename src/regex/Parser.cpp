@@ -77,8 +77,8 @@ bool Parser::parse(tags::RegexTag, NodePtr& node)
 
 bool Parser::parse(tags::ExpressionTag, NodePtr& node)
 {
-    auto subexpression = NodePtr();
-    auto expression = NodePtr();
+    NodePtr subexpression;
+    NodePtr expression;
 
     if(!parse<tags::SubexpressionTag>(subexpression))
     {
@@ -103,8 +103,8 @@ bool Parser::parse(tags::ExpressionTag, NodePtr& node)
 
 bool Parser::parse(tags::SubexpressionTag, NodePtr& node)
 {
-    auto subexpr = NodePtr();
-    auto next = NodePtr();
+    NodePtr subexpr;
+    NodePtr next;
 
     if(!parse<tags::SubexpressionItemTag>(subexpr))
     {
@@ -241,8 +241,8 @@ bool Parser::parse(tags::GroupNonCapturingModifierTag)
 
 bool Parser::parse(tags::MatchTag, NodePtr& node)
 {
-    auto matchItem = NodePtr();
-    auto quantifier = NodePtr();
+    NodePtr matchItem;
+    NodePtr quantifier;
 
     if(!parse<tags::MatchItemTag>(matchItem))
     {
@@ -678,8 +678,8 @@ bool Parser::parse(tags::CharacterTag, CodePoint& cp)
     // This is a bit messy. Not sure how to account for this in
     // the grammar. A '{' can be either treated as a literal or
     // the start of a ranged quantifier.
-    auto dummy1 = NodePtr();
-    auto dummy2 = NodePtr();
+    NodePtr dummy1;
+    NodePtr dummy2;
     if(parse<tags::RangeQuantifierTag>(dummy1,dummy2))
     {
         return false;

@@ -37,6 +37,7 @@ public:
     virtual BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const = 0;
     virtual void print(std::string&) const = 0;
     virtual void makeAlphabet(Alphabet&) const = 0; 
+    virtual ~Node() = default;
 };
 
 class Alternative : public Node
