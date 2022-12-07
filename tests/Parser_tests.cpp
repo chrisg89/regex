@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch2/catch_all.hpp>
 #include "Parser.hpp"
 
 #include <iostream>
@@ -6,7 +6,7 @@
 namespace regex::parser {
 namespace {
 
-using Catch::Contains;
+using Catch::Matchers::ContainsSubstring;
 
 SCENARIO("Parse empty regex")
 {
@@ -265,7 +265,7 @@ SCENARIO("Parse character from 4 digit unicode code point")
             "\\u123x" // x is not a hexidecimal digit, hence, codepoint is incomplete
         );
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("The Unicode codepoint is incomplete"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("The Unicode codepoint is incomplete"));
     }
 }
 
@@ -318,14 +318,14 @@ SCENARIO("Parse character from 8 digit unicode code point")
             "\\U1234567x" // x is not a hexidecimal digit, hence, codepoint is incomplete
         );
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("The Unicode codepoint is incomplete"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("The Unicode codepoint is incomplete"));
     }
 
     SECTION("Throw when unicode codepoint exceeds maximum value of 0x0010FFFF")
     {
         const std::string regex = "\\U00110000";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("The Unicode codepoint invalid"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("The Unicode codepoint invalid"));
     }
 }
 
@@ -613,21 +613,21 @@ SCENARIO("Parse character classes")
     {
         const std::string regex = "[z-a]";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Character range is out of order"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Character range is out of order"));
     }
 
     SECTION("Throw exception when the character class is empty")
     {
         const std::string regex = "[]";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Character class missing closing bracket"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Character class missing closing bracket"));
     }
 
     SECTION("Throw exception when the closing bracket is missing")
     {
         const std::string regex = "[123";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Character class missing closing bracket"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Character class missing closing bracket"));
     }
 }
 
@@ -637,7 +637,7 @@ SCENARIO("Parse backreference")
     {
         const std::string regex = "a\\4";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Backreferences are not supported"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Backreferences are not supported"));
     }
 }
 
@@ -647,49 +647,49 @@ SCENARIO("Parse Anchors")
     {
         const std::string regex = "^abc";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Anchors are not supported"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Anchors are not supported"));
     }
 
     SECTION("End of string anchor ($) is not supported")
     {
         const std::string regex = "abc$";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Anchors are not supported"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Anchors are not supported"));
     }
 
     SECTION("Word boundry anchor (\\b) is not recognized")
     {
         const std::string regex = "\\b";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("This token has no special meaning and has thus been rendered erroneous"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("This token has no special meaning and has thus been rendered erroneous"));
     }
 
     SECTION("Non-word boundry anchor (\\B) is not recognized")
     {
         const std::string regex = "\\B";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("This token has no special meaning and has thus been rendered erroneous"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("This token has no special meaning and has thus been rendered erroneous"));
     }
 
     SECTION("Anchor given by \\A is not recognized")
     {
         const std::string regex = "\\A";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("This token has no special meaning and has thus been rendered erroneous"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("This token has no special meaning and has thus been rendered erroneous"));
     }
 
     SECTION("Anchor given by \\Z is not recognized")
     {
         const std::string regex = "\\Z";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("This token has no special meaning and has thus been rendered erroneous"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("This token has no special meaning and has thus been rendered erroneous"));
     }
 
     SECTION("Anchor given by \\z is not recognized")
     {
         const std::string regex = "\\z";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("This token has no special meaning and has thus been rendered erroneous"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("This token has no special meaning and has thus been rendered erroneous"));
     }
 }
 
@@ -731,28 +731,28 @@ SCENARIO("Parse group")
     {
         const std::string regex = "(?:a)";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Non-capturing groups are the default. Capturing groups not supported"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Non-capturing groups are the default. Capturing groups not supported"));
     }
 
     SECTION("Throw when group is not complete due to missing closing parenthesis")
     {
         const std::string regex = "(a";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Incomplete group structure"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Incomplete group structure"));
     }
 
     SECTION("Throw when nested group is not complete due to missing closing parenthesis")
     {
         const std::string regex = "((a)";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Incomplete group structure"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Incomplete group structure"));
     }
 
     SECTION("Throw when there exists an unmatch left parenthesis")
     {
         const std::string regex = "abc)";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Unmatched parenthesis"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Unmatched parenthesis"));
     }
 }
 
@@ -762,28 +762,28 @@ SCENARIO("Parse quantifiers")
     {
         const std::string regex = "a*?";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Lazy modifier is not supported"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Lazy modifier is not supported"));
     }
 
     SECTION("Lazy Modifier (kleene plus +) is not supported")
     {
         const std::string regex = "a+?";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Lazy modifier is not supported"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Lazy modifier is not supported"));
     }
 
     SECTION("Lazy Modifier (optional ?) is not supported")
     {
         const std::string regex = "a??";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Lazy modifier is not supported"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Lazy modifier is not supported"));
     }
 
     SECTION("Lazy Modifier (ranged quantifier) is not supported")
     {
         const std::string regex = "a{1,3}?";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Lazy modifier is not supported"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Lazy modifier is not supported"));
     }
 
     SECTION("Kleene star (*)")
@@ -824,7 +824,7 @@ SCENARIO("Parse quantifiers")
             "a{1,2}*"
         );
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("The preceding token is not quantifiable"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("The preceding token is not quantifiable"));
     }
 
     SECTION("Kleene plus (+)")
@@ -865,7 +865,7 @@ SCENARIO("Parse quantifiers")
             "a{1,2}+"
         );
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("The preceding token is not quantifiable"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("The preceding token is not quantifiable"));
     }
 
     SECTION("Optional (?)")
@@ -906,7 +906,7 @@ SCENARIO("Parse quantifiers")
             //"a{1,2}?"   /* This is lazy modifier and valid syntax*/
         );
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("The preceding token is not quantifiable"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("The preceding token is not quantifiable"));
     }
 
     SECTION("Ranged quantifier: lower bound only ")
@@ -1011,28 +1011,28 @@ SCENARIO("Parse quantifiers")
             "a{1,2}{100,200}"
         );
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("The preceding token is not quantifiable"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("The preceding token is not quantifiable"));
     }
 
     SECTION("Ranged quantifier throws when lower bound is too large")
     {
         const std::string regex = "a{999999999999}";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Lower bound on ranged quantifier too large"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Lower bound on ranged quantifier too large"));
     }
 
     SECTION("Ranged quantifier throws when upper bound is too large")
     {
         const std::string regex = "a{1,999999999999}";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("Upper bound on ranged quantifier too large"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("Upper bound on ranged quantifier too large"));
     }
 
     SECTION("Ranged quantifier throws when lower bound is greater than upper bound")
     {
         const std::string regex = "a{2,1}";
         auto parser = Parser(regex);
-        REQUIRE_THROWS_WITH(parser.parse(), Contains("The quantifier range is out of order"));
+        REQUIRE_THROWS_WITH(parser.parse(), ContainsSubstring("The quantifier range is out of order"));
     }
 }
 

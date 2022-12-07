@@ -13,6 +13,4 @@ TARGET_LINK_LIBRARIES( regex_lib
 target_include_directories(regex_lib
     PUBLIC
     ./
-    ) 
-
-add_subdirectory(tests)
+    )

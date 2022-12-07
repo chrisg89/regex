@@ -1,11 +1,9 @@
-#include "catch.hpp"
+#include <catch2/catch_all.hpp>
 #include "Regex.hpp"
 
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-
-
 
 namespace regex{
 

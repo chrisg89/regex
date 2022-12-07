@@ -1,16 +1,58 @@
-cmake_minimum_required(VERSION 3.10)
+# Works with 3.14 and tested through 3.25
+cmake_minimum_required(VERSION 3.14...3.25)
 
-# specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+# Project name and a few useful settings. Other commands can pick up the results
+project(
+  Regex
+  VERSION 0.1
+  DESCRIPTION "Regex library based on DFA"
+  LANGUAGES CXX)
+
+# Only do these if this is the main project, and not if it is included through add_subdirectory
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+
+  # Optionally set things like CMAKE_CXX_STANDARD, CMAKE_POSITION_INDEPENDENT_CODE here
+
+  # Let's ensure -std=c++xx instead of -std=g++xx
+  set(CMAKE_CXX_EXTENSIONS OFF)
+
+  # Let's nicely support folders in IDEs
+  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+  # Testing only available if this is the main app
+  # Note this needs to be done in the main CMakeLists
+  # since it calls enable_testing, which must be in the
+  # main CMakeLists.
+  include(CTest)
+
+  # Docs only available if this is the main app
+  find_package(Doxygen)
+  if(Doxygen_FOUND)
+    add_subdirectory(docs)
+  else()
+    message(STATUS "Doxygen not found, not building docs")
+  endif()
+endif()
+
+# FetchContent added in CMake 3.11, downloads during the configure step
+# FetchContent_MakeAvailable was added in CMake 3.14; simpler usage
+include(FetchContent)
 
 
-set(CMAKE_BUILD_TYPE Debug)
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG v3.0.1
+)
 
-# set the project name
-project(Regex)
+FetchContent_MakeAvailable(Catch2)
 
-add_subdirectory(src/automata)
-add_subdirectory(src/regex)
-add_subdirectory(src/catch)
- 
+# The compiled library code is here
+add_subdirectory(src)
+
+# Testing only available if this is the main app
+# Emergency override REGEX_CMAKE_BUILD_TESTING provided as well
+if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR REGEX_CMAKE_BUILD_TESTING)
+   AND BUILD_TESTING)
+  add_subdirectory(tests)
+endif()

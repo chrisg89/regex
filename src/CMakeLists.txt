@@ -1,0 +1,2 @@
+add_subdirectory(automata)
+add_subdirectory(regex)
