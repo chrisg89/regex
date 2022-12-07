@@ -1,5 +1,5 @@
 #include <catch2/catch_all.hpp>
-#include "Regex.hpp"
+#include <regex/Regex.hpp>
 
 #include <iostream>
 #include <sstream>

@@ -1,4 +1,4 @@
-#include "Regex.hpp"
+#include <regex/Regex.hpp>
 
 #include "Alphabet.hpp"
 #include "AST.hpp"
