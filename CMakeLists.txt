@@ -1,3 +1,6 @@
+# This cmake project is largely based on this template:
+# https://gitlab.com/CLIUtils/modern-cmake/-/tree/master/examples/extended-project
+
 # Works with 3.14 and tested through 3.25
 cmake_minimum_required(VERSION 3.14...3.25)
 
