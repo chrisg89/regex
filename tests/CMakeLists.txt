@@ -1,9 +1,7 @@
 add_executable(tests
     Alphabet_tests.cpp
     Parser_tests.cpp
-    Regex_tests.cpp
     RegexMatch_tests.cpp
-    RegexSearch_tests.cpp
     )
 
 TARGET_LINK_LIBRARIES( tests
