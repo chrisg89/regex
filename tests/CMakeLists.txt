@@ -9,3 +9,5 @@ TARGET_LINK_LIBRARIES( tests
     Catch2::Catch2WithMain
     regex_lib
     )
+
+catch_discover_tests(tests)
