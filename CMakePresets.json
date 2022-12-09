@@ -1,0 +1,32 @@
+{
+    "version": 1,
+    "cmakeMinimumRequired": {
+      "major": 3,
+      "minor": 19,
+      "patch": 0
+    },
+    "configurePresets": [
+      {
+        "name": "CI-g++",
+        "displayName": "CI",
+        "description": "Preset for CI using g++",
+        "generator": "Unix Makefiles",
+        "binaryDir": "./build/g++",
+        "cacheVariables": {
+          "CMAKE_CXX_COMPILER": "g++-11",
+          "CMAKE_CXX_FLAGS": ""
+        }
+      },
+      {
+        "name": "CI-clang++",
+        "displayName": "CI",
+        "description": "Preset for CI using clang++",
+        "generator": "Unix Makefiles",
+        "binaryDir": "./build/clang++",
+        "cacheVariables": {
+          "CMAKE_CXX_COMPILER": "clang++",
+          "CMAKE_CXX_FLAGS": ""
+        }
+      }
+    ]
+  }
