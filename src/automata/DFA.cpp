@@ -210,17 +210,18 @@ void DFA::minimize()
 
     while(currPartitionMap != prevPartitionMap)
     {
+        auto paritionId = PartitionId{0};
         std::vector<StateId> movedStates{};
 
-        for(const auto& partition : pool.Partitions)
+        while(paritionId < pool.Partitions.size()) 
         {
             movedStates.clear();
 
-            for (const auto state : pool.Partitions[partition.Id].States)
+            for (const auto state : pool.Partitions[paritionId].States)
             {
-                if(state != pool.Partitions[partition.Id].Leader)
+                if(state != pool.Partitions[paritionId].Leader)
                 {
-                    if(!checkEquivalence(currPartitionMap, pool.Partitions[partition.Id].Leader, state))
+                    if(!checkEquivalence(currPartitionMap, pool.Partitions[paritionId].Leader, state))
                     {
                         movedStates.emplace_back(state);
                     }
@@ -233,10 +234,12 @@ void DFA::minimize()
 
                 for (const auto state : movedStates)
                 {
-                    pool.Partitions[partition.Id].States.erase(state);
+                    pool.Partitions[paritionId].States.erase(state);
                     pool.Partitions[newPartition].insert(state);
                 }
             }
+
+            paritionId++;
         }
 
         std::swap(prevPartitionMap, currPartitionMap);
