@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.14)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,7 +22,6 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   # Catch2 for unit testing
   FetchContent_Declare(
     Catch2
-    SYSTEM TRUE
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
     GIT_TAG v2.13.9 
   )
@@ -44,8 +43,6 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     message(STATUS "Doxygen not found, not building docs")
   endif()
 endif()
-
-
 
 # The compiled library code is here
 add_subdirectory(src)
