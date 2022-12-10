@@ -11,9 +11,8 @@
 namespace automata
 {
 
-using PartitionId = int;
+using PartitionId = unsigned int;
 using ParitionMap = std::unordered_map<StateId,PartitionId>;
-constexpr PartitionId kNullPartition = -1;
 
 class DFAState
 {
@@ -50,11 +49,10 @@ public:
 
 private:
     std::vector<DFAState> mStates;
-    Alphabet mAlphabet;
-
-    uint mStateCount;
+    unsigned int mStateCount;
     StateId mStartState;
     std::vector<StateId> mFinalStates;
+    Alphabet mAlphabet;
 
     bool checkEquivalence(const ParitionMap& paritionMap, StateId stateA, StateId stateB) const;
 };

@@ -19,12 +19,12 @@ using automata::StateId;
 struct BlackBox
 {
     BlackBox(StateId entry, StateId exit)
-    : entry {entry}
-    , exit {exit}
+    : Entry {entry}
+    , Exit {exit}
     {}
 
-    StateId entry;
-    StateId exit;
+    StateId Entry;
+    StateId Exit;
 };
 
 class Node;
@@ -55,10 +55,10 @@ public:
 
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
-        nfa.addTransition(automata::kEpsilon, entry, BB1.entry);
-        nfa.addTransition(automata::kEpsilon, entry, BB2.entry);
-        nfa.addTransition(automata::kEpsilon, BB1.exit, exit);
-        nfa.addTransition(automata::kEpsilon, BB2.exit, exit);
+        nfa.addTransition(automata::kEpsilon, entry, BB1.Entry);
+        nfa.addTransition(automata::kEpsilon, entry, BB2.Entry);
+        nfa.addTransition(automata::kEpsilon, BB1.Exit, exit);
+        nfa.addTransition(automata::kEpsilon, BB2.Exit, exit);
         return BlackBox(entry, exit);
     }
 
@@ -94,9 +94,9 @@ public:
         auto BB1 = mLeft->makeNFA(alphabet, nfa);
         auto BB2 = mRight->makeNFA(alphabet, nfa);
 
-        auto entry = BB1.entry;
-        auto exit = BB2.exit;
-        nfa.addTransition(automata::kEpsilon, BB1.exit, BB2.entry);
+        auto entry = BB1.Entry;
+        auto exit = BB2.Exit;
+        nfa.addTransition(automata::kEpsilon, BB1.Exit, BB2.Entry);
         return BlackBox(entry, exit);
     }
 
@@ -121,8 +121,8 @@ public:
 class Quantifier : public Node
 {
 public:
-    Quantifier(NodePtr& mInner, uint64_t min, uint64_t max, bool isMaxBounded)
-    : mInner {std::move(mInner)}
+    Quantifier(NodePtr& inner, uint64_t min, uint64_t max, bool isMaxBounded)
+    : mInner {std::move(inner)}
     , mMin {min}
     , mMax {max}
     , mIsMaxBounded {isMaxBounded}
@@ -137,8 +137,8 @@ public:
         for(uint64_t min = 0; min < mMin; ++min)
         {
             auto next = mInner->makeNFA(alphabet, nfa);
-            nfa.addTransition(automata::kEpsilon, prev, next.entry);
-            prev = next.exit;
+            nfa.addTransition(automata::kEpsilon, prev, next.Entry);
+            prev = next.Exit;
         }
 
         if(mIsMaxBounded)
@@ -146,18 +146,18 @@ public:
             for(uint64_t max = mMin; max < mMax; ++max)
             {
                 auto next = mInner->makeNFA(alphabet, nfa);
-                nfa.addTransition(automata::kEpsilon, prev, next.entry);
+                nfa.addTransition(automata::kEpsilon, prev, next.Entry);
                 nfa.addTransition(automata::kEpsilon, prev, exit);
-                prev = next.exit;
+                prev = next.Exit;
             }
         }
         else
         {
             auto next = mInner->makeNFA(alphabet, nfa);
-            nfa.addTransition(automata::kEpsilon, prev, next.entry);
+            nfa.addTransition(automata::kEpsilon, prev, next.Entry);
             nfa.addTransition(automata::kEpsilon, prev, exit);
-            nfa.addTransition(automata::kEpsilon, next.exit, next.entry);
-            prev = next.exit;
+            nfa.addTransition(automata::kEpsilon, next.Exit, next.Entry);
+            prev = next.Exit;
         }
 
         nfa.addTransition(automata::kEpsilon, prev, exit);
@@ -181,17 +181,17 @@ public:
             str += "{" + std::to_string(mMin) + "," + "}";
         }
     }
-
+     
+    NodePtr mInner;
     uint64_t mMin;
     uint64_t mMax;
-    bool mIsMaxBounded;     
-    NodePtr mInner;
+    bool mIsMaxBounded;
 };
 
 class Epsilon : public Node
 {
 public:
-    BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
+    BlackBox makeNFA(const Alphabet&, NFA& nfa) const final
     {
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
@@ -199,7 +199,7 @@ public:
         return BlackBox(entry, exit);
     }
 
-    void makeAlphabet(Alphabet& alphabet) const final
+    void makeAlphabet(Alphabet&) const final
     {
         /* Do nothing */
     }
@@ -213,7 +213,7 @@ public:
 class Null : public Node
 {
 public:
-    BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
+    BlackBox makeNFA(const Alphabet&, NFA& nfa) const final
     {
         //entry and exit are not connected by any transition
         auto entry = nfa.addState(false, false);
@@ -221,7 +221,7 @@ public:
         return BlackBox(entry, exit);
     }
 
-    void makeAlphabet(Alphabet& alphabet) const final
+    void makeAlphabet(Alphabet&) const final
     {
         /* Do nothing */
     }
@@ -252,11 +252,11 @@ public:
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
 
-        for(auto i=0; i<alphabet.size(); ++i)
+        for(auto i=0u; i<alphabet.size(); ++i)
         {
             if(isSubset(alphabet[i], interval))
             {
-                nfa.addTransition(i, entry, exit);
+                nfa.addTransition(static_cast<automata::InputType>(i), entry, exit);
             }
         }
 
@@ -318,8 +318,8 @@ public:
         auto bb = mRoot->makeNFA(alphabet, nfa);
         auto start = nfa.addState(true, false);
         auto end = nfa.addState(false, true);
-        nfa.addTransition(automata::kEpsilon, start, bb.entry);
-        nfa.addTransition(automata::kEpsilon, bb.exit, end);
+        nfa.addTransition(automata::kEpsilon, start, bb.Entry);
+        nfa.addTransition(automata::kEpsilon, bb.Exit, end);
 
         // The NFA built via Thompson-Construction is an "Epsilon NFA"
         // Such NFA contains epsilon transitions. Removal of said 

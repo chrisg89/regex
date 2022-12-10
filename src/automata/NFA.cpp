@@ -14,9 +14,9 @@ namespace automata
 // todo: This hasher is too expensive (especially on non-sequential containers such as sets). 
 // Need to find another way to create a bi-map or replace the bi-map entirely
 struct SetHasher {
-    int operator()(const std::set<StateId> &V) const {
-        int hash = V.size();
-        for(auto &i : V) {
+    std::size_t operator()(const std::set<StateId> &V) const {
+        auto hash = V.size();
+        for(const auto i : V) {
             hash ^= i + 0x9e3779b9 + (hash << 6) + (hash >> 2);
         }
         return hash;
@@ -38,7 +38,7 @@ void NFAState::addTransition(InputType input, StateId destination)
 NFA::NFA(Alphabet alphabet)
     : mStates{}
     , mStateCount{0}
-    , mStartState{kNullState}
+    , mStartState{}
     , mFinalStates{}
     , mAlphabet{alphabet}
 {}
@@ -47,7 +47,6 @@ StateId NFA::addState(bool isStart, bool isFinal)
 {
     if(isStart)
     {
-        assert(mStartState == kNullState);
         mStartState = mStateCount;
     }
 
@@ -235,7 +234,7 @@ DFA NFA::buildDFA() const
                 }
             }
 
-            auto newDfaState = StateId{kNullState};
+            StateId newDfaState;
             if(mapper.contains(set))
             {
                 newDfaState = mapper.get(set);

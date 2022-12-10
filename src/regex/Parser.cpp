@@ -48,7 +48,7 @@ void Parser::HandleUnexpected()
     error("Unknown parse error");
 }
 
-int Parser::pos() const
+long int Parser::pos() const
 {
     return std::distance(mBegin, mCurser);
 }
@@ -122,12 +122,12 @@ bool Parser::parse(tags::SubexpressionTag, NodePtr& node)
 
 bool Parser::parse(tags::SubexpressionItemTag, NodePtr& node)
 {
-    if(parse<tags::BackreferenceTag>(node))
+    if(parse<tags::BackreferenceTag>())
     {
         error("Backreferences are not supported");
     }
 
-    if(parse<tags::AnchorTag>(node))
+    if(parse<tags::AnchorTag>())
     {
         error("Anchors are not supported ");
     }
@@ -140,7 +140,7 @@ bool Parser::parse(tags::SubexpressionItemTag, NodePtr& node)
     return false;
 }
 
-bool Parser::parse(tags::AnchorTag, NodePtr& node)
+bool Parser::parse(tags::AnchorTag)
 {
 
     if(parse<tags::AnchorStartOfStringTag>())
@@ -166,7 +166,7 @@ bool Parser::parse(tags::AnchorEndOfStringTag)
     return (get() == '$');
 }
 
-bool Parser::parse(tags::BackreferenceTag, NodePtr& node)
+bool Parser::parse(tags::BackreferenceTag)
 {
     uint64_t integer = 0;
     bool overflow = false;
@@ -543,7 +543,6 @@ bool Parser::parse(tags::ShorthandCharacterClassDigitNegatedTag, CharacterGroup&
 
 bool Parser::parse(tags::ShorthandCharacterClassWhitespaceTag, CharacterGroup& group)
 {
-    CodePoint cp;
     if(get() == '\\' && get() == 's')
     {
         group.emplace_back(0x09, 0x0D);
@@ -555,7 +554,6 @@ bool Parser::parse(tags::ShorthandCharacterClassWhitespaceTag, CharacterGroup& g
 
 bool Parser::parse(tags::ShorthandCharacterClassWhitespaceNegatedTag, CharacterGroup& group)
 {
-    CodePoint cp;
     if(get() == '\\' && get() == 'S')
     {
         group.emplace_back(kCodePointMin, 0x08);
@@ -868,15 +866,25 @@ bool Parser::parse(tags::RangeSeparatorTag)
     return (get() == ',');
 }
 
-inline int hex2int(char ch)
+inline CodePoint hex2int(CodePoint ch)
 {
-    int val;
+    CodePoint val;
     if (ch >= '0' && ch <= '9')
+    {
         val = ch - '0';
-    if (ch >= 'A' && ch <= 'F')
+    }
+    else if (ch >= 'A' && ch <= 'F')
+    {
         val = ch - 'A' + 10;
-    if (ch >= 'a' && ch <= 'f')
+    }
+    else if (ch >= 'a' && ch <= 'f')
+    {
         val = ch - 'a' + 10;
+    }
+    else
+    {
+        val = kInvalid;
+    }
     return val;
 }
 
@@ -885,19 +893,19 @@ bool Parser::parse(tags::Unicode8DigitCodePointTag, CodePoint& cp)
     constexpr auto kNumDigits = 8u;
     
     cp = 0;
-    for(int i=0; i < kNumDigits; ++i)
+    for(auto i=0u; i < kNumDigits; ++i)
     {
-        CodePoint digit = get();
-        if(!isxdigit(digit))
+        CodePoint digit = hex2int(get());
+        if(digit == kInvalid)
         {
             error("The Unicode codepoint is incomplete");
         }
         
         cp = cp << 4;
-        cp |= hex2int(digit);
+        cp |= digit;
     }
 
-    if(cp > 0x0010FFFF)
+    if(cp > kCodePointMax)
     {
         error("The Unicode codepoint invalid");
     }
@@ -910,25 +918,25 @@ bool Parser::parse(tags::Unicode4DigitCodePointTag, CodePoint& cp)
     constexpr auto kNumDigits = 4u;
     
     cp = 0;
-    for(int i=0; i < kNumDigits; ++i)
+    for(auto i=0u; i < kNumDigits; ++i)
     {
-        CodePoint digit = get();
-        if(!isxdigit(digit))
+        CodePoint digit = hex2int(get());
+        if(digit == kInvalid)
         {
             error("The Unicode codepoint is incomplete");
         }
         
         cp = cp << 4;
-        cp |= hex2int(digit);
+        cp |= digit;
     }
 
     return true;
 }
 
-bool Parser::parse(tags::DigitTag, uint8_t& digit)
+bool Parser::parse(tags::DigitTag, unsigned int& digit)
 {
     CodePoint cp = get();
-    if(isdigit(cp))
+    if (cp >= '0' && cp <= '9')
     {
         digit = cp - '0';
         return true;
@@ -941,7 +949,7 @@ bool Parser::parse(tags::IntegerTag, uint64_t& integer, bool& overflow)
     integer = 0;
     overflow = false;
 
-    uint8_t digit; 
+    unsigned int digit; 
 
     if(!parse<tags::DigitTag>(digit))
     {

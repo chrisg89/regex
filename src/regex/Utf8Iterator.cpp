@@ -94,7 +94,7 @@ Utf8Iterator Utf8Iterator::operator--(int)
     return temp;
 }
 
-char32_t Utf8Iterator::operator*() const
+CodePoint Utf8Iterator::operator*() const
 {
     CalculateCurrentCodePoint();
  
@@ -106,7 +106,7 @@ void Utf8Iterator::CalculateCurrentCodePoint() const
 
     if(mDirty)
     {
-        char32_t codePoint = 0;
+        CodePoint codePoint = 0;
  
         char firstByte = *mStringIterator;
     
@@ -142,7 +142,7 @@ void Utf8Iterator::CalculateCurrentCodePoint() const
         }
         else
         {
-            codePoint = firstByte;
+            codePoint = static_cast<CodePoint>(firstByte);
         }
 
         mCurrentCodePoint = codePoint;

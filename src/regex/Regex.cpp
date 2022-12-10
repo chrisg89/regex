@@ -53,7 +53,9 @@ automata::InputType Regex::RegexImpl::findInAlphabet(CodePoint input)
     const auto end = mAlphabet.end();
     auto result = std::find_if(begin, end, within);
     assert(result != end);
-    return std::distance(begin, result);
+
+    // The index is the input to the automata
+    return static_cast<automata::InputType>(std::distance(begin, result));
 }
 
 bool Regex::RegexImpl::match(const std::string& target)

@@ -1,4 +1,6 @@
 #pragma once
+
+#include "CodePoint.hpp"
 #include <string>
 
 namespace regex
@@ -11,7 +13,7 @@ namespace regex
 // string is valid utf-8. No error checking was 
 // implemented. Future work may address this.
 
-class Utf8Iterator : public std::iterator<std::bidirectional_iterator_tag, char32_t, std::string::difference_type, const char32_t*, const char32_t&>
+class Utf8Iterator : public std::iterator<std::bidirectional_iterator_tag, CodePoint, std::string::difference_type, const CodePoint*, const CodePoint&>
 {
 public:
  
@@ -26,7 +28,7 @@ public:
     Utf8Iterator& operator--();
     Utf8Iterator operator--(int);
 
-    char32_t operator*() const;
+    CodePoint operator*() const;
 
     bool operator==(const Utf8Iterator& rhs) const;
     bool operator!=(const Utf8Iterator& rhs) const;
@@ -39,7 +41,7 @@ public:
 private:
  
     std::string::const_iterator mStringIterator;
-    mutable char32_t mCurrentCodePoint;
+    mutable CodePoint mCurrentCodePoint;
     mutable bool mDirty;
  
     void CalculateCurrentCodePoint() const;
