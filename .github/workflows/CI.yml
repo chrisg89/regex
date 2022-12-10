@@ -38,7 +38,7 @@ jobs:
       run: ctest --test-dir ${{github.workspace}}/build/g++/
 
     - name: Test with Valgrind
-      run: ctest -T memcheck --test-dir ${{github.workspace}}/build/g++/
+      run: ctest -T memcheck --test-dir ${{github.workspace}}/build/g++/ --output-on-failure -VV
 
   build-using-clang:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
