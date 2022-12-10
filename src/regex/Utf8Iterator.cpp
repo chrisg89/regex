@@ -7,7 +7,6 @@ const unsigned char kFirstBitMask = 128;
 const unsigned char kSecondBitMask = 64;
 const unsigned char kThirdBitMask = 32;
 const unsigned char kFourthBitMask = 16;
-const unsigned char kFifthBitMask = 8;
 
 Utf8Iterator::Utf8Iterator(std::string::const_iterator it) :
 mStringIterator(it),
@@ -94,7 +93,7 @@ Utf8Iterator Utf8Iterator::operator--(int)
     return temp;
 }
 
-char32_t Utf8Iterator::operator*() const
+CodePoint Utf8Iterator::operator*() const
 {
     CalculateCurrentCodePoint();
  
@@ -106,7 +105,7 @@ void Utf8Iterator::CalculateCurrentCodePoint() const
 
     if(mDirty)
     {
-        char32_t codePoint = 0;
+        CodePoint codePoint = 0;
  
         char firstByte = *mStringIterator;
     
@@ -116,33 +115,33 @@ void Utf8Iterator::CalculateCurrentCodePoint() const
             {
                 if(firstByte & kFourthBitMask) // This means that the first byte has a value greater than 224, and so it must be a four-octet code point.
                 {
-                    codePoint = (firstByte & 0x07) << 18;
+                    codePoint = static_cast<CodePoint>((firstByte & 0x07) << 18);
                     char secondByte = *(mStringIterator + 1);
-                    codePoint +=  (secondByte & 0x3f) << 12;
+                    codePoint +=  static_cast<CodePoint>((secondByte & 0x3f) << 12);
                     char thirdByte = *(mStringIterator + 2);
-                    codePoint +=  (thirdByte & 0x3f) << 6;;
+                    codePoint +=  static_cast<CodePoint>((thirdByte & 0x3f) << 6);
                     char fourthByte = *(mStringIterator + 3);
-                    codePoint += (fourthByte & 0x3f);
+                    codePoint += static_cast<CodePoint>((fourthByte & 0x3f));
                 }
                 else
                 {
-                    codePoint = (firstByte & 0x0f) << 12;
+                    codePoint = static_cast<CodePoint>((firstByte & 0x0f) << 12);
                     char secondByte = *(mStringIterator + 1);
-                    codePoint += (secondByte & 0x3f) << 6;
+                    codePoint += static_cast<CodePoint>((secondByte & 0x3f) << 6);
                     char thirdByte = *(mStringIterator + 2);
-                    codePoint +=  (thirdByte & 0x3f);
+                    codePoint +=  static_cast<CodePoint>((thirdByte & 0x3f));
                 }
             }
             else
             {
-                codePoint = (firstByte & 0x1f) << 6;
+                codePoint = static_cast<CodePoint>((firstByte & 0x1f) << 6);
                 char secondByte = *(mStringIterator + 1);
-                codePoint +=  (secondByte & 0x3f);
+                codePoint +=  static_cast<CodePoint>((secondByte & 0x3f));
             }
         }
         else
         {
-            codePoint = firstByte;
+            codePoint = static_cast<CodePoint>(firstByte);
         }
 
         mCurrentCodePoint = codePoint;

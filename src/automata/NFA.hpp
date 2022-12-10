@@ -47,11 +47,10 @@ private:
     DFA buildDFA() const;
 
     std::vector<NFAState> mStates;
-    Alphabet mAlphabet;
-
-    uint mStateCount;
+    unsigned int mStateCount;
     StateId mStartState;
     std::vector<StateId> mFinalStates;
+    Alphabet mAlphabet;
 };
 
 } //namespace automata

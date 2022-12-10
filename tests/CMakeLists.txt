@@ -6,7 +6,7 @@ add_executable(tests
 
 TARGET_LINK_LIBRARIES( tests
     PRIVATE
-    Catch2::Catch2WithMain
+    Catch2::Catch2
     regex_lib
     )
 

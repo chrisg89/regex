@@ -24,7 +24,7 @@ jobs:
       run: cmake --preset CI-g++
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build/g++
+      run: cmake --build ${{github.workspace}}/build/g++ -v
 
     - name: Test
       working-directory: ${{github.workspace}}/build/g++
@@ -44,7 +44,7 @@ jobs:
       run: cmake --preset CI-clang++
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build/clang++
+      run: cmake --build ${{github.workspace}}/build/clang++ -v
 
     - name: Test
       working-directory: ${{github.workspace}}/build/clang++

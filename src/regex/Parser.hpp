@@ -109,7 +109,7 @@ private:
     const Utf8Iterator mBegin;
     const Utf8Iterator mEnd;
 
-    int pos() const;
+    long int pos() const;
     CodePoint get();
     void error(const std::string& msg) const;
 
@@ -126,12 +126,12 @@ private:
     bool parse(tags::SubexpressionItemTag, NodePtr&);
 
     // Anchors
-    bool parse(tags::AnchorTag, NodePtr&);
+    bool parse(tags::AnchorTag);
     bool parse(tags::AnchorStartOfStringTag);
     bool parse(tags::AnchorEndOfStringTag);
 
     // Backreference
-    bool parse(tags::BackreferenceTag, NodePtr&);
+    bool parse(tags::BackreferenceTag);
     bool parse(tags::BackreferenceStartTag);
 
     // Alternation
@@ -195,7 +195,7 @@ private:
     // Numeric
     bool parse(tags::Unicode4DigitCodePointTag, CodePoint&);
     bool parse(tags::Unicode8DigitCodePointTag, CodePoint&);
-    bool parse(tags::DigitTag, uint8_t&);
+    bool parse(tags::DigitTag, unsigned int&);
     bool parse(tags::IntegerTag, uint64_t&, bool&);
 
     //EOF
