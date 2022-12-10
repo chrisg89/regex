@@ -13,9 +13,16 @@ namespace regex
 // string is valid utf-8. No error checking was 
 // implemented. Future work may address this.
 
-class Utf8Iterator : public std::iterator<std::bidirectional_iterator_tag, CodePoint, std::string::difference_type, const CodePoint*, const CodePoint&>
+class Utf8Iterator
 {
 public:
+
+    // iterator traits
+    using difference_type = std::string::difference_type;
+    using value_type = CodePoint;
+    using pointer = const CodePoint*;
+    using reference = const CodePoint&;
+    using iterator_category = std::bidirectional_iterator_tag;
  
     Utf8Iterator(std::string::const_iterator it);
  
