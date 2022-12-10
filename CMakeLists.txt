@@ -26,8 +26,11 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     GIT_TAG v2.13.9 
   )
   FetchContent_MakeAvailable(Catch2)
-
   list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/contrib)
+
+  # Valgrind for dynamic analysis
+  set(MEMORYCHECK_COMMAND_OPTIONS "-q --tool=memcheck --leak-check=yes --errors-for-leak-kinds=all --num-callers=25 --track-origins=yes --show-reachable=yes --error-exitcode=1")
+  
   include(CTest)
   include(Catch)
 
