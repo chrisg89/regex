@@ -13,10 +13,10 @@ SCENARIO("Parse empty regex")
 {
     SECTION("Empty Regex")
     {
-        const std::string regex = "";
+        const std::string regex;
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "");
+        CHECK(ast.print().empty());
     }
 }
 
@@ -257,7 +257,7 @@ SCENARIO("Parse character from 4 digit unicode code point")
 
     SECTION("Throw on incomplete 4 digit unicode codepoint")
     {
-        auto regex = GENERATE
+        const std::string regex = GENERATE
         (
             "\\u",
             "\\u1",
@@ -306,7 +306,7 @@ SCENARIO("Parse character from 8 digit unicode code point")
 
     SECTION("Throw on incomplete 8 digit unicode codepoint")
     {
-        auto regex = GENERATE
+        const std::string regex = GENERATE
         (
             "\\U",        
             "\\U1",
@@ -431,7 +431,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[^\\w\\W]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "");
+        CHECK(ast.print().empty());
     }
 
     SECTION("Character class with shorthand \\d")
@@ -455,7 +455,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[^\\d\\D]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "");
+        CHECK(ast.print().empty());
     }
 
     SECTION("Character class with shorthand \\s")
@@ -479,7 +479,7 @@ SCENARIO("Parse character classes")
         const std::string regex = "[^\\s\\S]";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "");
+        CHECK(ast.print().empty());
     }
 
     SECTION("Character class with escaped characters that have special meaning")
@@ -701,7 +701,7 @@ SCENARIO("Parse group")
         const std::string regex = "()";
         auto parser = Parser(regex);
         auto ast = parser.parse();
-        CHECK(ast.print() == "");
+        CHECK(ast.print().empty());
     }
 
     SECTION("Simple group")
@@ -813,7 +813,7 @@ SCENARIO("Parse quantifiers")
 
     SECTION("Throw when token preceding Kleene star is not quantifiable ")
     {
-        auto regex = GENERATE
+        const std::string regex = GENERATE
         (
             "*",
             "(*",
@@ -854,7 +854,7 @@ SCENARIO("Parse quantifiers")
 
     SECTION("Throw when token preceding Kleene plus is not quantifiable ")
     {
-        auto regex = GENERATE
+        const std::string regex = GENERATE
         (
             "+",
             "(+",
@@ -895,7 +895,7 @@ SCENARIO("Parse quantifiers")
 
     SECTION("Throw when token preceding optional is not quantifiable ")
     {
-        auto regex = GENERATE
+        const std::string regex = GENERATE
         (
             "?",
             "(?"
@@ -984,7 +984,7 @@ SCENARIO("Parse quantifiers")
 
     SECTION("Throw when token preceding ranged quantifier is not quantifiable ")
     {
-        auto regex = GENERATE
+        const std::string regex = GENERATE
         (
             "{100}",
             "({100}",

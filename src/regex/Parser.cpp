@@ -63,7 +63,7 @@ CodePoint Parser::get()
     return (mCurser == mEnd ? kEOF : *mCurser++);
 }
 
-bool Parser::parse(tags::RegexTag, NodePtr& node)
+bool Parser::parse(tags::RegexTag , NodePtr& node)
 {
     parse<tags::ExpressionTag>(node);
 
@@ -75,7 +75,7 @@ bool Parser::parse(tags::RegexTag, NodePtr& node)
     return true;
 }
 
-bool Parser::parse(tags::ExpressionTag, NodePtr& node)
+bool Parser::parse(tags::ExpressionTag , NodePtr& node)
 {
     NodePtr subexpression;
     NodePtr expression;
@@ -101,7 +101,7 @@ bool Parser::parse(tags::ExpressionTag, NodePtr& node)
     return true;
 }
 
-bool Parser::parse(tags::SubexpressionTag, NodePtr& node)
+bool Parser::parse(tags::SubexpressionTag , NodePtr& node)
 {
     NodePtr subexpr;
     NodePtr next;
@@ -120,7 +120,7 @@ bool Parser::parse(tags::SubexpressionTag, NodePtr& node)
     return true;
 }
 
-bool Parser::parse(tags::SubexpressionItemTag, NodePtr& node)
+bool Parser::parse(tags::SubexpressionItemTag , NodePtr& node)
 {
     if(parse<tags::BackreferenceTag>())
     {
@@ -132,15 +132,11 @@ bool Parser::parse(tags::SubexpressionItemTag, NodePtr& node)
         error("Anchors are not supported ");
     }
 
-    if(parse<tags::MatchTag>(node))
-    {
-        return true;
-    }
+    return parse<tags::MatchTag>(node);
 
-    return false;
 }
 
-bool Parser::parse(tags::AnchorTag)
+bool Parser::parse(tags::AnchorTag )
 {
 
     if(parse<tags::AnchorStartOfStringTag>())
@@ -156,17 +152,17 @@ bool Parser::parse(tags::AnchorTag)
     return false;
 }
 
-bool Parser::parse(tags::AnchorStartOfStringTag)
+bool Parser::parse(tags::AnchorStartOfStringTag )
 {
     return (get() == '^');
 }
 
-bool Parser::parse(tags::AnchorEndOfStringTag)
+bool Parser::parse(tags::AnchorEndOfStringTag )
 {
     return (get() == '$');
 }
 
-bool Parser::parse(tags::BackreferenceTag)
+bool Parser::parse(tags::BackreferenceTag )
 {
     uint64_t integer = 0;
     bool overflow = false;
@@ -189,17 +185,17 @@ bool Parser::parse(tags::BackreferenceTag)
     return true;
 }
 
-bool Parser::parse(tags::BackreferenceStartTag)
+bool Parser::parse(tags::BackreferenceStartTag )
 {
     return (get() == '\\');
 }
 
-bool Parser::parse(tags::AlternativeTag)
+bool Parser::parse(tags::AlternativeTag )
 {
     return (get() == '|');
 }
 
-bool Parser::parse(tags::GroupTag, NodePtr& node)
+bool Parser::parse(tags::GroupTag , NodePtr& node)
 {
     if(!parse<tags::GroupOpenTag>())
     {
@@ -224,22 +220,22 @@ bool Parser::parse(tags::GroupTag, NodePtr& node)
     return true;
 }
 
-bool Parser::parse(tags::GroupOpenTag)
+bool Parser::parse(tags::GroupOpenTag )
 {
     return (get() == '(');
 }
 
-bool Parser::parse(tags::GroupCloseTag)
+bool Parser::parse(tags::GroupCloseTag )
 {
     return (get() == ')');
 }
 
-bool Parser::parse(tags::GroupNonCapturingModifierTag)
+bool Parser::parse(tags::GroupNonCapturingModifierTag )
 {
     return (get() == '?' && get() == ':');
 }
 
-bool Parser::parse(tags::MatchTag, NodePtr& node)
+bool Parser::parse(tags::MatchTag , NodePtr& node)
 {
     NodePtr matchItem;
     NodePtr quantifier;
@@ -265,7 +261,7 @@ bool Parser::parse(tags::MatchTag, NodePtr& node)
     return true;
 }
 
-bool Parser::parse(tags::MatchItemTag, NodePtr& node)
+bool Parser::parse(tags::MatchItemTag , NodePtr& node)
 {
     if(parse<tags::GroupTag>(node))
     {
@@ -292,7 +288,7 @@ bool Parser::parse(tags::MatchItemTag, NodePtr& node)
     return false;
 }
 
-bool Parser::parse(tags::CharacterClassTypeTag, NodePtr& node)
+bool Parser::parse(tags::CharacterClassTypeTag , NodePtr& node)
 {
     CharacterGroup characterGroup;
 
@@ -311,7 +307,7 @@ bool Parser::parse(tags::CharacterClassTypeTag, NodePtr& node)
     return false;
 }
 
-bool Parser::parse(tags::CharacterClassTag, CharacterGroup& group)
+bool Parser::parse(tags::CharacterClassTag , CharacterGroup& group)
 {
     bool negated = false;
 
@@ -345,22 +341,22 @@ bool Parser::parse(tags::CharacterClassTag, CharacterGroup& group)
     return true;
 }
 
-bool Parser::parse(tags::CharacterClassOpenTag)
+bool Parser::parse(tags::CharacterClassOpenTag )
 {
     return (get() == '[');
 }
 
-bool Parser::parse(tags::CharacterClassCloseTag)
+bool Parser::parse(tags::CharacterClassCloseTag )
 {
     return (get() == ']');
 }
 
-bool Parser::parse(tags::CharacterClassNegativeModifierTag)
+bool Parser::parse(tags::CharacterClassNegativeModifierTag )
 {
     return (get() == '^');
 }
 
-bool Parser::parse(tags::CharacterClassItemTag, CharacterGroup& group)
+bool Parser::parse(tags::CharacterClassItemTag , CharacterGroup& group)
 {
     if(parse<tags::ShorthandCharacterClassTag>(group))
     {
@@ -383,7 +379,7 @@ bool Parser::parse(tags::CharacterClassItemTag, CharacterGroup& group)
     return false;
 }
 
-bool Parser::parse(tags::CharacterClassCharacterTag, CodePoint& cp)
+bool Parser::parse(tags::CharacterClassCharacterTag , CodePoint& cp)
 {
     if(parse<tags::EOFTag>())
     {
@@ -400,15 +396,10 @@ bool Parser::parse(tags::CharacterClassCharacterTag, CodePoint& cp)
     // interpreted literally depending on their position in the
     // character class. Hence, they're excluded here.
     cp = get();
-    if(cp == ']')
-    {
-        return false;
-    }
-
-    return true;
+    return cp != ']';
 }
 
-bool Parser::parse(tags::CharacterRangeTag, CharacterGroup& group)
+bool Parser::parse(tags::CharacterRangeTag , CharacterGroup& group)
 {
     CodePoint start; 
     CodePoint end; 
@@ -437,12 +428,12 @@ bool Parser::parse(tags::CharacterRangeTag, CharacterGroup& group)
     return true;
 }
 
-bool Parser::parse(tags::CharacterRangeSeparatorTag)
+bool Parser::parse(tags::CharacterRangeSeparatorTag )
 {
     return (get() == '-');
 }
 
-bool Parser::parse(tags::ShorthandCharacterClassTag, CharacterGroup& group)
+bool Parser::parse(tags::ShorthandCharacterClassTag , CharacterGroup& group)
 {
     if(parse<tags::ShorthandCharacterClassWordTag>(group))
     {
@@ -477,7 +468,7 @@ bool Parser::parse(tags::ShorthandCharacterClassTag, CharacterGroup& group)
     return false;
 }
 
-bool Parser::parse(tags::ShorthandCharacterClassWordTag, CharacterGroup& group)
+bool Parser::parse(tags::ShorthandCharacterClassWordTag , CharacterGroup& group)
 {
     if(get() != '\\')
     {
@@ -494,7 +485,7 @@ bool Parser::parse(tags::ShorthandCharacterClassWordTag, CharacterGroup& group)
     return true;
 }
 
-bool Parser::parse(tags::ShorthandCharacterClassWordNegatedTag, CharacterGroup& group)
+bool Parser::parse(tags::ShorthandCharacterClassWordNegatedTag , CharacterGroup& group)
 {
     if(get() != '\\')
     {
@@ -512,7 +503,7 @@ bool Parser::parse(tags::ShorthandCharacterClassWordNegatedTag, CharacterGroup& 
     return true;
 }
 
-bool Parser::parse(tags::ShorthandCharacterClassDigitTag, CharacterGroup& group)
+bool Parser::parse(tags::ShorthandCharacterClassDigitTag , CharacterGroup& group)
 {
     if(get() != '\\')
     {
@@ -526,7 +517,7 @@ bool Parser::parse(tags::ShorthandCharacterClassDigitTag, CharacterGroup& group)
     return true;
 }
 
-bool Parser::parse(tags::ShorthandCharacterClassDigitNegatedTag, CharacterGroup& group)
+bool Parser::parse(tags::ShorthandCharacterClassDigitNegatedTag , CharacterGroup& group)
 {
     if(get() != '\\')
     {
@@ -541,7 +532,7 @@ bool Parser::parse(tags::ShorthandCharacterClassDigitNegatedTag, CharacterGroup&
     return true;
 }
 
-bool Parser::parse(tags::ShorthandCharacterClassWhitespaceTag, CharacterGroup& group)
+bool Parser::parse(tags::ShorthandCharacterClassWhitespaceTag , CharacterGroup& group)
 {
     if(get() == '\\' && get() == 's')
     {
@@ -552,7 +543,7 @@ bool Parser::parse(tags::ShorthandCharacterClassWhitespaceTag, CharacterGroup& g
     return false;
 }
 
-bool Parser::parse(tags::ShorthandCharacterClassWhitespaceNegatedTag, CharacterGroup& group)
+bool Parser::parse(tags::ShorthandCharacterClassWhitespaceNegatedTag , CharacterGroup& group)
 {
     if(get() == '\\' && get() == 'S')
     {
@@ -564,7 +555,7 @@ bool Parser::parse(tags::ShorthandCharacterClassWhitespaceNegatedTag, CharacterG
     return false;
 }
 
-bool Parser::parse(tags::AnyCharacterTag, NodePtr& node)
+bool Parser::parse(tags::AnyCharacterTag , NodePtr& node)
 {
     if (get() == '.')
     {
@@ -575,7 +566,7 @@ bool Parser::parse(tags::AnyCharacterTag, NodePtr& node)
     return false;
 }
 
-bool Parser::parse(tags::EscapedCharacterTag, CodePoint& cp)
+bool Parser::parse(tags::EscapedCharacterTag , CodePoint& cp)
 {
     if(get() != '\\')
     {
@@ -670,7 +661,7 @@ bool Parser::parse(tags::EscapedCharacterTag, CodePoint& cp)
     }
 }
 
-bool Parser::parse(tags::CharacterTag, CodePoint& cp)
+bool Parser::parse(tags::CharacterTag , CodePoint& cp)
 {
 
     // This is a bit messy. Not sure how to account for this in
@@ -695,26 +686,21 @@ bool Parser::parse(tags::CharacterTag, CodePoint& cp)
 
     // ignore meta-characters
     cp = get();
-    if(cp == '^' ||    
-       cp == '$' || 
-       cp == '*' || 
-       cp == '+' || 
-       cp == '?' || 
-       cp == '.' ||
-       cp == '(' || 
-       cp == ')' || 
-       cp == '[' || 
-       cp == ']' || 
-       cp == '|'
-    )
-    {
-        return false;
-    }
+    return (cp != '^' &&    
+            cp != '$' && 
+            cp != '*' && 
+            cp != '+' && 
+            cp != '?' && 
+            cp != '.' &&
+            cp != '(' && 
+            cp != ')' && 
+            cp != '[' && 
+            cp != ']' && 
+            cp != '|'  );
 
-    return true;
 }
 
-bool Parser::parse(tags::QuantifierTag, NodePtr& node, NodePtr& inner)
+bool Parser::parse(tags::QuantifierTag , NodePtr& node, NodePtr& inner)
 {
     if(!parse<tags::QuantifierTypeTag>(node, inner))
     {
@@ -729,7 +715,7 @@ bool Parser::parse(tags::QuantifierTag, NodePtr& node, NodePtr& inner)
     return true;
 }
 
-bool Parser::parse(tags::QuantifierTypeTag, NodePtr& node, NodePtr& inner)
+bool Parser::parse(tags::QuantifierTypeTag , NodePtr& node, NodePtr& inner)
 {
     if(parse<tags::ZeroOrMoreQuantifierTag>(node, inner))
     {
@@ -754,12 +740,12 @@ bool Parser::parse(tags::QuantifierTypeTag, NodePtr& node, NodePtr& inner)
     return false;
 }
 
-bool Parser::parse(tags::LazyModifierTag)
+bool Parser::parse(tags::LazyModifierTag )
 {
     return (get() == '?');
 }
 
-bool Parser::parse(tags::ZeroOrMoreQuantifierTag, NodePtr& node, NodePtr& inner)
+bool Parser::parse(tags::ZeroOrMoreQuantifierTag , NodePtr& node, NodePtr& inner)
 {
     if (get() == '*')
     {
@@ -769,7 +755,7 @@ bool Parser::parse(tags::ZeroOrMoreQuantifierTag, NodePtr& node, NodePtr& inner)
     return false;
 }
 
-bool Parser::parse(tags::OneOrMoreQuantifierTag, NodePtr& node, NodePtr& inner)
+bool Parser::parse(tags::OneOrMoreQuantifierTag , NodePtr& node, NodePtr& inner)
 {
     if (get() == '+')
     {
@@ -779,7 +765,7 @@ bool Parser::parse(tags::OneOrMoreQuantifierTag, NodePtr& node, NodePtr& inner)
     return false;
 }
 
-bool Parser::parse(tags::ZeroOrOneQuantifierTag, NodePtr& node, NodePtr& inner)
+bool Parser::parse(tags::ZeroOrOneQuantifierTag , NodePtr& node, NodePtr& inner)
 {
     if (get() == '?')
     {
@@ -789,7 +775,7 @@ bool Parser::parse(tags::ZeroOrOneQuantifierTag, NodePtr& node, NodePtr& inner)
     return false;
 }
 
-bool Parser::parse(tags::RangeQuantifierTag, NodePtr& node, NodePtr& inner)
+bool Parser::parse(tags::RangeQuantifierTag , NodePtr& node, NodePtr& inner)
 {
     uint64_t min = 0;
     uint64_t max = 0;
@@ -841,27 +827,27 @@ bool Parser::parse(tags::RangeQuantifierTag, NodePtr& node, NodePtr& inner)
     return true;
 }
 
-bool Parser::parse(tags::RangeQuantifierLowerBoundTag, uint64_t& min, bool& overflow)
+bool Parser::parse(tags::RangeQuantifierLowerBoundTag , uint64_t& min, bool& overflow)
 {
     return parse<tags::IntegerTag>(min, overflow);
 }
 
-bool Parser::parse(tags::RangeQuantifierUpperBoundTag, uint64_t& max, bool& overflow)
+bool Parser::parse(tags::RangeQuantifierUpperBoundTag , uint64_t& max, bool& overflow)
 {
     return parse<tags::IntegerTag>(max, overflow);
 }
 
-bool Parser::parse(tags::RangeOpenTag)
+bool Parser::parse(tags::RangeOpenTag )
 {
     return (get() == '{');
 }
 
-bool Parser::parse(tags::RangeCloseTag)
+bool Parser::parse(tags::RangeCloseTag )
 {
     return (get() == '}');
 }
 
-bool Parser::parse(tags::RangeSeparatorTag)
+bool Parser::parse(tags::RangeSeparatorTag )
 {
     return (get() == ',');
 }
@@ -888,12 +874,12 @@ inline CodePoint hex2int(CodePoint ch)
     return val;
 }
 
-bool Parser::parse(tags::Unicode8DigitCodePointTag, CodePoint& cp)
+bool Parser::parse(tags::Unicode8DigitCodePointTag , CodePoint& cp)
 {
-    constexpr auto kNumDigits = 8u;
+    constexpr auto kNumDigits = 8U;
     
     cp = 0;
-    for(auto i=0u; i < kNumDigits; ++i)
+    for(auto i=0U; i < kNumDigits; ++i)
     {
         CodePoint digit = hex2int(get());
         if(digit == kInvalid)
@@ -913,12 +899,12 @@ bool Parser::parse(tags::Unicode8DigitCodePointTag, CodePoint& cp)
     return true;
 }
 
-bool Parser::parse(tags::Unicode4DigitCodePointTag, CodePoint& cp)
+bool Parser::parse(tags::Unicode4DigitCodePointTag , CodePoint& cp)
 {
-    constexpr auto kNumDigits = 4u;
+    constexpr auto kNumDigits = 4U;
     
     cp = 0;
-    for(auto i=0u; i < kNumDigits; ++i)
+    for(auto i=0U; i < kNumDigits; ++i)
     {
         CodePoint digit = hex2int(get());
         if(digit == kInvalid)
@@ -933,7 +919,7 @@ bool Parser::parse(tags::Unicode4DigitCodePointTag, CodePoint& cp)
     return true;
 }
 
-bool Parser::parse(tags::DigitTag, unsigned int& digit)
+bool Parser::parse(tags::DigitTag , unsigned int& digit)
 {
     CodePoint cp = get();
     if (cp >= '0' && cp <= '9')
@@ -944,7 +930,7 @@ bool Parser::parse(tags::DigitTag, unsigned int& digit)
     return false;
 }
 
-bool Parser::parse(tags::IntegerTag, uint64_t& integer, bool& overflow)
+bool Parser::parse(tags::IntegerTag , uint64_t& integer, bool& overflow)
 {
     integer = 0;
     overflow = false;
@@ -971,7 +957,7 @@ bool Parser::parse(tags::IntegerTag, uint64_t& integer, bool& overflow)
     return true;
 }
 
-bool Parser::parse(tags::EOFTag)
+bool Parser::parse(tags::EOFTag )
 {
     return (get() == kEOF);
 }

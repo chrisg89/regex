@@ -1,5 +1,6 @@
 #include "DFA.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <optional>
 #include <unordered_set>
@@ -12,7 +13,6 @@ DFAState::DFAState(StateId id, bool isStart, bool isFinal)
     , IsStart{isStart}
     , IsFinal{isFinal}
     , IsDead{true}
-    , Transitions{}
 {}
 
 void DFAState::addTransition(InputType input, StateId destination)
@@ -26,11 +26,9 @@ void DFAState::addTransition(InputType input, StateId destination)
 }
 
 DFA::DFA(Alphabet alphabet)
-    : mStates{}
-    , mStateCount{0}
+    : mStateCount{0}
     , mStartState{}
-    , mFinalStates{}
-    , mAlphabet{alphabet}
+    , mAlphabet{std::move(alphabet)}
 {}
 
 StateId DFA::addState(bool isStart, bool isFinal)
@@ -57,7 +55,7 @@ void DFA::addTransition(InputType input, StateId source, StateId destination)
 
 std::string DFA::serialize() const
 {
-    std::string out = "";
+    std::string out;
     
     for (const auto& state : mStates)
     {
@@ -108,15 +106,12 @@ bool DFA::isFinalState(StateId current) const
 struct Partition
 {
     Partition(PartitionId id)
-    : States{}
-    , LeaderSelected {false}
-    , Leader{}
-    , Id{id}
+    : Id{id}
     {}
 
     void insert(StateId state)
     {
-        if(LeaderSelected == false)
+        if(!LeaderSelected)
         {
             Leader = state;
             LeaderSelected = true;
@@ -126,31 +121,26 @@ struct Partition
     }
 
     std::unordered_set<StateId> States;
-    bool LeaderSelected;
-    StateId Leader;
+    bool LeaderSelected{false};
+    StateId Leader{};
     const PartitionId Id;
 };
 
 struct PartitionPool
 {
-    PartitionPool();
+    PartitionPool() = default;
 
     PartitionId addPartition();
 
-    ParitionMap makePartitionMap() const;
+    [[nodiscard]] ParitionMap makePartitionMap() const;
 
     void addState(PartitionId partition, StateId state);
 
     std::vector<Partition> Partitions;
 
-    unsigned int PartitionCount;
+    unsigned int PartitionCount{};
 
 };
-
-PartitionPool::PartitionPool()
-: Partitions{}
-, PartitionCount{0}
-{}
 
 PartitionId PartitionPool::addPartition()
 {
@@ -277,21 +267,19 @@ void DFA::minimize()
 
 bool DFA::checkEquivalence(const ParitionMap& paritionMap, StateId stateA, StateId stateB) const
 {
-    for(const auto c : mAlphabet)
+    auto equiv = [&](InputType c)
     {
         const auto stateADest = mStates.at(stateA).Transitions.at(c);
         const auto stateBDest = mStates.at(stateB).Transitions.at(c);
 
-        if (stateADest != stateBDest)
+        if (stateADest == stateBDest)
         {
-            if(paritionMap.at(stateADest) != paritionMap.at(stateBDest))
-            {
-                return false;
-            }
-        } 
-    }
+            return true;
+        }
+        return paritionMap.at(stateADest) == paritionMap.at(stateBDest);
+    };
 
-    return true;
+    return std::all_of(mAlphabet.cbegin(), mAlphabet.cend(), equiv);
 }
 
 } //namespace automata

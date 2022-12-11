@@ -9,12 +9,7 @@ namespace regex
 
 bool isSubset(const CodePointInterval inner, const CodePointInterval outer)
 {
-    if(outer.first <= inner.first && outer.second >= inner.second)
-    {
-        return true;
-    }
-
-    return false;
+    return (outer.first <= inner.first && outer.second >= inner.second);
 }
 
 void disjoinOverlap(Alphabet& alphabet, CodePoint min, CodePoint max)
