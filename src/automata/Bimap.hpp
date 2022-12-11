@@ -10,7 +10,7 @@ template <typename Type1, typename Type2, typename Type1Hasher = std::hash<Type1
 class Bimap
 {
 public:
-    Bimap();
+    Bimap() = default;
 
     void insert(Type1, Type2);
     void insert(Type2, Type1);
@@ -22,8 +22,8 @@ public:
     bool contains(Type2);
 
 private:
-    std::unordered_map<Type1, Type2, Type1Hasher> unordered_map1;
-    std::unordered_map<Type2, Type1, Type2Hasher> unordered_map2;
+    std::unordered_map<Type1, Type2, Type1Hasher> unordered_map1{};
+    std::unordered_map<Type2, Type1, Type2Hasher> unordered_map2{};
 };
 
 } // namespace automata

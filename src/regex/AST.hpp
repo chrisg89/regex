@@ -34,10 +34,20 @@ using automata::NFA;
 class Node
 {
 public:
-    virtual BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const = 0;
+    [[nodiscard]] virtual BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const = 0;
     virtual void print(std::string&) const = 0;
     virtual void makeAlphabet(Alphabet&) const = 0; 
     virtual ~Node() = default;
+
+    Node() = default;
+
+    // no copy
+    Node ( const Node& ) = delete;
+    Node& operator= ( const Node& ) = delete;
+
+    // move allowed
+    Node ( Node&& ) = default;
+    Node& operator= ( Node&& ) = default;
 };
 
 class Alternative : public Node
@@ -48,7 +58,7 @@ public:
     , mRight {std::move(rhs)}
     {}
 
-    BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
+    [[nodiscard]] BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
     {
         auto BB1 = mLeft->makeNFA(alphabet, nfa);
         auto BB2 = mRight->makeNFA(alphabet, nfa);
@@ -89,7 +99,7 @@ public:
     , mRight {std::move(rhs)}
     {}
 
-    BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
+    [[nodiscard]] BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
     {
         auto BB1 = mLeft->makeNFA(alphabet, nfa);
         auto BB2 = mRight->makeNFA(alphabet, nfa);
@@ -128,7 +138,7 @@ public:
     , mIsMaxBounded {isMaxBounded}
     {}
 
-    BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
+    [[nodiscard]] BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
     {
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
@@ -191,7 +201,7 @@ public:
 class Epsilon : public Node
 {
 public:
-    BlackBox makeNFA(const Alphabet&, NFA& nfa) const final
+    [[nodiscard]] BlackBox makeNFA(const Alphabet&, NFA& nfa) const final
     {
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
@@ -213,7 +223,7 @@ public:
 class Null : public Node
 {
 public:
-    BlackBox makeNFA(const Alphabet&, NFA& nfa) const final
+    [[nodiscard]] BlackBox makeNFA(const Alphabet&, NFA& nfa) const final
     {
         //entry and exit are not connected by any transition
         auto entry = nfa.addState(false, false);
@@ -245,14 +255,14 @@ public:
     , mEnd{codepoint}
     {}
 
-    BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
+    [[nodiscard]] BlackBox makeNFA(const Alphabet& alphabet, NFA& nfa) const final
     {
         auto interval = CodePointInterval{mStart, mEnd};
 
         auto entry = nfa.addState(false, false);
         auto exit = nfa.addState(false, false);
 
-        for(auto i=0u; i<alphabet.size(); ++i)
+        for(auto i=0U; i<alphabet.size(); ++i)
         {
             if(isSubset(alphabet[i], interval))
             {
@@ -290,14 +300,14 @@ public:
     explicit AST(NodePtr& node ) : mRoot{std::move(node)}
     {}
 
-    std::string print() const
+    [[nodiscard]] std::string print() const
     {
         std::string str;
         mRoot->print(str);
         return str;
     }
 
-    Alphabet makeAlphabet() const
+    [[nodiscard]] Alphabet makeAlphabet() const
     {
         Alphabet alphabet;
         mRoot->makeAlphabet(alphabet);
@@ -305,7 +315,7 @@ public:
         return alphabet;
     }
 
-    NFA makeNFA(const Alphabet& alphabet) const
+    [[nodiscard]] NFA makeNFA(const Alphabet& alphabet) const
     {
         // Make the NFA's alphabet
         auto nfaAlphabet = automata::Alphabet(alphabet.size());

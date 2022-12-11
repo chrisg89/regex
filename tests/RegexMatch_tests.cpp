@@ -2125,7 +2125,7 @@ SCENARIO("Random tests")
     
     SECTION("Hello World! in Kanji:「こんにちは世界」")
     {
-        const char kanji[] = 
+        const std::array kanji = 
         {
             '\xE3', '\x80', '\x8C', '\xE3',
             '\x81', '\x93', '\xE3', '\x82',
@@ -2135,10 +2135,10 @@ SCENARIO("Random tests")
             '\x96', '\xE7', '\x95', '\x8C', 
             '\xE3', '\x80', '\x8D', '\x00'
         };
-        std::string string = kanji;
+        std::string string = kanji.data();
         
         auto regex = Regex(string);
-        REQUIRE(regex.match(kanji));
+        REQUIRE(regex.match(string));
     }
 }
 

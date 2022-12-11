@@ -3,33 +3,14 @@
 namespace regex
 {
 
-const unsigned char kFirstBitMask = 128;
+const unsigned char kFirstBitMask  = 128;
 const unsigned char kSecondBitMask = 64;
-const unsigned char kThirdBitMask = 32;
+const unsigned char kThirdBitMask  = 32;
 const unsigned char kFourthBitMask = 16;
 
-Utf8Iterator::Utf8Iterator(std::string::const_iterator it) :
-mStringIterator(it),
-mCurrentCodePoint(0),
-mDirty(true)
-{
-}
- 
-Utf8Iterator::Utf8Iterator(const Utf8Iterator& source) :
-mStringIterator(source.mStringIterator),
-mCurrentCodePoint(source.mCurrentCodePoint),
-mDirty(source.mDirty)
-{
-}
- 
-Utf8Iterator& Utf8Iterator::operator=(const Utf8Iterator& rhs)
-{
-    mStringIterator = rhs.mStringIterator;
-    mCurrentCodePoint = rhs.mCurrentCodePoint;
-    mDirty = rhs.mDirty;
- 
-    return *this;
-}
+Utf8Iterator::Utf8Iterator(std::string::const_iterator it) 
+: mStringIterator(it)
+{}
 
 Utf8Iterator& Utf8Iterator::operator++()
 {
@@ -37,14 +18,18 @@ Utf8Iterator& Utf8Iterator::operator++()
  
     std::string::difference_type offset = 1;
  
-    if(firstByte & kFirstBitMask) // This means the first byte has a value greater than 127, and so is beyond the ASCII range.
+    if((firstByte & kFirstBitMask) != 0) // This means the first byte has a value greater than 127, and so is beyond the ASCII range.
     {
-        if(firstByte & kThirdBitMask) // This means that the first byte has a value greater than 224, and so it must be at least a three-octet code point.
+        if((firstByte & kThirdBitMask) != 0) // This means that the first byte has a value greater than 224, and so it must be at least a three-octet code point.
         {
-            if(firstByte & kFourthBitMask) // This means that the first byte has a value greater than 240, and so it must be a four-octet code point.
+            if((firstByte & kFourthBitMask) != 0) // This means that the first byte has a value greater than 240, and so it must be a four-octet code point.
+            {
                 offset = 4;
+            }    
             else
+            {
                 offset = 3;
+            }  
         }
         else
         {
@@ -69,7 +54,7 @@ Utf8Iterator& Utf8Iterator::operator--()
 {
     --mStringIterator;
  
-    if(*mStringIterator & kFirstBitMask) // This means that the previous byte is not an ASCII character.
+    if((*mStringIterator & kFirstBitMask) == 0) // This means that the previous byte is not an ASCII character.
     {
         --mStringIterator;
         if((*mStringIterator & kSecondBitMask) == 0)
@@ -109,11 +94,11 @@ void Utf8Iterator::CalculateCurrentCodePoint() const
  
         char firstByte = *mStringIterator;
     
-        if(firstByte & kFirstBitMask) // This means the first byte has a value greater than 127, and so is beyond the ASCII range.
+        if((firstByte & kFirstBitMask) != 0) // This means the first byte has a value greater than 127, and so is beyond the ASCII range.
         {
-            if(firstByte & kThirdBitMask) // This means that the first byte has a value greater than 191, and so it must be at least a three-octet code point.
+            if((firstByte & kThirdBitMask) != 0) // This means that the first byte has a value greater than 191, and so it must be at least a three-octet code point.
             {
-                if(firstByte & kFourthBitMask) // This means that the first byte has a value greater than 224, and so it must be a four-octet code point.
+                if((firstByte & kFourthBitMask) != 0) // This means that the first byte has a value greater than 224, and so it must be a four-octet code point.
                 {
                     codePoint = static_cast<CodePoint>((firstByte & 0x07) << 18);
                     char secondByte = *(mStringIterator + 1);

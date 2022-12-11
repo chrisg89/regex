@@ -62,6 +62,7 @@ bool Regex::RegexImpl::match(const std::string& target)
 {
     auto state = mDFA.getStartState();
 
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for( Utf8Iterator it = target.cbegin(); it != target.cend(); ++it )
     {
         // lookup the codepoint in the alphabet

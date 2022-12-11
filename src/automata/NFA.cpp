@@ -27,7 +27,6 @@ NFAState::NFAState(StateId id, bool isStart, bool isFinal)
     : Id{id}
     , IsStart{isStart}
     , IsFinal{isFinal}
-    , Transitions{}
 {}
 
 void NFAState::addTransition(InputType input, StateId destination)
@@ -36,11 +35,7 @@ void NFAState::addTransition(InputType input, StateId destination)
 }
 
 NFA::NFA(Alphabet alphabet)
-    : mStates{}
-    , mStateCount{0}
-    , mStartState{}
-    , mFinalStates{}
-    , mAlphabet{alphabet}
+    : mAlphabet{std::move(alphabet)}
 {}
 
 StateId NFA::addState(bool isStart, bool isFinal)
@@ -67,7 +62,7 @@ void NFA::addTransition(InputType input, StateId source, StateId destination)
 
 std::string NFA::serialize() const
 {
-    std::string out = "";
+    std::string out;;
     
     for (const auto& state : mStates)
     {
@@ -108,14 +103,8 @@ DFA NFA::makeDFA() const
 
 bool isReachableByEpsilonClosure(const EpsilonClusureMap& map, StateId source, StateId destination)
 {
-    auto& reachable = map.at(source);
-
-    if (std::find(reachable.begin(), reachable.end(), destination) != reachable.end())
-    {
-        return true;
-    }
-
-    return false;
+    const auto& reachable = map.at(source);
+    return (std::find(reachable.begin(), reachable.end(), destination) != reachable.end());
 }
 
 EpsilonClusureMap NFA::CreateEpsilonClosureMap() const
@@ -137,7 +126,7 @@ EpsilonClusureMap NFA::CreateEpsilonClosureMap() const
             stack.pop();
 
             const auto& transitions = mStates.at(state).Transitions;
-            if(transitions.count(kEpsilon))
+            if(transitions.count(kEpsilon) != 0)
             {
                 for (const auto adjacent : transitions.at(kEpsilon))
                 {
@@ -227,14 +216,14 @@ DFA NFA::buildDFA() const
             for(const auto nfaState : nfaStates)
             {
                 const auto& transitions = mStates.at(nfaState).Transitions;
-                if(transitions.count(c))
+                if(transitions.count(c) != 0)
                 {
                     const auto& destinations = transitions.at(c);
                     std::copy(destinations.begin(), destinations.end(), std::inserter(set, set.end()));
                 }
             }
 
-            StateId newDfaState;
+            StateId newDfaState{};
             if(mapper.contains(set))
             {
                 newDfaState = mapper.get(set);

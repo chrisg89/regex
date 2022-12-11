@@ -24,7 +24,7 @@ public:
     const StateId Id;
     const bool IsStart;
     const bool IsFinal;
-    bool IsDead;
+    bool IsDead{true};
     std::map<InputType, StateId> Transitions;
 };
 
@@ -38,23 +38,23 @@ public:
 
     void addTransition(InputType input, StateId source, StateId destination);
 
-    std::string serialize() const;
+    [[nodiscard]] std::string serialize() const;
 
-    StateId step(StateId current, InputType input) const;
-    StateId getStartState() const;
-    bool isDeadState(StateId current) const;
-    bool isFinalState(StateId current) const;
+    [[nodiscard]] StateId step(StateId current, InputType input) const;
+    [[nodiscard]] StateId getStartState() const;
+    [[nodiscard]] bool isDeadState(StateId current) const;
+    [[nodiscard]] bool isFinalState(StateId current) const;
 
     void minimize();
 
 private:
     std::vector<DFAState> mStates;
-    unsigned int mStateCount;
-    StateId mStartState;
+    unsigned int mStateCount{0};
+    StateId mStartState{};
     std::vector<StateId> mFinalStates;
     Alphabet mAlphabet;
 
-    bool checkEquivalence(const ParitionMap& paritionMap, StateId stateA, StateId stateB) const;
+    [[nodiscard]] bool checkEquivalence(const ParitionMap& paritionMap, StateId stateA, StateId stateB) const;
 };
 
 } //namespace automata

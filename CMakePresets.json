@@ -27,6 +27,18 @@
           "CMAKE_CXX_COMPILER": "clang++",
           "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Werror"
         }
+      },
+      {
+        "name": "CI-clang-tidy",
+        "displayName": "CI",
+        "description": "Preset for CI running clang-tidy",
+        "generator": "Unix Makefiles",
+        "binaryDir": "./build/clang-tidy",
+        "cacheVariables": {
+          "CMAKE_CXX_COMPILER": "clang++",
+          "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Werror",
+          "CMAKE_CXX_CLANG_TIDY": "clang-tidy"
+        }
       }
     ]
   }
