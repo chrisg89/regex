@@ -7,74 +7,51 @@ on:
     branches: [ "main" ]
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
 
 jobs:
   build-using-gnu:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-
     - name: Configure CMake
       run: cmake --preset CI-g++
-
     - name: Build
       run: cmake --build ${{github.workspace}}/build/g++ -v -j $(nproc)
-
     - name: Test
       run: ctest --test-dir ${{github.workspace}}/build/g++/
 
   build-using-clang:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-
     - name: Configure CMake
       run: cmake --preset CI-clang++
-
     - name: Build
       run: cmake --build ${{github.workspace}}/build/clang++ -v -j $(nproc)
-
     - name: Test
       run: ctest --test-dir ${{github.workspace}}/build/clang++/
 
   dynamic-analysis-using-valgrind:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-
-    # Valgrind must be installed before cmake configuration step
     - name: Install Valgrind
       run: |
           sudo apt-get update
           sudo apt install -y valgrind
-
     - name: Configure CMake
       run: cmake --preset CI-g++
-
     - name: Build
       run: cmake --build ${{github.workspace}}/build/g++ -v -j $(nproc)
-
     - name: Test with Valgrind
       run: ctest -T memcheck --test-dir ${{github.workspace}}/build/g++/ --output-on-failure -VV
 
   static-analysis-using-clang-tidy:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-
     - name: Configure CMake
       run: cmake --preset CI-clang-tidy
-
     - name: Build
       run: cmake --build ${{github.workspace}}/build/clang-tidy -v -j $(nproc)
-
