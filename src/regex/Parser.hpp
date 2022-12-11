@@ -54,7 +54,7 @@ namespace tags
     struct CharacterRangeTag{};
     struct CharacterRangeSeparatorTag{};
 
-    // Short hand character classes    
+    // Short hand character classes
     struct ShorthandCharacterClassTag{};
     struct ShorthandCharacterClassWordTag{};        
     struct ShorthandCharacterClassWordNegatedTag{};  
@@ -104,7 +104,6 @@ public:
     AST parse();
 
 private:
-
     Utf8Iterator mCurser;
     const Utf8Iterator mBegin;
     const Utf8Iterator mEnd;
@@ -116,7 +115,7 @@ private:
     void HandleUnexpected();
 
     // Wraps the specialized parsing routines with backtracking capability
-    template <typename Tag, typename... Args>
+    template<typename Tag, typename... Args>
     bool parse(Args&... args);
 
     // Regex & expressions
@@ -137,7 +136,7 @@ private:
     // Alternation
     bool parse(tags::AlternativeTag);
 
-    // Group 
+    // Group
     bool parse(tags::GroupTag, NodePtr&);
     bool parse(tags::GroupOpenTag);
     bool parse(tags::GroupCloseTag);
@@ -148,8 +147,8 @@ private:
     bool parse(tags::MatchItemTag, NodePtr&);
 
     // Character class
-    bool parse(tags::CharacterClassTypeTag, NodePtr&);  
-    bool parse(tags::CharacterClassTag, CharacterGroup&);  
+    bool parse(tags::CharacterClassTypeTag, NodePtr&);
+    bool parse(tags::CharacterClassTag, CharacterGroup&);
     bool parse(tags::CharacterClassOpenTag);
     bool parse(tags::CharacterClassCloseTag);
     bool parse(tags::CharacterClassNegativeModifierTag);
@@ -167,7 +166,8 @@ private:
     bool parse(tags::ShorthandCharacterClassDigitTag, CharacterGroup&);
     bool parse(tags::ShorthandCharacterClassDigitNegatedTag, CharacterGroup&);
     bool parse(tags::ShorthandCharacterClassWhitespaceTag, CharacterGroup&);
-    bool parse(tags::ShorthandCharacterClassWhitespaceNegatedTag, CharacterGroup&);
+    bool parse(tags::ShorthandCharacterClassWhitespaceNegatedTag,
+               CharacterGroup&);
 
     // Any character
     bool parse(tags::AnyCharacterTag, NodePtr&);
@@ -198,7 +198,7 @@ private:
     bool parse(tags::DigitTag, unsigned int&);
     bool parse(tags::IntegerTag, uint64_t&, bool&);
 
-    //EOF
+    // EOF
     bool parse(tags::EOFTag);
 };
 

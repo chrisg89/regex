@@ -1,13 +1,15 @@
 #include <catch2/catch.hpp>
 #include <regex/Regex.hpp>
 
+#include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
 
-namespace regex{
+namespace regex
+{
 
-namespace {
+namespace
+{
 
 SCENARIO("Match empty regex")
 {
@@ -72,7 +74,7 @@ SCENARIO("Match character")
         REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
     }
-  
+
     SECTION("Telugu letter A")
     {
         auto regex = Regex("అ");
@@ -83,7 +85,7 @@ SCENARIO("Match character")
         // Negative test case(s)
         REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
-    }  
+    }
 
     SECTION("Katakana letter Ga")
     {
@@ -438,7 +440,7 @@ SCENARIO("Match any (.) character")
     }
 }
 
-SCENARIO("Match 'digit' shorthand character class") 
+SCENARIO("Match 'digit' shorthand character class")
 {
     SECTION("digits")
     {
@@ -462,7 +464,7 @@ SCENARIO("Match 'digit' shorthand character class")
     }
 }
 
-SCENARIO("Match 'non-digit' shorthand character class") 
+SCENARIO("Match 'non-digit' shorthand character class")
 {
     SECTION("non-digits")
     {
@@ -488,7 +490,7 @@ SCENARIO("Match 'non-digit' shorthand character class")
     }
 }
 
-SCENARIO("Match 'word' shorthand character class") 
+SCENARIO("Match 'word' shorthand character class")
 {
     SECTION("word character")
     {
@@ -567,7 +569,7 @@ SCENARIO("Match 'word' shorthand character class")
     }
 }
 
-SCENARIO("Match 'non-word' shorthand character class") 
+SCENARIO("Match 'non-word' shorthand character class")
 {
     SECTION("non-word character")
     {
@@ -646,7 +648,7 @@ SCENARIO("Match 'non-word' shorthand character class")
     }
 }
 
-SCENARIO("Match 'whitespace' shorthand character class") 
+SCENARIO("Match 'whitespace' shorthand character class")
 {
     SECTION("whitespace")
     {
@@ -666,7 +668,7 @@ SCENARIO("Match 'whitespace' shorthand character class")
     }
 }
 
-SCENARIO("Match 'non-whitespace' shorthand character class") 
+SCENARIO("Match 'non-whitespace' shorthand character class")
 {
     SECTION("Non-whitespace")
     {
@@ -686,7 +688,7 @@ SCENARIO("Match 'non-whitespace' shorthand character class")
     }
 }
 
-SCENARIO("Match character class") 
+SCENARIO("Match character class")
 {
     SECTION("Simple character class")
     {
@@ -700,7 +702,7 @@ SCENARIO("Match character class")
         // Negative test case(s)
         REQUIRE(!regex.match(""));
         REQUIRE(!regex.match("A"));
-    } 
+    }
 
     SECTION("Negated character class")
     {
@@ -716,7 +718,7 @@ SCENARIO("Match character class")
         REQUIRE(!regex.match("a"));
         REQUIRE(!regex.match("b"));
         REQUIRE(!regex.match("c"));
-    } 
+    }
 
     SECTION("Character class with shorthand \\w")
     {
@@ -988,8 +990,8 @@ SCENARIO("Match character class")
         REQUIRE(!regex.match("A"));
         REQUIRE(!regex.match("1"));
         REQUIRE(!regex.match("!"));
-    }    
-    
+    }
+
     SECTION("Character class with escaped characters that have special meaning")
     {
         auto regex = Regex("[\\n\\f\\r\\t\\v\\a\\\\]");
@@ -1027,7 +1029,8 @@ SCENARIO("Match character class")
         REQUIRE(!regex.match("!"));
     }
 
-    SECTION("Character class with characters that are considered meta characters outside the character class")
+    SECTION("Character class with characters that are considered meta "
+            "characters outside the character class")
     {
         auto regex = Regex("[$*+?.()]");
 
@@ -1048,7 +1051,7 @@ SCENARIO("Match character class")
     }
 
     SECTION("Character class with unicode code point (4 digits)")
-    {        
+    {
         auto regex = Regex("\\u1234");
 
         // Positive test case(s)
@@ -1123,7 +1126,8 @@ SCENARIO("Match character class")
         REQUIRE(!regex.match("A"));
     }
 
-    SECTION("Character class where hyphen is treated literally because it is surrounded by shorthand character classes")
+    SECTION("Character class where hyphen is treated literally because it is "
+            "surrounded by shorthand character classes")
     {
         auto regex = Regex("[\\d-\\s]");
 
@@ -1237,7 +1241,8 @@ SCENARIO("Match character class")
         REQUIRE(!regex.match("A"));
     }
 
-    SECTION("Character class with range, literal character and escaped character")
+    SECTION(
+      "Character class with range, literal character and escaped character")
     {
         auto regex = Regex("[a-cXYZ\\a]");
 
@@ -1256,7 +1261,7 @@ SCENARIO("Match character class")
     }
 }
 
-SCENARIO("Match group") 
+SCENARIO("Match group")
 {
     SECTION("Empty group")
     {
@@ -1318,7 +1323,7 @@ SCENARIO("Match group")
     }
 }
 
-SCENARIO("Match quantifiers") 
+SCENARIO("Match quantifiers")
 {
     SECTION("Kleene star (*)")
     {
@@ -1570,7 +1575,8 @@ SCENARIO("Match quantifiers")
         REQUIRE(!regex.match("!"));
     }
 
-    SECTION("Ranged quantifier: lower bound only operating on a character class")
+    SECTION(
+      "Ranged quantifier: lower bound only operating on a character class")
     {
         auto regex = Regex("[abc]{3}");
 
@@ -1661,7 +1667,8 @@ SCENARIO("Match quantifiers")
         REQUIRE(!regex.match("!"));
     }
 
-    SECTION("Ranged quantifier: lower bound only operating on a character class")
+    SECTION(
+      "Ranged quantifier: lower bound only operating on a character class")
     {
         auto regex = Regex("[abc]{3,}");
 
@@ -1750,7 +1757,8 @@ SCENARIO("Match quantifiers")
         REQUIRE(!regex.match("!"));
     }
 
-    SECTION("Ranged quantifier: lower and upper bound operating on a character class")
+    SECTION(
+      "Ranged quantifier: lower and upper bound operating on a character class")
     {
         auto regex = Regex("[abc]{3,4}");
 
@@ -2052,7 +2060,6 @@ SCENARIO("Match alternation")
         REQUIRE(!regex.match("!"));
     }
 
-
     SECTION("Alternation of two empty groups")
     {
         auto regex = Regex("()|()");
@@ -2116,33 +2123,28 @@ SCENARIO("Random tests")
 {
     SECTION("Realistic tests using dates")
     {
-        
-        auto regex = Regex("\\d\\d-(\\d\\d|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)-\\d\\d(\\d\\d)?");
+
+        auto regex = Regex("\\d\\d-(\\d\\d|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|"
+                           "OCT|NOV|DEC)-\\d\\d(\\d\\d)?");
         REQUIRE(regex.match("12-12-22"));
         REQUIRE(regex.match("12-12-2022"));
         REQUIRE(regex.match("12-OCT-2022"));
     }
-    
+
     SECTION("Hello World! in Kanji:「こんにちは世界」")
     {
-        const std::array kanji = 
-        {
-            '\xE3', '\x80', '\x8C', '\xE3',
-            '\x81', '\x93', '\xE3', '\x82',
-            '\x93', '\xE3', '\x81', '\xAB',
-            '\xE3', '\x81', '\xA1', '\xE3', 
-            '\x81', '\xAF', '\xE4', '\xB8', 
-            '\x96', '\xE7', '\x95', '\x8C', 
-            '\xE3', '\x80', '\x8D', '\x00'
-        };
+        const std::array kanji = { '\xE3', '\x80', '\x8C', '\xE3', '\x81',
+                                   '\x93', '\xE3', '\x82', '\x93', '\xE3',
+                                   '\x81', '\xAB', '\xE3', '\x81', '\xA1',
+                                   '\xE3', '\x81', '\xAF', '\xE4', '\xB8',
+                                   '\x96', '\xE7', '\x95', '\x8C', '\xE3',
+                                   '\x80', '\x8D', '\x00' };
         std::string string = kanji.data();
-        
+
         auto regex = Regex(string);
         REQUIRE(regex.match(string));
     }
 }
 
-
-
-} // namespace 
+} // namespace
 } // namespace regex

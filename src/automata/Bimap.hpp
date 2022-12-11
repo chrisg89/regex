@@ -1,12 +1,15 @@
 
-#pragma once 
+#pragma once
 
 #include <unordered_map>
 
 namespace automata
 {
 
-template <typename Type1, typename Type2, typename Type1Hasher = std::hash<Type1>, typename Type2Hasher = std::hash<Type2>>
+template<typename Type1,
+         typename Type2,
+         typename Type1Hasher = std::hash<Type1>,
+         typename Type2Hasher = std::hash<Type2>>
 class Bimap
 {
 public:

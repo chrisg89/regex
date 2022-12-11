@@ -9,33 +9,35 @@ namespace automata
 {
 
 DFAState::DFAState(StateId id, bool isStart, bool isFinal)
-    : Id{id}
-    , IsStart{isStart}
-    , IsFinal{isFinal}
-{}
+  : Id{ id }
+  , IsStart{ isStart }
+  , IsFinal{ isFinal }
+{
+}
 
 void DFAState::addTransition(InputType input, StateId destination)
 {
     Transitions[input] = destination;
 
-    if(destination != Id)
+    if (destination != Id)
     {
         IsDead = false;
     }
 }
 
 DFA::DFA(Alphabet alphabet)
-    : mAlphabet{std::move(alphabet)}
-{}
+  : mAlphabet{ std::move(alphabet) }
+{
+}
 
 StateId DFA::addState(bool isStart, bool isFinal)
 {
-    if(isStart)
+    if (isStart)
     {
         mStartState = mStateCount;
     }
 
-    if(isFinal)
+    if (isFinal)
     {
         mFinalStates.emplace_back(mStateCount);
     }
@@ -53,12 +55,12 @@ void DFA::addTransition(InputType input, StateId source, StateId destination)
 std::string DFA::serialize() const
 {
     std::string out;
-    
+
     for (const auto& state : mStates)
     {
         out += std::to_string(state.Id);
-        out += " : Start =" ;
-        out += (state.IsStart? "true" : "false");
+        out += " : Start =";
+        out += (state.IsStart ? "true" : "false");
         out += " , Final = ";
         out += (state.IsFinal ? "true" : "false");
         out += " , Dead = ";
@@ -103,12 +105,13 @@ bool DFA::isFinalState(StateId current) const
 struct Partition
 {
     Partition(PartitionId id)
-    : Id{id}
-    {}
+      : Id{ id }
+    {
+    }
 
     void insert(StateId state)
     {
-        if(!LeaderSelected)
+        if (!LeaderSelected)
         {
             Leader = state;
             LeaderSelected = true;
@@ -118,7 +121,7 @@ struct Partition
     }
 
     std::unordered_set<StateId> States;
-    bool LeaderSelected{false};
+    bool LeaderSelected{ false };
     StateId Leader{};
     const PartitionId Id;
 };
@@ -136,7 +139,6 @@ struct PartitionPool
     std::vector<Partition> Partitions;
 
     unsigned int PartitionCount{};
-
 };
 
 PartitionId PartitionPool::addPartition()
@@ -162,9 +164,9 @@ ParitionMap PartitionPool::makePartitionMap() const
 
 void DFA::minimize()
 {
-    // Using the partitioning method of DFA minimization 
+    // Using the partitioning method of DFA minimization
 
-    //STEP1: parition the original dfa
+    // STEP1: parition the original dfa
 
     PartitionPool pool;
     ParitionMap prevPartitionMap;
@@ -177,7 +179,7 @@ void DFA::minimize()
     {
         if (!state.IsFinal)
         {
-            if(!partitionNonFinal.has_value())
+            if (!partitionNonFinal.has_value())
             {
                 partitionNonFinal = pool.addPartition();
             }
@@ -185,7 +187,7 @@ void DFA::minimize()
         }
         else
         {
-            if(!partitionFinal.has_value())
+            if (!partitionFinal.has_value())
             {
                 partitionFinal = pool.addPartition();
             }
@@ -195,27 +197,29 @@ void DFA::minimize()
 
     currPartitionMap = pool.makePartitionMap();
 
-    while(currPartitionMap != prevPartitionMap)
+    while (currPartitionMap != prevPartitionMap)
     {
-        auto paritionId = PartitionId{0};
+        auto paritionId = PartitionId{ 0 };
         std::vector<StateId> movedStates{};
 
-        while(paritionId < pool.Partitions.size()) 
+        while (paritionId < pool.Partitions.size())
         {
             movedStates.clear();
 
             for (const auto state : pool.Partitions[paritionId].States)
             {
-                if(state != pool.Partitions[paritionId].Leader)
+                if (state != pool.Partitions[paritionId].Leader)
                 {
-                    if(!checkEquivalence(currPartitionMap, pool.Partitions[paritionId].Leader, state))
+                    if (!checkEquivalence(currPartitionMap,
+                                          pool.Partitions[paritionId].Leader,
+                                          state))
                     {
                         movedStates.emplace_back(state);
                     }
                 }
             }
 
-            if(!movedStates.empty())
+            if (!movedStates.empty())
             {
                 const auto newPartition = pool.addPartition();
 
@@ -233,8 +237,7 @@ void DFA::minimize()
         currPartitionMap = pool.makePartitionMap();
     }
 
-
-    //STEP2: create new DFA from partitions
+    // STEP2: create new DFA from partitions
 
     DFA newDFA(mAlphabet);
 
@@ -251,18 +254,21 @@ void DFA::minimize()
 
         const auto newState = newDFA.addState(isStart, isFinal);
 
-        for(const auto c : mAlphabet)
+        for (const auto c : mAlphabet)
         {
-            const auto targetState = currPartitionMap.at(mStates.at(partition.Leader).Transitions.at(c));
+            const auto targetState = currPartitionMap.at(
+              mStates.at(partition.Leader).Transitions.at(c));
             newDFA.addTransition(c, newState, targetState);
         }
     }
 
-    //STEP3: replace old DFA with new DFA
+    // STEP3: replace old DFA with new DFA
     *this = std::move(newDFA);
 }
 
-bool DFA::checkEquivalence(const ParitionMap& paritionMap, StateId stateA, StateId stateB) const
+bool DFA::checkEquivalence(const ParitionMap& paritionMap,
+                           StateId stateA,
+                           StateId stateB) const
 {
     auto equiv = [&](InputType c)
     {
@@ -279,4 +285,4 @@ bool DFA::checkEquivalence(const ParitionMap& paritionMap, StateId stateA, State
     return std::all_of(mAlphabet.cbegin(), mAlphabet.cend(), equiv);
 }
 
-} //namespace automata
+} // namespace automata

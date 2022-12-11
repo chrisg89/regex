@@ -3,15 +3,15 @@
 namespace regex::parser
 {
 
-template <typename Tag, typename... Args>
+template<typename Tag, typename... Args>
 bool Parser::parse(Args&... args)
 {
     const Utf8Iterator begin = mCurser;
     bool success = parse(Tag{}, args...);
 
-    if(!success)
+    if (!success)
     {
-        //backtrack
+        // backtrack
         mCurser = begin;
     }
 
