@@ -1,4 +1,14 @@
 Checks: '-*
+        , bugprone-*
+        , -bugprone-easily-swappable-parameters
+        , cert-*
+        , -cert-dcl21-cpp
+        , concurrency-*
+        , cppcoreguidelines-*
+        , -cppcoreguidelines-avoid-magic-numbers
+        , misc-*
+        , -misc-no-recursion
+        , -misc-non-private-member-variables-in-classes
         , modernize-* 
         , -modernize-use-trailing-return-type, 
         , -modernize-raw-string-literal
@@ -10,8 +20,7 @@ Checks: '-*
         , -readability-identifier-length
         , -readability-identifier-naming
         , -readability-magic-numbers
-        , -readability-named-parameter
-        '               
+        , -readability-named-parameter'               
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false

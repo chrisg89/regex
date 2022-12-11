@@ -225,7 +225,7 @@ DFA NFA::buildDFA() const
                 }
             }
 
-            StateId newDfaState;
+            StateId newDfaState{};
             if(mapper.contains(set))
             {
                 newDfaState = mapper.get(set);

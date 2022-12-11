@@ -278,7 +278,7 @@ bool Parser::parse(tags::MatchItemTag , NodePtr& node)
         return true;
     }
 
-    CodePoint cp;
+    CodePoint cp{};
     if(parse<tags::CharacterTag>(cp))
     {
         node = std::make_unique<ast::CharacterRange>(cp);
@@ -368,7 +368,7 @@ bool Parser::parse(tags::CharacterClassItemTag , CharacterGroup& group)
         return true;
     }
 
-    CodePoint cp;
+    CodePoint cp{};
     NodePtr node;
     if(parse<tags::CharacterClassCharacterTag>(cp))
     {
@@ -401,8 +401,8 @@ bool Parser::parse(tags::CharacterClassCharacterTag , CodePoint& cp)
 
 bool Parser::parse(tags::CharacterRangeTag , CharacterGroup& group)
 {
-    CodePoint start; 
-    CodePoint end; 
+    CodePoint start{}; 
+    CodePoint end{}; 
     
     if(!parse<tags::CharacterClassCharacterTag>(start))
     {
@@ -854,7 +854,7 @@ bool Parser::parse(tags::RangeSeparatorTag )
 
 inline CodePoint hex2int(CodePoint ch)
 {
-    CodePoint val;
+    CodePoint val{};
     if (ch >= '0' && ch <= '9')
     {
         val = ch - '0';
@@ -935,7 +935,7 @@ bool Parser::parse(tags::IntegerTag , uint64_t& integer, bool& overflow)
     integer = 0;
     overflow = false;
 
-    unsigned int digit; 
+    unsigned int digit{}; 
 
     if(!parse<tags::DigitTag>(digit))
     {
