@@ -1,5 +1,5 @@
 
-#pragma once 
+#pragma once
 
 #include "Automata.hpp"
 #include "DFA.hpp"
@@ -10,7 +10,7 @@
 namespace automata
 {
 
-using EpsilonClusureMap = std::map<StateId,std::vector<StateId>>;
+using EpsilonClusureMap = std::map<StateId, std::vector<StateId>>;
 
 class NFAState
 {
@@ -37,22 +37,19 @@ public:
     [[nodiscard]] DFA makeDFA() const;
 
     [[nodiscard]] std::string serialize() const;
-    
+
     void removeEpsilonTransitions();
 
 private:
-
     [[nodiscard]] EpsilonClusureMap CreateEpsilonClosureMap() const;
 
     [[nodiscard]] DFA buildDFA() const;
 
     std::vector<NFAState> mStates;
-    unsigned int mStateCount{0};
+    unsigned int mStateCount{ 0 };
     StateId mStartState{};
     std::vector<StateId> mFinalStates;
     Alphabet mAlphabet;
 };
 
-} //namespace automata
-
-
+} // namespace automata

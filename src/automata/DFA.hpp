@@ -1,5 +1,5 @@
 
-#pragma once 
+#pragma once
 
 #include "Automata.hpp"
 
@@ -12,7 +12,7 @@ namespace automata
 {
 
 using PartitionId = unsigned int;
-using ParitionMap = std::unordered_map<StateId,PartitionId>;
+using ParitionMap = std::unordered_map<StateId, PartitionId>;
 
 class DFAState
 {
@@ -24,14 +24,13 @@ public:
     const StateId Id;
     const bool IsStart;
     const bool IsFinal;
-    bool IsDead{true};
+    bool IsDead{ true };
     std::map<InputType, StateId> Transitions;
 };
 
 class DFA
 {
 public:
-
     explicit DFA(Alphabet alphabet);
 
     StateId addState(bool isStart, bool isFinal);
@@ -49,14 +48,14 @@ public:
 
 private:
     std::vector<DFAState> mStates;
-    unsigned int mStateCount{0};
+    unsigned int mStateCount{ 0 };
     StateId mStartState{};
     std::vector<StateId> mFinalStates;
     Alphabet mAlphabet;
 
-    [[nodiscard]] bool checkEquivalence(const ParitionMap& paritionMap, StateId stateA, StateId stateB) const;
+    [[nodiscard]] bool checkEquivalence(const ParitionMap& paritionMap,
+                                        StateId stateA,
+                                        StateId stateB) const;
 };
 
-} //namespace automata
-
-
+} // namespace automata

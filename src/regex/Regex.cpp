@@ -1,7 +1,7 @@
 #include <regex/Regex.hpp>
 
-#include "Alphabet.hpp"
 #include "AST.hpp"
+#include "Alphabet.hpp"
 #include "CodePoint.hpp"
 #include "DFA.hpp"
 #include "Parser.hpp"
@@ -34,20 +34,20 @@ private:
 };
 
 Regex::RegexImpl::RegexImpl(const std::string& pattern)
-: RegexImpl{Parser(pattern).parse()}
-{}
+  : RegexImpl{ Parser(pattern).parse() }
+{
+}
 
 Regex::RegexImpl::RegexImpl(const ast::AST& ast)
-: mAlphabet{ast.makeAlphabet()}
-, mDFA{ast.makeNFA(mAlphabet).makeDFA()}
-{}
+  : mAlphabet{ ast.makeAlphabet() }
+  , mDFA{ ast.makeNFA(mAlphabet).makeDFA() }
+{
+}
 
 automata::InputType Regex::RegexImpl::findInAlphabet(CodePoint input)
 {
     const auto within = [input](CodePointInterval interval)
-    { 
-        return input>= interval.first && input <= interval.second; 
-    };
+    { return input >= interval.first && input <= interval.second; };
 
     const auto begin = mAlphabet.begin();
     const auto end = mAlphabet.end();
@@ -63,16 +63,16 @@ bool Regex::RegexImpl::match(const std::string& target)
     auto state = mDFA.getStartState();
 
     // NOLINTNEXTLINE(modernize-loop-convert)
-    for( Utf8Iterator it = target.cbegin(); it != target.cend(); ++it )
+    for (Utf8Iterator it = target.cbegin(); it != target.cend(); ++it)
     {
         // lookup the codepoint in the alphabet
         auto input = findInAlphabet(*it);
 
         // advance the DFA
         state = mDFA.step(state, input);
-        
+
         // exit on a dead state
-        if(mDFA.isDeadState(state))
+        if (mDFA.isDeadState(state))
         {
             break;
         }
@@ -82,8 +82,9 @@ bool Regex::RegexImpl::match(const std::string& target)
 }
 
 Regex::Regex(const std::string& pattern)
-: impl{std::make_unique<RegexImpl>(pattern)}
-{}
+  : impl{ std::make_unique<RegexImpl>(pattern) }
+{
+}
 
 Regex::~Regex() = default;
 
@@ -92,4 +93,4 @@ bool Regex::match(const std::string& target)
     return impl->match(target);
 }
 
-} //namespace regex
+} // namespace regex
