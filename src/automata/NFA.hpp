@@ -34,21 +34,21 @@ public:
 
     void addTransition(InputType input, StateId source, StateId destination);
 
-    DFA makeDFA() const;
+    [[nodiscard]] DFA makeDFA() const;
 
-    std::string serialize() const;
+    [[nodiscard]] std::string serialize() const;
     
     void removeEpsilonTransitions();
 
 private:
 
-    EpsilonClusureMap CreateEpsilonClosureMap() const;
+    [[nodiscard]] EpsilonClusureMap CreateEpsilonClosureMap() const;
 
-    DFA buildDFA() const;
+    [[nodiscard]] DFA buildDFA() const;
 
     std::vector<NFAState> mStates;
-    unsigned int mStateCount;
-    StateId mStartState;
+    unsigned int mStateCount{0};
+    StateId mStartState{};
     std::vector<StateId> mFinalStates;
     Alphabet mAlphabet;
 };

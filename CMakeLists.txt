@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.25)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,6 +22,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   # Catch2 for unit testing
   FetchContent_Declare(
     Catch2
+    SYSTEM ON # catch2 header is added as system header (cmake 3.25)
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
     GIT_TAG v2.13.9 
   )

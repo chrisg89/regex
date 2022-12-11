@@ -10,8 +10,9 @@ Checks: '-*
         , -misc-no-recursion
         , -misc-non-private-member-variables-in-classes
         , modernize-* 
-        , -modernize-use-trailing-return-type, 
         , -modernize-raw-string-literal
+        , -modernize-return-braced-init-list
+        , -modernize-use-trailing-return-type
         , performance-*
         , portability-*
         , readability-*
@@ -22,7 +23,7 @@ Checks: '-*
         , -readability-magic-numbers
         , -readability-named-parameter'               
 WarningsAsErrors: '*'
-HeaderFilterRegex: ''
+HeaderFilterRegex: '.*'
 AnalyzeTemporaryDtors: false
 FormatStyle:     none
 User:            chris

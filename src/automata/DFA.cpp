@@ -12,7 +12,6 @@ DFAState::DFAState(StateId id, bool isStart, bool isFinal)
     : Id{id}
     , IsStart{isStart}
     , IsFinal{isFinal}
-    , IsDead{true}
 {}
 
 void DFAState::addTransition(InputType input, StateId destination)
@@ -26,9 +25,7 @@ void DFAState::addTransition(InputType input, StateId destination)
 }
 
 DFA::DFA(Alphabet alphabet)
-    : mStateCount{0}
-    , mStartState{}
-    , mAlphabet{std::move(alphabet)}
+    : mAlphabet{std::move(alphabet)}
 {}
 
 StateId DFA::addState(bool isStart, bool isFinal)

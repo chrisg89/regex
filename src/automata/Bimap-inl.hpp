@@ -6,12 +6,6 @@ namespace automata
 {
 
 template <typename Type1, typename Type2, typename Type1Hasher, typename Type2Hasher>
-Bimap<Type1, Type2, Type1Hasher, Type2Hasher>::Bimap()
-    : unordered_map1{}
-    , unordered_map2{}
-{}
-
-template <typename Type1, typename Type2, typename Type1Hasher, typename Type2Hasher>
 void Bimap<Type1, Type2, Type1Hasher, Type2Hasher>::insert(Type1 type1, Type2 type2)
 {
     // We could allow re-insertion but its not required by NFA

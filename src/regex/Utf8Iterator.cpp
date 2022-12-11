@@ -3,21 +3,14 @@
 namespace regex
 {
 
-const unsigned char kFirstBitMask = 128;
+const unsigned char kFirstBitMask  = 128;
 const unsigned char kSecondBitMask = 64;
-const unsigned char kThirdBitMask = 32;
+const unsigned char kThirdBitMask  = 32;
 const unsigned char kFourthBitMask = 16;
 
-Utf8Iterator::Utf8Iterator(std::string::const_iterator it) :
-mStringIterator(it),
-mCurrentCodePoint(0),
-mDirty(true)
-{
-}
- 
-Utf8Iterator::Utf8Iterator(const Utf8Iterator& source) = default;
- 
-Utf8Iterator& Utf8Iterator::operator=(const Utf8Iterator& rhs) = default;
+Utf8Iterator::Utf8Iterator(std::string::const_iterator it) 
+: mStringIterator(it)
+{}
 
 Utf8Iterator& Utf8Iterator::operator++()
 {

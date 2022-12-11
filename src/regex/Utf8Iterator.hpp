@@ -26,10 +26,6 @@ public:
  
     Utf8Iterator(std::string::const_iterator it);
  
-    Utf8Iterator(const Utf8Iterator& source);
- 
-    Utf8Iterator& operator=(const Utf8Iterator& rhs);
-
     Utf8Iterator& operator++();
     Utf8Iterator operator++(int);
     Utf8Iterator& operator--();
@@ -48,8 +44,8 @@ public:
 private:
  
     std::string::const_iterator mStringIterator;
-    mutable CodePoint mCurrentCodePoint;
-    mutable bool mDirty;
+    mutable CodePoint mCurrentCodePoint{};
+    mutable bool mDirty{true};
  
     void CalculateCurrentCodePoint() const;
 };

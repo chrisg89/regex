@@ -35,9 +35,7 @@ void NFAState::addTransition(InputType input, StateId destination)
 }
 
 NFA::NFA(Alphabet alphabet)
-    : mStateCount{0}
-    , mStartState{}
-    , mAlphabet{std::move(alphabet)}
+    : mAlphabet{std::move(alphabet)}
 {}
 
 StateId NFA::addState(bool isStart, bool isFinal)
