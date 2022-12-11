@@ -12,21 +12,11 @@ env:
 
 jobs:
   build-using-gnu:
-    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
-    # You can convert this to a matrix build if you need cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
-
-    # Valgrind must be installed before cmake configuration step
-    - name: Install Valgrind
-      run: |
-          sudo apt-get update
-          sudo apt install -y valgrind
-          valgrind --version
-          which valgrind
 
     - name: Configure CMake
       run: cmake --preset CI-g++
@@ -37,13 +27,8 @@ jobs:
     - name: Test
       run: ctest --test-dir ${{github.workspace}}/build/g++/
 
-    - name: Test with Valgrind
-      run: ctest -T memcheck --test-dir ${{github.workspace}}/build/g++/ --output-on-failure -VV
-
   build-using-clang:
-    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
-    # You can convert this to a matrix build if you need cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+
     runs-on: ubuntu-latest
 
     steps:
@@ -57,4 +42,39 @@ jobs:
 
     - name: Test
       run: ctest --test-dir ${{github.workspace}}/build/clang++/
+
+  dynamic-analysis-using-valgrind:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    # Valgrind must be installed before cmake configuration step
+    - name: Install Valgrind
+      run: |
+          sudo apt-get update
+          sudo apt install -y valgrind
+
+    - name: Configure CMake
+      run: cmake --preset CI-g++
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build/g++ -v -j $(nproc)
+
+    - name: Test with Valgrind
+      run: ctest -T memcheck --test-dir ${{github.workspace}}/build/g++/ --output-on-failure -VV
+
+  static-analysis-using-clang-tidy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure CMake
+      run: cmake --preset CI-clang-tidy
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build/clang-tidy -v -j $(nproc)
 
