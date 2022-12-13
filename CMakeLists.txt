@@ -53,3 +53,55 @@ endif()
 add_subdirectory(src)
 
 
+##############################################
+# Installation instructions
+
+include(GNUInstallDirs)
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/Regex)
+
+install(
+    DIRECTORY include/ 
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(
+    TARGETS regex_lib
+    EXPORT regex-targets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(
+    EXPORT regex-targets
+    FILE RegexTargets.cmake
+    NAMESPACE Regex::
+    DESTINATION ${INSTALL_CONFIGDIR}
+)
+
+include(CMakePackageConfigHelpers)
+
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/RegexConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_LIST_DIR}/cmake/RegexConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/RegexConfig.cmake
+    INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/RegexConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/RegexConfigVersion.cmake
+    DESTINATION ${INSTALL_CONFIGDIR}
+)
+
+##############################################
+## Exporting from the build tree
+
+export(
+    EXPORT regex-targets
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/RegexTargets.cmake
+    NAMESPACE Regex::
+)

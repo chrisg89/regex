@@ -16,3 +16,6 @@ target_include_directories(regex_lib
         ./automata
         ./regex
     )
+
+#This is required so that the exported target has the name Regex
+set_target_properties(regex_lib PROPERTIES EXPORT_NAME Regex)
