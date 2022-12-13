@@ -67,7 +67,7 @@ std::string DFA::serialize() const
         out += (state.IsDead ? "true" : "false");
         out += "\n";
 
-        for (auto const& [input, destination] : state.Transitions)
+        for (const auto& [input, destination] : state.Transitions)
         {
             out += std::to_string(state.Id);
             out += " -> ";

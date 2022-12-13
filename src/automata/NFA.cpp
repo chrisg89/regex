@@ -79,7 +79,7 @@ std::string NFA::serialize() const
         out += (state.IsFinal ? "true" : "false");
         out += "\n";
 
-        for (auto const& [input, destinations] : state.Transitions)
+        for (const auto& [input, destinations] : state.Transitions)
         {
             for (const auto destination : destinations)
             {
