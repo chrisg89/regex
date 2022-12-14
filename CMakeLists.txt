@@ -47,11 +47,29 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     else()
         message(STATUS "Doxygen not found, not building docs")
     endif()
+
+    if(ENABLE_COVERAGE)
+
+        # find required tools
+        find_program(LCOV lcov REQUIRED)
+        find_program(GENHTML genhtml REQUIRED)
+    
+        # add coverage target
+        # only contents of the '/src' directory will be included in the coverage report
+        add_custom_target(
+        coverage
+        COMMAND ${LCOV} --capture --no-external --directory ${CMAKE_BINARY_DIR}/src --base-directory ${PROJECT_SOURCE_DIR}/src --output-file coverage.info
+        COMMAND ${GENHTML} --demangle-cpp -o coverage coverage.info
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+    endif()
+
+
 endif()
 
 # The compiled library code is here
 add_subdirectory(src)
-
 
 ##############################################
 # Installation instructions
