@@ -59,3 +59,20 @@ jobs:
       run: cmake --preset CI-clang-tidy
     - name: Build
       run: cmake --build ${{github.workspace}}/build/clang-tidy -v -j $(nproc)
+
+  code-coverage:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install lcov
+      run: |
+          sudo apt-get update
+          sudo apt install -y lcov
+    - uses: actions/checkout@v3
+    - name: Configure CMake
+      run: cmake --preset CI-code-coverage
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build/code-coverage -v -j $(nproc)
+    - name: Test
+      run: ctest --test-dir ${{github.workspace}}/build/code-coverage
+    - name: Generate coverage analysis
+      run: cmake --build ${{github.workspace}}/build/code-coverage --target coverage
