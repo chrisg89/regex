@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.14)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -12,6 +12,9 @@ project(
 
 # Only do these if this is the main project, and not if it is included through add_subdirectory
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+
+    # Bump min version to 3.25 for FetchContent_Declare
+    cmake_minimum_required(VERSION 3.25)
 
     set(CMAKE_CXX_EXTENSIONS OFF)
 
