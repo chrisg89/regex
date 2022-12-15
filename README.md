@@ -1,7 +1,7 @@
 # regex
 
 [![Coverage Status](https://coveralls.io/repos/github/chrisg89/regex/badge.svg?branch=main)](https://coveralls.io/github/chrisg89/regex?branch=main)
-
+![CI](https://github.com//chrisg89/regex/actions/workflows/CI.yml/badge.svg)
 # regex
 
 [Regular Expression Engine Comparison Chart](https://gist.github.com/CMCDragonkai/6c933f4a7d713ef712145c5eb94a1816) of all mainstream regular expression engines
