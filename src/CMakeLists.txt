@@ -17,5 +17,9 @@ target_include_directories(regex_lib
         ./regex
     )
 
+# For consistent use across find_package() and fetch_content()
+# https://www.youtube.com/watch?v=bsXLMQ6WgIk&t=3126s
+add_library(Regex::Regex ALIAS regex_lib)
+
 #This is required so that the exported target has the name Regex
 set_target_properties(regex_lib PROPERTIES EXPORT_NAME Regex)
