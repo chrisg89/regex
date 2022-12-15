@@ -39,6 +39,19 @@
           "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Werror",
           "CMAKE_CXX_CLANG_TIDY": "clang-tidy"
         }
+      },
+      {
+        "name": "CI-code-coverage",
+        "displayName": "CI",
+        "description": "Preset for CI code coverage reporting",
+        "generator": "Unix Makefiles",
+        "binaryDir": "./build/code-coverage",
+        "cacheVariables": {
+          "CMAKE_CXX_COMPILER": "g++-11",
+          "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Werror -O0 -fprofile-arcs -ftest-coverage",
+          "ENABLE_COVERAGE": "true",
+          "CMAKE_BUILD_TYPE":"Debug"
+        }
       }
     ]
   }
