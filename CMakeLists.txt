@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(
     Regex
     VERSION 0.1
-    DESCRIPTION "Regex library based on DFA"
+    DESCRIPTION "A c++ regex library based on DFA"
     LANGUAGES CXX
 )
 
