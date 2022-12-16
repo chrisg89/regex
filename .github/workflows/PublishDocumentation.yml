@@ -1,0 +1,29 @@
+name: Doxygen GitHub Pages Deploy Action
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Doxygen
+        run: sudo apt-get install doxygen graphviz -y
+      - name: Configure CMake
+        run: cmake --preset CI-g++
+      - name: Generate Doxygen Documentation
+        run: cmake --build ${{github.workspace}}/build/g++ --target=docs
+      - name: Create .nojekyll (ensures pages with underscores work on gh pages)
+        run: touch ${{github.workspace}}/build/g++/docs/html/.nojekyll
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: "gh-pages"
+          folder: ${{github.workspace}}/build/g++/docs/html
+
