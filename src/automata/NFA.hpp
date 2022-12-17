@@ -36,8 +36,6 @@ public:
 
     [[nodiscard]] DFA makeDFA() const;
 
-    [[nodiscard]] std::string serialize() const;
-
     void removeEpsilonTransitions();
 
 private:

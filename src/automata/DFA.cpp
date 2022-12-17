@@ -52,35 +52,6 @@ void DFA::addTransition(InputType input, StateId source, StateId destination)
     mStates.at(source).addTransition(input, destination);
 }
 
-std::string DFA::serialize() const
-{
-    std::string out;
-
-    for (const auto& state : mStates)
-    {
-        out += std::to_string(state.Id);
-        out += " : Start =";
-        out += (state.IsStart ? "true" : "false");
-        out += " , Final = ";
-        out += (state.IsFinal ? "true" : "false");
-        out += " , Dead = ";
-        out += (state.IsDead ? "true" : "false");
-        out += "\n";
-
-        for (const auto& [input, destination] : state.Transitions)
-        {
-            out += std::to_string(state.Id);
-            out += " -> ";
-            out += std::to_string(destination);
-            out += " : ";
-            out += std::to_string(input);
-            out += "\n";
-        }
-    }
-
-    return out;
-}
-
 StateId DFA::getStartState() const
 {
     return mStartState;

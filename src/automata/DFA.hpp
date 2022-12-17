@@ -37,8 +37,6 @@ public:
 
     void addTransition(InputType input, StateId source, StateId destination);
 
-    [[nodiscard]] std::string serialize() const;
-
     [[nodiscard]] StateId step(StateId current, InputType input) const;
     [[nodiscard]] StateId getStartState() const;
     [[nodiscard]] bool isDeadState(StateId current) const;

@@ -66,37 +66,6 @@ void NFA::addTransition(InputType input, StateId source, StateId destination)
     mStates.at(source).addTransition(input, destination);
 }
 
-std::string NFA::serialize() const
-{
-    std::string out;
-
-    for (const auto& state : mStates)
-    {
-        out += std::to_string(state.Id);
-        out += " : Start = ";
-        out += (state.IsStart ? "true" : "false");
-        out += " | Final = ";
-        out += (state.IsFinal ? "true" : "false");
-        out += "\n";
-
-        for (const auto& [input, destinations] : state.Transitions)
-        {
-            for (const auto destination : destinations)
-            {
-                out += std::to_string(state.Id);
-                out += " -> ";
-                out += std::to_string(destination);
-                out += " : ";
-                out += (input == kEpsilon ? std::string{ "null" }
-                                          : std::to_string(input));
-                out += "\n";
-            }
-        }
-    }
-
-    return out;
-}
-
 DFA NFA::makeDFA() const
 {
     // Convert the NFA to a DFA
