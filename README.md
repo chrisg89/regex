@@ -2,7 +2,77 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/chrisg89/regex/badge.svg?branch=main)](https://coveralls.io/github/chrisg89/regex?branch=main)
 ![CI](https://github.com//chrisg89/regex/actions/workflows/CI.yml/badge.svg)
-# regex
+
+
+## Motivation
+
+Why another regex implementation?   
+While anyone is welcome to use this library, I doubt that it will be of any practical use. Most programming languages come with a native regex implementation (e.g. std::regex in c++). Furthermore, many standalone implementations exist with more functionality and better performance than this library. I created this library first and foremost as a [learning exercise](https://github.com/chrisg89/regex/blob/main/README.md).
+
+## About
+This library differentiates itself from other modern regular expression engines by being entirely implemented as a Deterministic Finite Automata (for better or worse). Engines driven by an underlying backtracking NFA tend to be faster because their construction is relatively cheap. However, this does come at a cost. Backtracking can lead to [Catastrophic Backtracking](https://www.regular-expressions.info/catastrophic.html). Furthermore, NFAs are, in principle, less deterministic in their behavior than DFAs. A DFA-based implementation has a high upfront construction time, but can match inputs in linear time.
+
+## Installation and CMake integration
+
+Please check [here](https://github.com/chrisg89/regex/blob/main/docs/install.md) for installation and CMake integration instructions.
+
+## Usage
+
+Find online Doxygen documentation [here](https://chrisg89.github.io/regex/).
+
+Example code snippet:
+```
+#include <iostream>
+#include <regex/Regex.hpp>
+#include <string>
+
+int main()
+{
+    auto regex = regex::Regex("col[ou]r");
+    std::cout << std::boolalpha << regex.match("color") << std::endl;
+    return 0;
+}
+```
+
+Example code snippet with non-ASCII character code points:
+```
+#include <iostream>
+#include <regex/Regex.hpp>
+#include <string>
+
+int main()
+{
+    auto regex = regex::Regex("[AÅÃ]");
+    std::cout << std::boolalpha << regex.match("A") << std::endl;
+    std::cout << std::boolalpha << regex.match("Å") << std::endl;
+    std::cout << std::boolalpha << regex.match("Ã") << std::endl;
+    return 0;
+}
+```
+
+Exceptions are thrown on illegal usage (e.g. usage of unsupported regex features):
+```
+#include <iostream>
+#include <regex/Regex.hpp>
+#include <string>
+
+int main()
+{
+    /* Anchors are not supported*/
+    auto regex = regex::Regex("^Hello World!$");
+    return 0;
+}
+```
+
+throws exception:
+```
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  Error at position 1. Message: Anchors are not supported 
+```
+
+Take a look at the [unit tests](https://github.com/chrisg89/regex/blob/update-documentation/tests/RegexMatch_tests.cpp) for more examples.
+
+## Supported Regex Features
 
 [Regular Expression Engine Comparison Chart](https://gist.github.com/CMCDragonkai/6c933f4a7d713ef712145c5eb94a1816) of all mainstream regular expression engines
 
@@ -28,7 +98,7 @@
     <tr>
         <td>\x00 through \xFF (ASCII character)</td>
         <td>NO</td>
-        <td></td>
+        <td>See <br> \u0000-\uFFFF <br> \u00000000-\u0010FFFF </td>
     </tr>
     <tr>
         <td>\n (LF)</td>
@@ -57,7 +127,7 @@
     </tr>
     <tr>
         <td>\a (bell)</td>
-        <td>NO</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
@@ -100,27 +170,32 @@
     </tr>
     <tr>
         <td>[abc] character class</td>
-        <td>NO</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
         <td>[^abc] negated character class</td>
-        <td>NO</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
         <td>Hyphen in [\d-z] is a literal</td>
-        <td>NO</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
         <td>Hyphen in [a-\d] is a literal</td>
-        <td>NO</td>
+        <td>YES</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Hyphen in [\w-\d] is a literal</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
         <td>Backslash escapes one character class metacharacter</td>
-        <td>NO</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
@@ -131,32 +206,32 @@
     <tr>
         <td>\d shorthand for digits</td>
         <td>YES</td>
-        <td></td>
+        <td>Equivalent to [0-9]</td>
     </tr>
     <tr>
         <td>\D (negation of \d)</td>
         <td>YES</td>
-        <td></td>
+        <td>Equivalent to [^0-9]</td>
     </tr>
     <tr>
         <td>\w shorthand for word characters</td>
         <td> YES</td>
-        <td></td>
+        <td>Equivalent to [a-zA-Z0-9_]</td>
     </tr>
     <tr>
         <td>\W (negation of \w)</td>
         <td>YES</td>
-        <td></td>
+        <td>Equivalent to [^a-zA-Z0-9_]</td>
     </tr>
     <tr>
         <td>\s shorthand for whitespace</td>
         <td>YES</td>
-        <td></td>
+        <td>Equivalent to [ \t\r\n\f]</td>
     </tr>
     <tr>
         <td>\S (negation of \s)</td>
         <td>YES</td>
-        <td></td>
+        <td>Equivalent to [^ \t\r\n\f]</td>
     </tr>
     <tr>
         <td>[\b] backspace</td>
@@ -174,7 +249,7 @@
     <tr>
         <td> . (dot) </td>
         <td>YES</td>
-        <td></td>
+        <td>Excludes new-line (\n)</td>
     </tr>
     <tr>
         <th colspan="3"><a href="http://www.regular-expressions.info/anchors.html">Anchors</a></th>
@@ -277,7 +352,7 @@
     </tr>
     <tr>
         <td> | (alternation)</td>
-        <td>NO</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
@@ -285,32 +360,32 @@
     </tr>
     <tr>
         <td> ? (0 or 1)</td>
-        <td>NO</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
         <td> * (0 or more)</td>
-        <td>NO</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
         <td> + (1 or more)</td>
-        <td>NO</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
         <td> {n} (exactly n)</td>
-        <td>NO</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
         <td> {n,m} (between n and m)</td>
-        <td>NO</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
         <td> {n,} (n or more)</td>
-        <td>NO</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
@@ -329,7 +404,12 @@
     <tr>
         <td> (regex) (numbered capturing group)</td>
         <td>NO</td>
-        <td></td>
+        <td>Used for non-capturing groups instead (see below)</td>
+    </tr>
+    <tr>
+        <td> (regex) (non-capturing group)</td>
+        <td>YES</td>
+        <td> This library uses this syntax for non-capturing groups <br> In contrast, most other implementations use it for capturing groups!</td>
     </tr>
     <tr>
         <td> (?:regex) (non-capturing group)</td>
@@ -538,8 +618,13 @@
         <td></td>
     </tr>
     <tr>
-        <td> \u0000 through \uFFFF (Unicode character)</td>
-        <td>NO</td>
+        <td> \u0000 through \uFFFF (4 digit Unicode character)</td>
+        <td>YES</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td> \U00000000 through \u0010FFFF (8 digit Unicode character)</td>
+        <td>YES</td>
         <td></td>
     </tr>
     <tr>
@@ -631,7 +716,8 @@
         <td></td>
     </tr>
     <tr>
-        <td> Spaces, hyphens and underscores allowed in all long names listed above (e.g. BasicLatin can be written as Basic-Latin or Basic_Latin or Basic Latin)</td>
+        <td> Spaces, hyphens and underscores allowed in all long names listed above  <br>
+         (e.g. BasicLatin can be written as Basic-Latin or Basic_Latin or Basic Latin)</td>
         <td>NO</td>
         <td></td>
     </tr>
@@ -740,3 +826,16 @@
         <td></td>
     </tr>
 </table>
+
+## Quality
+
+This repository employs the following practices to achieve a reasonable level of quality:
+* Modern CMake to build, test, and install the library.
+* Continuous integration that:
+    * builds on GNU g++
+    * builds on clang++
+    * runs unit tests 
+    * runs static code analysis (clang-tidy)
+    * runs dynamic code analysis (Valgrind)
+    * analyzes unit test code coverage
+    * builds with many compiler warnings enabled
