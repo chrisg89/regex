@@ -7,7 +7,7 @@
 ## Motivation
 
 Why another regex implementation?   
-While anyone is welcome to use this library, I doubt that it will be of any practical use. Most programming languages come with a native regex implementation (e.g. std::regex in c++). Furthermore, many standalone implementations exist with more functionality and better performance than this library. I created this library first and foremost as a [learning exercise](https://github.com/chrisg89/regex/blob/main/README.md).
+While anyone is welcome to use this library, I doubt that it will be of any practical use. Most programming languages come with a native regex implementation (e.g. std::regex in c++). Furthermore, many standalone implementations exist with more functionality and better performance than this library. I created this library first and foremost as a [learning exercise](https://github.com/chrisg89/regex/blob/main/docs/learning.md).
 
 ## About
 This library differentiates itself from other modern regular expression engines by being entirely implemented as a Deterministic Finite Automata (for better or worse). Engines driven by an underlying backtracking NFA tend to be faster because their construction is relatively cheap. However, this does come at a cost. Backtracking can lead to [Catastrophic Backtracking](https://www.regular-expressions.info/catastrophic.html). Furthermore, NFAs are, in principle, less deterministic in their behavior than DFAs. A DFA-based implementation has a high upfront construction time, but can match inputs in linear time.
@@ -70,7 +70,7 @@ terminate called after throwing an instance of 'std::runtime_error'
   what():  Error at position 1. Message: Anchors are not supported 
 ```
 
-Take a look at the [unit tests](https://github.com/chrisg89/regex/blob/update-documentation/tests/RegexMatch_tests.cpp) for more examples.
+Take a look at the [unit tests](https://github.com/chrisg89/regex/blob/main/tests/RegexMatch_tests.cpp) for more examples.
 
 ## Supported Regex Features
 
