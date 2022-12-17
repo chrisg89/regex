@@ -32,7 +32,7 @@ $ -- Installing: /usr/local/lib/cmake/Regex/RegexConfigVersion.cmake
 Note: This method requires the library to be installed.
 
 ```
-  find_package(Regex 0.1 REQUIRED)
+  find_package(Regex 1.0.0 REQUIRED)
   add_executable(fooExe foo.cpp)
   target_link_libraries(fooExe PRIVATE Regex::Regex)
 ```
@@ -47,7 +47,7 @@ Include(FetchContent)
 FetchContent_Declare(
   Regex
   GIT_REPOSITORY https://github.com/chrisg89/regex.git
-  GIT_TAG        v0.0.1 # check github for latest tag or commit sha
+  GIT_TAG        v1.0.0 # check github for latest tag or commit sha
 )
 
 FetchContent_MakeAvailable(Regex)
